@@ -1,0 +1,27 @@
+# Credenciais — NUNCA subir pro Git
+.env
+*credentials*.json
+*service_account*.json
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+
+# Outputs temporários
+*.csv
+!pipelines/jogos.csv
+*.xlsx
+outputs/
+
+# Logs
+pipelines/logs/
+
+# Memory (local do Claude Code)
+memory/
+
+# IDE
+.vscode/
+*.code-workspace
