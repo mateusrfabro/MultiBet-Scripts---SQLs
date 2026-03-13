@@ -1,0 +1,83 @@
+ANOTAÇÕES REUNIÃO TIME DE DADOS COM RAFAEL GONZAGA (ÚNICO ANALISTA E RESPONSÁVEL POR DADOS/BI DA MULTIBET) 26/02:
+
+1. primeiro momento - Cactus no lugar da Pragmatic.
+
+2. segundo momento pós migração - Pragmatic.
+
+3. a migração foi da Cactus para Pragmatic em outubro 28/10/2025 - oficialmente a partir de 01/11/2025.
+
+4. os números da primeira e segunda semana de novembro estão abaixo pois tivemos "casualidades" segundo o analista Rafael Gonzaga (responsável pelo BI e pela área de dados até o momento, antes da gente entrar).
+
+5. problemas da migração - KYC, login, problemas de CRM, problemas de usuários que foi pra base nova da Pragmatic e não conseguiam fazer login após migração. basicamente ele disse que o time de TI que cuida principalmente disso.
+
+6. acesso ao redshift foi no final de dezembro, demorou uns dias ele disse para ter acesso.
+
+7. para ter acessos ao redshift (é por pessoa) deve ser solicitado ao time da Pragmatic
+
+8. pessoal da Pragmatic quem gerencia os acessos, passar para o James e Gabriel Robson.
+
+9. podemos solicitar acesso a API, estrutura de dados, tudo pela Pragmatic via ticket. provavelmente podemos solicitar webhook também.
+
+10. Rafael disse que tem acesso e não usa, o time de TI que utiliza as APIs para enviar requisição de alteração de usuário, etc. processos pro SIGAP.
+
+11. a única API que ele usa é a mesma do BackOffice da Pragmatic. para trazer informações de relatórios específicos. Segundo ele: Temos sim APIs com a Pragmatic mas não é o melhor cara para explicar isso. Pelo que entendemos são APIs de BackOffice mesmo para subir bônus ou enviar informações de clientes, usuários.
+
+12. nosso DW (DataWarehouse) da Pragmatic (Redshift) pelo que entendemos atualiza a cada 15 minutos.
+
+13. relatório diário via API, com informações de Depósitos, Saques, etc. Via Airflow. Algo parecido com uma matriz financeira, via BOT/Automação.
+
+14. tudo sobre API, ou ter alinhamento com Gabriel ou com James.
+
+15. ele roda um banco de dados em MYSQL, que tá por fora do Redshift.
+
+16. o MYSQL está hospedado numa VPS (servidor próprio na nuvem) como serviço do MYSQL.
+
+17. banco MYSQL: estrutura: banco bomultibet - criado para uma pessoa específica, segundo o Rafael ele não sabe o que tem ali e não usa, não sabe descrever. o banco multibet: foi o primeiro banco de dados que tiveram, quando o setor de dados era mato, segundo ele, banco enxuto com informações apenas de depósito, saque e registro de usuário, banco obsoleto, parou de ser usado. montou o banco multibet_DWH (um DW com informações que vieram da cactos (modelo schema, dimensão e fato)), também não é utilizado esse banco, obsoleto. banco pragmatic_dwh é o banco que atuamos hoje e segundo ele ainda ESTÁ SENDO CONSTRUÍDO no MYSQL. algumas informações que utilizam no POWER BI, vemd o MYSQL, desse banco pragmatic_dwh, segundo ele o banco também é bem enxuto e começou a ser construído recentemente, tem apenas o que é utilizado nos dashboards, que são poucos.
+Esse último banco pragmatic_dwh, são informações replicadas, modeladas e dimensionadas, informações/tabelas de usuários, afiliados, KYC, atividade diária, depósito, saldo de carteira diário, para validação, saques, rotina com SIGAP, resultados de VIP e 2 tabelas auxiliares. Segundo ele um cenário bem enxuto no momento, pelo fato disso ter começado a ser feito a pouco tempo.
+
+18. No POWER BI ele faz a incrementação das bases diferentes para conseguir entregar os relatórios históricos, visto que tínhamos um banco antes, depois trabalhamos com outro e por último estamos trabalhando com o banco pragmatic_dwh.
+
+19. o MYSQL para entrar nele não tem VPN, trabalha com WhiteList.
+
+20. o que tem de dados ali foi construído nos últimos 2/3 meses, segundo ele.
+
+21. na época da Cactus tinham 36 dashboards operacionais e agora temos 3. uma diferença gritante.
+
+22. na tabela F_Depositos temos apenas informações apenas a partir de 01/2026 pelo que o Rafael disse, precisamos validar após conectar no DBeaver.
+
+23. base Multi bet - pré legalização (bomultibet) pós legalização (multibet, 2 banco). 
+
+24. tabela F_Player_Activy_Daily, basicamente informações resumidas por usuário e dia. replicação de uma das tabelas da Pragmatic.
+
+25. tudo isso hospedado com os kubernetes para trazer isso no MYSQL, o SLA, tempo de tráfego para trazer uma tabela é de 25 minutos (15 min da pragmatic no redshift e mais 10 min para rodar e ele puxar no mysql, talvez mais 1 minuto de incrementar para rodar). temos gap aonde temos tabelas da Pragmatic que temos informação de ontem, na base da Pragmatic não foi atualizado. mais de 12h sem atualizar. ele rodou o ETL e não achou nada hoje por exemplo, só roda incrementar e só se teve atualização. a lógica é pegar o último update do banco MYSQL. mudar isso para rodar num CDC ou Kafka para rodar isso para gente por eventos (essa última sugestão é do nosso head), manter os logs e ver como está o desempenho da base da Pragmatic. por enquanto segundo o Rafael é só a consulta, sem pegar por evento, escolheu o caminho mais rápido para já ter a informação.
+
+26. servidor Coolify - mysql rodando um Docker - é o jeito que o Rafael montou para atualizar as tabelas MYSQL, puxando do Redshift da Pragmatic.
+
+27. segundo o Rafael a fonte principal para consulta e análise é o RedShift, já tinha esse entendimento.
+
+28. temos uma base/banco da própria Pragmatic, segmentada em 16 schemas (diferente do MYSQL que o Rafael trabalha). o que ele utiliza com maior frequência: bireports, cashier (matriz financeira), ps_bi (relatórios internos da Pragmatic), risk (para matriz de risco). Esse banco da Pragmatic EU MATEUS entendo que é o melhor caminho para trabalharmos, esquece MYSQL. 
+
+29. não temos uma tabela específica de saldo de carteira dos usuários (wallet), temos informação de saldo de carteira na abertura do dia e fechamento do dia (não serve para wallet pois o gap é muito grande de horário, no schema bireports).
+
+30. c_external_id funcionava para Cactus, sportsbook, Smartico (CRM e afilhados) usam isso. c_ecr_id é a chave primária do usuário INTERNA da PRAGMATIC, qualquer associação externa da Pragmatic temos que fazer pelo external_id. bom levar isso em consideração para todas análises.
+
+31. jogadores que tinham saldo em carteira ou começado o KYC foram os jogadores que foram enviados e mantidos na base após migração. sempre com código de afiliado que foram associados. 
+
+32. regras de clientes VIP, etc. vamos tirar essas duvidas agora. eu mudaria as regras pois uma delas é avaliar nos últimos 28 dias, mudaria para os últimos 30 dias de range. ele avalia NGR para falar quem é VIP ou não, não vejo como algo bacana para ser avaliado, prefiro depósito (vale discutir a estratégia).
+
+33. o James Head do time de TI - solicitou a pragmatic o acesso ao endpoint das aprovações de saques. hoje no BackOffice conseguimos por regras para o saque automático, esse critério poderia ser melhor definido segundo o James. e isso precisamos fazer esses critérios para aprovar o saque automático, se não passar por esses critérios passa pela aprovação manual. essa é a ideia dele, com esse acesso vai nos chamar para bater um papo e definirmos isso juntos. como se fosse uma Matriz de Fraudadores/Abusers.
+
+34. apenas o Rafael Gonzaga utiliza o MYSQL, falou que não precisa se prender a ele. eu prefiro usar o banco da própria Pragmatic e consumir os Schemas.
+
+35. informações da Infra segundo o James: já temos algo na AWS e o que for preciso contratar nós conseguimos contratar.
+
+37. Rafael vai passar as informações dos ETLs e eu vou mandar em sequência: ele tem um container que roda um python e que faz a carga no banco via PANDAS majoritariamente; estrutura: redshift; pandas; sql; request; python. tem vários ETLs em python no GitHub, agendados via KROM dentro do Container. configurações de LOG do ETL ta jogando para arquivo, precisamos jogar para banco posteriormente (acredito); vai na origem MYSQL, consulta data máxima de depósito, utilizando PANDAS, volta no Redshift e traz as informações de depósitos que vieram após a data básica e fazem um incremental, posteriormente grava no MYSQL dentro da tabela de depósito, padrão o que faz, faz upsert e joga na STG pois tem alteração de status de depósito (pode ser pendente, ativo) por isso faz um retroativo para esse caso específico. o processo geral segundo ele é: temos nosso repositório no GitHub, tem o data_etl dentro do Git e os Jobs, qualquer alteração que fizer o push no GIT atualiza automaticamente no Coolify (ferramenta para gestão de Containers, já conectado na conta do Git vai webhook), após isso já joga os arquivos para dentro do Coolify aonde faz o agendamento das rotinas, ou seja, como ele ta dentro de um container de Python ele executa o arquivo: "python Jobs/etl_redshift_mysql.py" seria isso que ele roda para fazer updates no banco e fazer inserções. tudo isso entendemos que podemos mudar a Infra ou a maneira, ou reavaliar pelo menos segundo nosso Head Caio. segundo ele por isso saímos do Airflow para fazer isso.
+
+
+38. o Rafael ele só acessa o redshift via JBDC pelo Dbeaver (não mostrou o redshift web para nós), não pode verificar configurações e mapeamento (o usuário é apenas para leitura).
+
+39. sobre os 36 BIs, estamos em dúvida se temos os dados necessários para os mesmos BIs e se todos são necessários e essenciais para operação, visto que antes tínhamos 36 e hoje temos 3. Segundo o Rafael temos todos os dados/informações necessárias para entregar e refazer esses BIs, visto que hoje temos até mais informações que antes. Então conseguimos refazer todos os BIs (pelo menos 90%); não eram todos essenciais segundo o Rafael (tinha dashboard para um afiliado específico ou algo do tipo); segundo ele entre 8-10 eram BIs essenciais e os demais eram pontuais ou específicos.
+
+40. questionamos sobre aplicações etc que o Rafael pode usar, segundo ele após a virada/migração para Pragmatic ele disse "vamos dar um passo para trás para recomeçar a fazer as coisas e estruturar do zero"; tirando o Coolify que ele (o TI gerencia), na mão dele fica apenas os ETLs, então pelo que entendemos ele usa apenas o Coolify como aplicação; a única coisa é que o disparo para dentro do Slack é feito via Script (é um arquivo python que roda dentro do Coolify dentro do processo de ETL) e no final ele faz o envio para o Slack ao invés de gravar no banco e gerar o report via BOT.
+
+essas são todas anotações que fiz, entendo que devemos resumir e discutir com o time de dados. Posteriormente fazer e atuar no nosso papel de analisar, entregar o que é necessário (nossos dashboards padrão) e atender as demandas que já existem para o Time de Dados. Pelo que vimos já temos várias demandas inclusive com o Rafael, ainda vamos discutir como vão ser feitas porém eu sou analytics, eu construo dashboard, levanto informações para as áreas e stakeholders da empresa, etc.
