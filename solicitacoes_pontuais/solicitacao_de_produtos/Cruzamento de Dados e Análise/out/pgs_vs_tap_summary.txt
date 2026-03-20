@@ -1,0 +1,6 @@
+PGS rows (loaded cols): 1070781
+PGS distinct ext_id: 1070781
+TAP distinct user_ext_id: 3762529
+Intersection (PGS ext_id in TAP): 1068556
+PGS not in TAP (by ext_id): 2225
+Output: pgs_not_in_tap_by_ext_id.csv

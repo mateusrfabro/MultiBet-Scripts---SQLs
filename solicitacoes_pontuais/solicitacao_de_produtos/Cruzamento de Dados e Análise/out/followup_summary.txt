@@ -1,0 +1,37 @@
+============================================================
+FOLLOW-UP — Análises adicionais (ATUALIZADO Redshift 10/03/2026)
+============================================================
+
+1) DISTRIBUIÇÃO DE ACCOUNT_CATEGORY (Redshift — 10/03/2026)
+----------------------------------------
+  real_user                688,169  (63.49%)
+  play_user                303,822  (28.03%)
+  closed                    41,214  (3.80%)
+  suspended                 37,467  (3.46%)
+  rg_closed                  9,595  (0.89%)
+  rg_cool_off                2,007  (0.19%)
+  fraud                      1,616  (0.15%)
+
+2) DOUBLE CHECK — PGS x TAP (Redshift 10/03 vs TAP local)
+----------------------------------------
+  Total de jogadores PGS (Redshift):        1,083,890
+  Total de jogadores TAP (arquivo):         3,762,529
+  PGS encontrados na TAP:                   1,068,556
+  PGS NÃO encontrados na TAP:                  15,334
+
+3) CRUZAMENTO: ACCOUNT_CATEGORY x PRESENÇA NA TAP
+----------------------------------------
+na_tap             Não     Sim   Total
+account_category                      
+real_user         5748  682421  688169
+play_user         6330  297492  303822
+closed            2938   38276   41214
+suspended           66   37401   37467
+rg_closed          168    9427    9595
+rg_cool_off         82    1925    2007
+fraud                2    1614    1616
+
+NOTA: Dados PGS extraídos do Redshift em 10/03/2026.
+Dados TAP extraídos dos arquivos locais (base_restante + lista_email).
+
+============================================================

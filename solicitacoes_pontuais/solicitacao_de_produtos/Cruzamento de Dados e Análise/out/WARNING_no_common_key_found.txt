@@ -1,0 +1,2 @@
+Não encontrei chave comum entre PGS e TAP automaticamente.
+Abra pgs_full.csv e tap_unified_union.csv e escolha uma coluna comum (ext_id/ecr_id/email).

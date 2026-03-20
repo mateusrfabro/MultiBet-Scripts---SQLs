@@ -1,0 +1,6 @@
+PGS files: 5 | PGS rows: 1070781
+TAP A rows: 2713954 | TAP B rows: 1048575
+TAP key used (A/B): user_ext_id
+TAP key overlap (A∩B): 0
+TAP column similarity (Jaccard): 1.000
+TAP overlap ratio vs min(distinct keys): 0.000

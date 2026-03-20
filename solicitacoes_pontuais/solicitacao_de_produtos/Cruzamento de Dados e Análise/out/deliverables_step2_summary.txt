@@ -1,0 +1,4 @@
+PGS rows (loaded cols only): 1070781
+TAP distinct user_ext_id: 0
+TAP distinct e_mail: 0
+Status cols used: rg_cool_off_status, is_rg_closed

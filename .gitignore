@@ -1,5 +1,10 @@
+# ============================================
+# MultiBet .gitignore — atualizado 20/03/2026
+# ============================================
+
 # Credenciais — NUNCA subir pro Git
 .env
+*.env.*
 *credentials*.json
 *service_account*.json
 dwh-ext-24105.json
@@ -10,15 +15,22 @@ __pycache__/
 *.pyo
 .venv/
 venv/
+*.egg-info/
 
-# Outputs temporários
+# Outputs (dados gerados — não são código)
 *.csv
 !pipelines/jogos.csv
 *.xlsx
+*.html
+output/
 outputs/
+analysis/output/
+segmentacao_output_*/
 
 # Logs
+*.log
 pipelines/logs/
+segmentacao/app/logs/
 
 # Memory (local do Claude Code)
 memory/
@@ -32,6 +44,7 @@ build/
 dist/
 *.zip
 *.mp4
+*.pdf
 
 # Claude / Agentes (config local)
 .agents/
@@ -40,36 +53,38 @@ dist/
 .mcp.json
 skills-lock.json
 
-# Arquivos acidentais (fragmentos de comandos)
-0
-0,
-0,-
-1
-12}]
-15s}
-50
-70%
-7}
-9}
-Enquanto
-JOURNEY
-SLACK_MIN_HIGH_RISK
-pd.DataFrame
-smr_game_id
-top_n
-temp_query_relampago.py
-TIMESTAMP('2026-03-12
-TIMESTAMP_SUB(CURRENT_TIMESTAMP()
+# Arquivos acidentais (fragmentos de terminal)
+# Regra genérica: ignorar arquivos de 1-3 chars sem extensão na raiz
+# e fragmentos SQL/Python que vazaram como nomes de arquivo
+[0-9]
+[0-9][0-9]
+[0-9][0-9][0-9]
+D[0-9]
+D[0-9][0-9]
 
-# Outputs de pipelines e análises
-analysis/output/
-reports/perfil_jogadores_*.csv
-reports/anti_abuse_*.csv
-reports/relatorio_bonus_*.csv
+# Outputs específicos de validações e reports
 validacoes/*.csv
 validacoes/*.zip
-segmentacao_output_*/
-"Mapeamento Matriz de Risco/Arquivos CSV*"
-"Mapeamento Matriz de Risco/_WITH_*.csv"
-"Solicitações Pontuais/**/*.csv"
-"Solicitações Pontuais/**/*.xlsx"
+reports/*.csv
+
+# Matriz de risco outputs
+matriz_de_risco/Arquivos CSV*/
+matriz_de_risco/_WITH_*.csv
+
+# Solicitações pontuais outputs
+solicitacoes_pontuais/**/*.csv
+solicitacoes_pontuais/**/*.xlsx
+
+# Segmentação outputs por jogo
+segmentacao/*/output_*/
+
+# Anti-abuse deploy artifacts
+anti_abuse_deploy/.env
+anti_abuse_deploy/*.zip
+ec2_deploy/*.zip
+
+# Temporários do OS
+Thumbs.db
+.DS_Store
+*.tmp
+~$*

@@ -6,7 +6,7 @@ sincronizado com os campos core_account_status e core_external_account_status
 na Smartico.
 
 Base verdade: Redshift (bireports.tbl_ecr)
-Periodo: contas com c_category_updated_time entre 01/01/2026 e 11/03/2026
+Periodo: contas com c_category_updated_time entre 01/01/2026 e 17/03/2026
 
 Joins: Redshift c_external_id = Smartico user_ext_id
 """
@@ -27,7 +27,7 @@ log = logging.getLogger(__name__)
 # PARAMETROS
 # ---------------------------------------------------------------------------
 DATA_INICIO = "2026-01-01"
-DATA_FIM = "2026-03-12"  # exclusivo (< data_fim)
+DATA_FIM = "2026-03-18"  # exclusivo (< data_fim) -- atualizado em 17/03/2026
 output_path = "c:/Users/NITRO/OneDrive - PGX/MultiBet/validacoes/"
 ts = datetime.now().strftime("%Y%m%d_%H%M")
 
@@ -332,7 +332,7 @@ cols_full = [
     "smartico_updated_at", "dias_diff"
 ]
 df[cols_full].to_csv(
-    f"{output_path}dataset_completo_{ts}.csv",
+    f"{output_path}dataset_completo_FINAL_{ts}.csv",
     index=False, encoding="utf-8-sig"
 )
 
@@ -346,5 +346,5 @@ print(f"  - detalhe_contas_closed_{ts}.csv")
 print(f"  - causa_raiz_por_tipo_{ts}.csv")
 print(f"  - causa_raiz_mudancas_reais_semana_{ts}.csv")
 print(f"  - causa_raiz_reprocessamento_semana_{ts}.csv")
-print(f"  - dataset_completo_{ts}.csv")
+print(f"  - dataset_completo_FINAL_{ts}.csv")
 print("Validacao concluida!")
