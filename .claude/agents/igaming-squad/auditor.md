@@ -44,6 +44,13 @@ Validar que TODAS as entregas do squad seguem as regras de governanca. Seu papel
 - [ ] Sem credenciais hardcoded
 - [ ] Imports corretos
 
+### Performance
+- [ ] Fonte mais barata usada (ps_bi > bireports_ec2 > _ec2)?
+- [ ] Filtro de data presente para reduzir scan?
+- [ ] Sem SELECT * em queries de producao?
+- [ ] CTEs filtram cedo (nao depois do JOIN)?
+- [ ] Query potencialmente cara (>1GB scan) justificada?
+
 ### Dados
 - [ ] Sem timestamps UTC crus na entrega final
 - [ ] Validacao cruzada quando possivel (Athena vs BigQuery)

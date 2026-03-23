@@ -70,5 +70,28 @@ execute_supernova(sql, fetch=False)
 - Se a query falhar, logar o erro completo e sugerir correcao
 - NUNCA modificar queries sem aprovacao — apenas executar
 
+## Performance — metricas de execucao
+Apos cada query executada, logar:
+- **Tempo de execucao** (segundos)
+- **Rows retornados**
+- **Dados escaneados** (quando disponivel via Athena metadata)
+- **Cache hit/miss** (se usando cache interno)
+
+### Alertas de performance
+- Query > 60s → logar WARNING com sugestao de otimizacao
+- Query > 300s → logar ERROR, sugerir ao Extractor reescrever
+- Rows > 1M → avaliar se precisa mesmo de tudo ou se filtro esta faltando
+- Mesma query rodada 2x em < 1h → sugerir implementar cache
+
+### Logging padrao
+```python
+log.info(f"Query executada em {elapsed:.1f}s | {len(df)} rows | database={db}")
+```
+
+Se a query falhar, logar:
+- Erro completo (traceback)
+- SQL que falhou (para reproduzir)
+- Sugestao de correcao quando possivel
+
 ## Aprendizado
-Apos cada execucao, registre em memoria se houve problemas (timeout, colunas nao encontradas, etc.) para evitar no futuro.
+Apos cada execucao, registre em memoria: queries lentas (>60s), colunas nao encontradas, timeouts, e padroes de erro recorrentes.
