@@ -97,7 +97,7 @@ def _query_day_metrics(target_date: date) -> dict:
         COUNT(*) AS ftd,
         COALESCE(SUM(ftd_amount_inhouse), 0) AS ftd_deposit
     FROM ps_bi.dim_user
-    WHERE ftd_date = DATE '{dt}'
+    WHERE CAST(ftd_datetime AT TIME ZONE 'UTC' AT TIME ZONE 'America/Sao_Paulo' AS DATE) = DATE '{dt}'
       AND CAST(affiliate_id AS VARCHAR) IN {aff}
       AND is_test = false
     """
@@ -189,7 +189,7 @@ def _query_day_by_affiliate(target_date: date) -> list:
             COUNT(*) AS ftd,
             COALESCE(SUM(ftd_amount_inhouse), 0) AS ftd_deposit
         FROM ps_bi.dim_user
-        WHERE ftd_date = DATE '{dt}'
+        WHERE CAST(ftd_datetime AT TIME ZONE 'UTC' AT TIME ZONE 'America/Sao_Paulo' AS DATE) = DATE '{dt}'
           AND CAST(affiliate_id AS VARCHAR) IN {aff}
           AND is_test = false
         GROUP BY CAST(affiliate_id AS VARCHAR)
