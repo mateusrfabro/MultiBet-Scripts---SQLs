@@ -168,6 +168,45 @@ body {
 }
 
 /* =====================================================================
+ * FILTRO DE CANAL — abas Google / Meta / Consolidado
+ * ===================================================================== */
+
+.channel-filter {
+    display: flex;
+    gap: 4px;
+}
+
+.channel-btn {
+    background: transparent;
+    border: 1px solid var(--cor-borda-card);
+    color: var(--cor-texto-secundario);
+    padding: 6px 14px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: var(--tamanho-pequeno);
+    font-weight: 500;
+    transition: all 0.2s;
+}
+
+.channel-btn.active {
+    background: var(--cor-destaque);
+    color: #fff;
+    border-color: var(--cor-destaque);
+}
+
+.channel-btn:hover:not(.active) {
+    border-color: var(--cor-destaque);
+    color: var(--cor-destaque);
+}
+
+.filter-separator {
+    color: var(--cor-borda-card);
+    display: flex;
+    align-items: center;
+    padding: 0 8px;
+}
+
+/* =====================================================================
  * CONTAINER PRINCIPAL
  * ===================================================================== */
 

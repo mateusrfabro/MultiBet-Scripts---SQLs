@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Performance — MultiBet</title>
+
+    <!-- Fontes (designer: trocar aqui se quiser outra fonte) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+    <!-- CSS do tema (o designer mexe AQUI) -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/theme.css') }}?v=3">
+
+    <!-- Chart.js (graficos) -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+</head>
+<body>
+
+    <!-- ================================================================
+         HEADER — barra superior
+         ================================================================ -->
+    <header class="header">
+        <div>
+            <h1 id="dashboard-title" class="header-title">Performance Google Ads</h1>
+            <p id="dashboard-subtitle" class="header-subtitle">MultiBet — Affiliates {{ affiliate_ids | join(', ') }}</p>
+        </div>
+
+        <div class="header-actions">
+            <!-- Filtro de canal -->
+            <div class="channel-filter">
+                <button class="channel-btn active" data-channel="google">Google Ads</button>
+                <button class="channel-btn" data-channel="meta">Meta</button>
+                <button class="channel-btn" data-channel="all">Consolidado</button>
+            </div>
+            <div class="filter-separator">|</div>
+
+            <!-- Filtro de periodo -->
+            <div class="period-filter">
+                <button class="period-btn active" data-compare="d1">vs Ontem</button>
+                <button class="period-btn" data-compare="d7">vs 7 dias</button>
+                <button class="period-btn" data-compare="hourly">Hoje (live)</button>
+            </div>
+
+            <button class="btn btn-refresh" id="btn-refresh" title="Forcar atualizacao">Atualizar</button>
+            <a href="/logout" class="btn">Sair</a>
+        </div>
+
+        <div class="header-updated" id="header-updated">Carregando dados...</div>
+    </header>
+
+    <!-- ================================================================
+         CONTEUDO PRINCIPAL
+         ================================================================ -->
+    <main class="main-content" id="main-content">
+
+        <!-- Estado de loading -->
+        <div class="loading" id="loading-state">
+            <div class="loading-spinner"></div>
+            <p style="margin-top: 12px;">Consultando Athena...</p>
+        </div>
+
+        <!-- Tudo abaixo fica oculto ate os dados carregarem -->
+        <div id="dashboard-content" style="display: none;">
+
+            <!-- ========================================================
+                 SECAO 1 — Resumo executivo (frase automatica)
+                 ======================================================== -->
+            <section class="executive-summary" id="executive-summary">
+                <p id="summary-text"></p>
+            </section>
+
+            <!-- ========================================================
+                 SECAO 2 — KPI Cards (10 metricas)
+                 ======================================================== -->
+            <section class="kpi-grid" id="kpi-grid">
+                <!-- Cards gerados via JS -->
+            </section>
+
+            <!-- ========================================================
+                 SECAO 3 — Insights automaticos
+                 ======================================================== -->
+            <section>
+                <h2 style="font-size: 18px; margin-bottom: 12px;">Alertas e Insights</h2>
+                <div class="insights-list" id="insights-list">
+                    <!-- Gerado via JS -->
+                </div>
+            </section>
+
+            <!-- ========================================================
+                 SECAO 4 — Graficos
+                 ======================================================== -->
+            <section class="charts-row">
+                <div class="chart-card">
+                    <div class="chart-title">GGR Casino vs Sport — Ultimos 7 dias</div>
+                    <div class="chart-container">
+                        <canvas id="chart-ggr"></canvas>
+                    </div>
+                </div>
+                <div class="chart-card">
+                    <div class="chart-title">NGR — Tendencia 7 dias</div>
+                    <div class="chart-container">
+                        <canvas id="chart-ngr"></canvas>
+                    </div>
+                </div>
+            </section>
+
+            <section class="charts-row">
+                <div class="chart-card">
+                    <div class="chart-title">Funil: REG → FTD → Depositantes</div>
+                    <div class="chart-container">
+                        <canvas id="chart-funnel"></canvas>
+                    </div>
+                </div>
+                <div class="chart-card">
+                    <div class="chart-title">Distribuicao por Affiliate</div>
+                    <div class="chart-container">
+                        <canvas id="chart-donut"></canvas>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ========================================================
+                 SECAO 5 — Tabela por affiliate
+                 ======================================================== -->
+            <section class="table-container">
+                <h2 style="font-size: 18px; margin-bottom: 16px;">Detalhamento por Affiliate</h2>
+                <table class="data-table" id="affiliate-table">
+                    <thead>
+                        <tr>
+                            <th>Affiliate</th>
+                            <th class="col-right">REG</th>
+                            <th class="col-right">FTD</th>
+                            <th class="col-right">Conv%</th>
+                            <th class="col-right">FTD Deposit</th>
+                            <th class="col-right">Dep Amount</th>
+                            <th class="col-right">GGR Casino</th>
+                            <th class="col-right">GGR Sport</th>
+                            <th class="col-right">NGR</th>
+                            <th class="col-right">Saques</th>
+                        </tr>
+                    </thead>
+                    <tbody id="affiliate-tbody">
+                        <!-- Gerado via JS -->
+                    </tbody>
+                </table>
+            </section>
+
+            <!-- ========================================================
+                 SECAO 6 — Legenda (como ler este dashboard)
+                 ======================================================== -->
+            <section class="legenda">
+                <h3>Como ler este dashboard</h3>
+                <dl>
+                    <dt>REG</dt>
+                    <dd>Novos cadastros vindos dos anuncios do canal selecionado</dd>
+
+                    <dt>FTD</dt>
+                    <dd>Primeiro deposito — quantos cadastros realmente colocaram dinheiro</dd>
+
+                    <dt>Conv%</dt>
+                    <dd>Taxa de conversao (FTD / REG) — quanto maior, melhor a qualidade do trafego</dd>
+
+                    <dt>Ticket Medio FTD</dt>
+                    <dd>Valor medio do primeiro deposito (Valor FTD / Qtd FTD)</dd>
+
+                    <dt>FTD Deposit</dt>
+                    <dd>Valor total dos primeiros depositos (em R$)</dd>
+
+                    <dt>Dep Amount</dt>
+                    <dd>Valor total de TODOS os depositos (primeiro + recorrentes)</dd>
+
+                    <dt>GGR Casino</dt>
+                    <dd>Receita bruta de jogos de cassino (apostas - premios pagos). So dinheiro real, sem bonus</dd>
+
+                    <dt>GGR Sport</dt>
+                    <dd>Receita bruta de apostas esportivas (apostas - premios pagos)</dd>
+
+                    <dt>NGR *</dt>
+                    <dd>Receita Liquida = GGR total - bonus emitidos. O NUMERO QUE IMPORTA para medir retorno.
+                        <strong>* Proxy operacional.</strong> Difere do NGR contabil (GGR - BTR - RCA) por nao incluir ajustes de receita e turnover de bonus.</dd>
+
+                    <dt>Net Deposit</dt>
+                    <dd>Depositos - Saques. Fluxo liquido de caixa dos jogadores (em R$)</dd>
+
+                    <dt>Saques</dt>
+                    <dd>Total retirado pelos jogadores (em R$) — visivel na tabela de detalhamento</dd>
+                </dl>
+                <p style="margin-top: 12px; font-size: 11px; color: var(--cor-texto-discreto);">
+                    Cores: <span style="color: var(--cor-positivo);">verde = subiu</span> |
+                    <span style="color: var(--cor-negativo);">vermelho = caiu</span> |
+                    Periodo de comparacao selecionado no filtro do topo.
+                    Dados atualizados a cada 1 hora (cache Athena).
+                    REG conta pela data BRT do cadastro. Metricas financeiras seguem o corte de data do Data Lake (UTC).
+                    Dados de hoje podem estar incompletos (ingestao em andamento).
+                </p>
+            </section>
+
+        </div><!-- /dashboard-content -->
+
+    </main>
+
+    <!-- ================================================================
+         FOOTER
+         ================================================================ -->
+    <footer class="footer">
+        Fonte: Athena Data Lake (bireports_ec2 + ps_bi) |
+        Timezone: BRT (UTC-3) |
+        Test users excluidos |
+        GGR = somente dinheiro real (sem bonus)
+    </footer>
+
+    <!-- JavaScript (logica + graficos) -->
+    <script src="{{ url_for('static', filename='js/dashboard.js') }}?v=3"></script>
+
+</body>
+</html>

@@ -1,12 +1,14 @@
 /**
- * Dashboard Google Ads — JavaScript
+ * Dashboard Multi-Canal — JavaScript
  *
  * Responsavel por:
- * - Carregar dados da API (/api/data)
+ * - Carregar dados da API (/api/data?channel=xxx)
  * - Renderizar KPI cards, graficos, insights e tabela
  * - Gerenciar filtro de periodo:
- *     "hourly" = Hoje ate agora vs Ontem mesmo horario (PRINCIPAL)
- *     "d1"     = D-1 vs D-2 (dias fechados, secundario)
+ *     "d1"     = D-1 vs D-2 (dias fechados, DEFAULT)
+ *     "d7"     = D-1 vs D-7 (comparativo semanal)
+ *     "hourly" = Hoje ate agora vs Ontem mesmo horario (live)
+ * - Gerenciar filtro de canal: google, meta, all
  * - Auto-refresh a cada 30 minutos
  *
  * NOTA PARA O DESIGNER:
@@ -18,7 +20,8 @@
 // ESTADO GLOBAL
 // =========================================================================
 let dashboardData = null;
-let currentCompare = 'hourly'; // 'hourly' (hoje vs ontem mesmo horario) ou 'd1' (D-1 vs D-2)
+let currentCompare = 'd1'; // 'd1' (D-1 vs D-2), 'd7' (D-1 vs D-7), 'hourly' (live)
+let currentChannel = 'google'; // 'google', 'meta', 'all'
 
 // Cores dos graficos (lidas do CSS para manter consistencia)
 const COLORS = {
@@ -38,7 +41,7 @@ const COLORS = {
 // =========================================================================
 async function loadData() {
     try {
-        const resp = await fetch('/api/data');
+        const resp = await fetch(`/api/data?channel=${currentChannel}`);
         if (resp.status === 401 || resp.status === 403) {
             window.location.href = '/login';
             return;
@@ -71,6 +74,22 @@ function renderAll() {
     document.getElementById('dashboard-content').style.display = 'flex';
     document.getElementById('dashboard-content').style.flexDirection = 'column';
     document.getElementById('dashboard-content').style.gap = 'var(--gap-secoes)';
+
+    // Atualizar titulo com canal
+    const titleEl = document.getElementById('dashboard-title');
+    if (titleEl && dashboardData.channel_label) {
+        titleEl.textContent = `Performance ${dashboardData.channel_label}`;
+    }
+    const subtitleEl = document.getElementById('dashboard-subtitle');
+    if (subtitleEl && dashboardData.channel) {
+        const ch = dashboardData.channel;
+        if (ch === 'all') {
+            subtitleEl.textContent = `Consolidado — Todos os canais`;
+        } else if (dashboardData.by_affiliate) {
+            const ids = dashboardData.by_affiliate.map(a => a.affiliate_id).join(', ');
+            subtitleEl.textContent = `Affiliates ${ids}`;
+        }
+    }
 
     renderUpdatedAt();
     renderSummary();
@@ -168,6 +187,23 @@ function getKpiData(key, format) {
         };
     }
 
+    // Modo d7: dia fechado D-1 vs D-7
+    if (currentCompare === 'd7') {
+        const d1 = dashboardData.d1;
+        const vars = dashboardData.variations_d7 || {};
+        const v = vars[key] || { pct: 0, direction: 'neutral' };
+        const d7 = dashboardData.d7;
+        return {
+            value: d1[key],
+            varPct: v.pct,
+            direction: v.direction,
+            showVar: true,
+            label: 'Ontem (fechado)',
+            subtitle: `7 dias atras: ${fmtValue(d7 ? d7[key] : null, format)}`,
+            compareLabel: 'vs 7 dias',
+        };
+    }
+
     // Modo d1: dia fechado D-1 vs D-2
     const d1 = dashboardData.d1;
     const vars = dashboardData.variations_d1 || {};
@@ -191,6 +227,7 @@ function getKpiData(key, format) {
 function fmtValue(val, format) {
     if (val == null || isNaN(val)) return '-';
     if (format === 'brl') return `R$ ${formatBRL(val)}`;
+    if (format === 'pct') return `${Number(val).toFixed(1)}%`;
     return Number(val).toLocaleString('pt-BR');
 }
 
@@ -201,9 +238,9 @@ function fmtValue(val, format) {
 function renderSummary() {
     if (currentCompare === 'hourly') {
         renderSummaryHourly();
+    } else if (currentCompare === 'd7') {
+        renderSummaryD7();
     } else {
-        // Qualquer outro modo (d1, d7, etc.) usa D-1 fechado
-        currentCompare = 'd1';
         renderSummaryD1();
     }
 }
@@ -267,20 +304,44 @@ function renderSummaryD1() {
         `NGR R$ ${formatBRL(today.ngr)}.`;
 }
 
+function renderSummaryD7() {
+    const d1 = dashboardData.d1;
+    const d7 = dashboardData.d7;
+    const today = dashboardData.today;
+    const vars = dashboardData.variations_d7 || {};
+
+    const ngrVar = vars.ngr || { pct: 0, direction: 'neutral' };
+    const ngrClass = ngrVar.direction === 'up' ? 'highlight-positive' : 'highlight-negative';
+    const ngrArrow = ngrVar.direction === 'up' ? '↑' : (ngrVar.direction === 'down' ? '↓' : '→');
+
+    document.getElementById('summary-text').innerHTML =
+        `<strong>Ontem (fechado):</strong> ` +
+        `<span class="highlight-number">${d1.ftd}</span> FTDs, ` +
+        `R$ <span class="highlight-number">${formatBRL(d1.dep_amount)}</span> depositados, ` +
+        `NGR R$ <span class="highlight-number">${formatBRL(d1.ngr)}</span> ` +
+        `<span class="${ngrClass}">${ngrArrow} ${Math.abs(ngrVar.pct)}%</span> vs 7 dias atras. ` +
+        `<br><strong>7 dias atras:</strong> ` +
+        `${d7 ? d7.ftd : '-'} FTDs, ` +
+        `R$ ${formatBRL(d7 ? d7.dep_amount : 0)} depositados, ` +
+        `NGR R$ ${formatBRL(d7 ? d7.ngr : 0)}.`;
+}
+
 
 // =========================================================================
 // KPI CARDS
 // =========================================================================
 function renderKPIs() {
     const metrics = [
-        { key: 'reg',         label: 'REG (Cadastros)',        format: 'int' },
-        { key: 'ftd',         label: 'FTD (1o Deposito)',      format: 'int' },
-        { key: 'ftd_deposit', label: 'Valor FTD',              format: 'brl' },
-        { key: 'dep_amount',  label: 'Total Depositado',       format: 'brl' },
-        { key: 'ggr_cassino', label: 'GGR Casino',             format: 'brl' },
-        { key: 'ggr_sport',   label: 'GGR Sport',              format: 'brl' },
-        { key: 'ngr',         label: 'NGR (Receita Liquida)',   format: 'brl', highlight: true },
-        { key: 'saques',      label: 'Saques',                 format: 'brl' },
+        { key: 'reg',              label: 'REG (Cadastros)',        format: 'int' },
+        { key: 'ftd',              label: 'FTD (1o Deposito)',      format: 'int' },
+        { key: 'conv_pct',         label: 'Conv% (REG→FTD)',        format: 'pct' },
+        { key: 'ticket_medio_ftd', label: 'Ticket Medio FTD',       format: 'brl' },
+        { key: 'ftd_deposit',      label: 'Valor FTD',              format: 'brl' },
+        { key: 'dep_amount',       label: 'Total Depositado',       format: 'brl' },
+        { key: 'ggr_cassino',      label: 'GGR Casino',             format: 'brl' },
+        { key: 'ggr_sport',        label: 'GGR Sport',              format: 'brl' },
+        { key: 'ngr',              label: 'NGR (Receita Liquida)',   format: 'brl', highlight: true },
+        { key: 'net_deposit',      label: 'Net Deposit',            format: 'brl' },
     ];
 
     const grid = document.getElementById('kpi-grid');
@@ -691,6 +752,19 @@ document.querySelectorAll('.period-btn').forEach(btn => {
         btn.classList.add('active');
         currentCompare = btn.dataset.compare;
         if (dashboardData) renderAll();
+    });
+});
+
+
+// =========================================================================
+// FILTRO DE CANAL
+// =========================================================================
+document.querySelectorAll('.channel-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+        document.querySelectorAll('.channel-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        currentChannel = btn.dataset.channel;
+        loadData();
     });
 });
 

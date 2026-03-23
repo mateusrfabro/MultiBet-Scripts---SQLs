@@ -1,7 +1,7 @@
 """
-Dashboard Google Ads Affiliates — Flask App.
+Dashboard de Trafego Pago — Multi-Canal (Google Ads, Meta, etc.)
 
-Produto self-service para gestora de trafego Google Ads.
+Produto self-service para gestores de trafego.
 Roda localmente + Cloudflare Tunnel para acesso externo com HTTPS.
 
 Uso:
@@ -22,7 +22,8 @@ from functools import wraps
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
 from dashboards.google_ads.config import (
     FLASK_HOST, FLASK_PORT, FLASK_DEBUG, SECRET_KEY,
-    DASHBOARD_USER, DASHBOARD_PASS, RATE_LIMIT, AFFILIATE_IDS,
+    DASHBOARD_USER, DASHBOARD_PASS, RATE_LIMIT,
+    CHANNELS, ALL_AFFILIATE_IDS, DEFAULT_CHANNEL,
 )
 from dashboards.google_ads.queries import get_dashboard_data, clear_cache
 
@@ -106,7 +107,8 @@ def dashboard():
     """Pagina principal do dashboard."""
     return render_template(
         "dashboard.html",
-        affiliate_ids=AFFILIATE_IDS,
+        channels=CHANNELS,
+        default_channel=DEFAULT_CHANNEL,
         now=datetime.now().strftime("%d/%m/%Y %H:%M"),
     )
 
@@ -117,14 +119,16 @@ def api_data():
     """
     Endpoint principal — retorna todos os dados do dashboard em JSON.
 
+    Query param ?channel=google|meta|all (default: google)
     O frontend chama este endpoint via fetch() e renderiza os dados.
     """
+    channel = request.args.get("channel", DEFAULT_CHANNEL)
     try:
-        data = get_dashboard_data()
+        data = get_dashboard_data(channel=channel)
         data["updated_at"] = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
         return jsonify(data)
     except Exception as e:
-        log.error(f"Erro ao carregar dados: {e}", exc_info=True)
+        log.error(f"Erro ao carregar dados (channel={channel}): {e}", exc_info=True)
         return jsonify({
             "error": "Erro ao consultar dados. Tente novamente em alguns minutos."
         }), 500
@@ -145,7 +149,11 @@ def api_refresh():
 @app.route("/health")
 def health():
     """Health check simples."""
-    return jsonify({"status": "ok", "timestamp": datetime.now().isoformat()})
+    return jsonify({
+        "status": "ok",
+        "timestamp": datetime.now().isoformat(),
+        "channels": list(CHANNELS.keys()),
+    })
 
 
 # =========================================================================
@@ -166,8 +174,9 @@ def log_request(response):
 # MAIN
 # =========================================================================
 if __name__ == "__main__":
-    log.info(f"Dashboard Google Ads iniciando em {FLASK_HOST}:{FLASK_PORT}")
-    log.info(f"Affiliates: {AFFILIATE_IDS}")
+    log.info(f"Dashboard Trafego Pago iniciando em {FLASK_HOST}:{FLASK_PORT}")
+    log.info(f"Canais: {list(CHANNELS.keys())}")
+    log.info(f"Total affiliates: {len(ALL_AFFILIATE_IDS)}")
     log.info(f"Debug: {FLASK_DEBUG}")
     app.run(
         host=FLASK_HOST,

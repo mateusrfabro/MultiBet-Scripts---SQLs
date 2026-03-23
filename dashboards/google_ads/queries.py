@@ -18,15 +18,19 @@ from time import time
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
 from db.athena import query_athena
-from dashboards.google_ads.config import AFFILIATE_IDS, CACHE_TTL_SECONDS, TREND_DAYS
+from dashboards.google_ads.config import CHANNELS, ALL_AFFILIATE_IDS, CACHE_TTL_SECONDS, TREND_DAYS, DEFAULT_CHANNEL
 
 log = logging.getLogger(__name__)
 
 
-def _aff_filter():
-    """Retorna string SQL segura para filtro de affiliate_ids (sem input do usuario)."""
+def _aff_filter(channel=None):
+    """Retorna string SQL segura para filtro de affiliate_ids por canal."""
     # IDs vem do config.py (hardcoded), nao do request — sem risco de injection
-    return "(" + ", ".join(f"'{aid}'" for aid in AFFILIATE_IDS) + ")"
+    if channel and channel != "all" and channel in CHANNELS:
+        ids = CHANNELS[channel]["affiliate_ids"]
+    else:
+        ids = ALL_AFFILIATE_IDS
+    return "(" + ", ".join(f"'{aid}'" for aid in ids) + ")"
 
 
 # =========================================================================
@@ -66,9 +70,9 @@ def get_cache_age():
 # =========================================================================
 # QUERY 1: Metricas consolidadas para um dia especifico
 # =========================================================================
-def _query_day_metrics(target_date: date) -> dict:
+def _query_day_metrics(target_date: date, channel=None) -> dict:
     """
-    Retorna metricas consolidadas dos 3 affiliates para um dia.
+    Retorna metricas consolidadas dos affiliates de um canal para um dia.
 
     Fontes:
       - REG: bireports_ec2.tbl_ecr (conversao BRT explicita)
@@ -76,10 +80,10 @@ def _query_day_metrics(target_date: date) -> dict:
       - Financeiro: bireports_ec2.tbl_ecr_wise_daily_bi_summary (centavos/100)
 
     Retorna dict com: reg, ftd, ftd_deposit, dep_amount, saques,
-                      ggr_cassino, ggr_sport, ngr, bonus_cost
+                      ggr_cassino, ggr_sport, ngr, bonus_cost, net_deposit
     """
     dt = target_date.isoformat()
-    aff = _aff_filter()
+    aff = _aff_filter(channel)
 
     # --- REG (bireports com BRT) ---
     sql_reg = f"""
@@ -154,16 +158,17 @@ def _query_day_metrics(target_date: date) -> dict:
         "players_ativos": int(r["players_ativos"]),
         "conv_pct": round(ftd / max(reg, 1) * 100, 1),
         "ticket_medio_ftd": round(ftd_deposit / max(ftd, 1), 2),
+        "net_deposit": round(dep_amount - saques, 2),
     }
 
 
 # =========================================================================
 # QUERY 2: Breakdown por affiliate ID para um dia
 # =========================================================================
-def _query_day_by_affiliate(target_date: date) -> list:
+def _query_day_by_affiliate(target_date: date, channel=None) -> list:
     """Retorna lista de dicts com metricas por affiliate para um dia."""
     dt = target_date.isoformat()
-    aff = _aff_filter()
+    aff = _aff_filter(channel)
 
     sql = f"""
     WITH player_aff AS (
@@ -251,11 +256,11 @@ def _query_day_by_affiliate(target_date: date) -> list:
 # =========================================================================
 # QUERY 3: Serie temporal (ultimos N dias) para graficos de tendencia
 # =========================================================================
-def _query_trend(days: int = None) -> list:
+def _query_trend(days: int = None, channel=None) -> list:
     """Retorna lista de metricas diarias para os ultimos N dias."""
     if days is None:
         days = TREND_DAYS
-    aff = _aff_filter()
+    aff = _aff_filter(channel)
 
     end_date = date.today() - timedelta(days=1)  # D-1 (hoje pode estar incompleto)
     start_date = end_date - timedelta(days=days - 1)
@@ -307,39 +312,39 @@ def _query_trend(days: int = None) -> list:
 # =========================================================================
 # FUNCOES PUBLICAS (com cache)
 # =========================================================================
-def get_today_metrics() -> dict:
+def get_today_metrics(channel=None) -> dict:
     """Metricas de hoje (pode estar incompleto)."""
     today = date.today()
-    return _cached(f"day_{today}", lambda: _query_day_metrics(today))
+    return _cached(f"day_{today}_{channel}", lambda: _query_day_metrics(today, channel))
 
 
-def get_d1_metrics() -> dict:
+def get_d1_metrics(channel=None) -> dict:
     """Metricas de ontem (D-1)."""
     d1 = date.today() - timedelta(days=1)
-    return _cached(f"day_{d1}", lambda: _query_day_metrics(d1))
+    return _cached(f"day_{d1}_{channel}", lambda: _query_day_metrics(d1, channel))
 
 
-def get_d7_metrics() -> dict:
+def get_d7_metrics(channel=None) -> dict:
     """Metricas de 7 dias atras."""
     d7 = date.today() - timedelta(days=7)
-    return _cached(f"day_{d7}", lambda: _query_day_metrics(d7))
+    return _cached(f"day_{d7}_{channel}", lambda: _query_day_metrics(d7, channel))
 
 
-def get_today_by_affiliate() -> list:
+def get_today_by_affiliate(channel=None) -> list:
     """Breakdown por affiliate de hoje."""
     today = date.today()
-    return _cached(f"aff_{today}", lambda: _query_day_by_affiliate(today))
+    return _cached(f"aff_{today}_{channel}", lambda: _query_day_by_affiliate(today, channel))
 
 
-def get_d1_by_affiliate() -> list:
+def get_d1_by_affiliate(channel=None) -> list:
     """Breakdown por affiliate de ontem."""
     d1 = date.today() - timedelta(days=1)
-    return _cached(f"aff_{d1}", lambda: _query_day_by_affiliate(d1))
+    return _cached(f"aff_{d1}_{channel}", lambda: _query_day_by_affiliate(d1, channel))
 
 
-def get_trend() -> list:
+def get_trend(channel=None) -> list:
     """Serie temporal para graficos."""
-    return _cached("trend", lambda: _query_trend())
+    return _cached(f"trend_{channel}", lambda: _query_trend(channel=channel))
 
 
 def _calc_variation(current: float, previous: float) -> dict:
@@ -354,28 +359,29 @@ def _calc_variation(current: float, previous: float) -> dict:
     }
 
 
-def get_dashboard_data() -> dict:
+def get_dashboard_data(channel=None) -> dict:
     """
     Retorna TODOS os dados necessarios para renderizar o dashboard.
 
     Chamada unica do frontend — consolida tudo em um JSON.
+    Aceita channel para filtrar por canal (google, meta, etc.) ou None/all para consolidado.
     """
     # Timestamp de INICIO da extracao (primeiro dado solicitado)
     # Mostra quando os dados "sao" — a foto do banco naquele instante
     from datetime import datetime
     query_started_at = datetime.now().strftime("%d/%m/%Y %H:%M")
 
-    today = get_today_metrics()
-    d1 = get_d1_metrics()
-    d7 = get_d7_metrics()
-    trend = get_trend()
-    by_affiliate = get_today_by_affiliate()
+    today = get_today_metrics(channel)
+    d1 = get_d1_metrics(channel)
+    d7 = get_d7_metrics(channel)
+    trend = get_trend(channel)
+    by_affiliate = get_today_by_affiliate(channel)
 
     # D-2 e D-8 para comparativos entre dias FECHADOS
-    d2 = _cached(f"day_{date.today() - timedelta(days=2)}",
-                 lambda: _query_day_metrics(date.today() - timedelta(days=2)))
-    d8 = _cached(f"day_{date.today() - timedelta(days=8)}",
-                 lambda: _query_day_metrics(date.today() - timedelta(days=8)))
+    d2 = _cached(f"day_{date.today() - timedelta(days=2)}_{channel}",
+                 lambda: _query_day_metrics(date.today() - timedelta(days=2), channel))
+    d8 = _cached(f"day_{date.today() - timedelta(days=8)}_{channel}",
+                 lambda: _query_day_metrics(date.today() - timedelta(days=8), channel))
 
     # Calcular variacoes entre dias FECHADOS (D-1 vs D-2, D-1 vs D-8)
     # NUNCA comparar hoje (parcial) com ontem (fechado) — nao faz sentido
@@ -397,6 +403,14 @@ def get_dashboard_data() -> dict:
     # Gerar insights com base em D-1 vs D-2 (dias fechados)
     insights = _generate_insights(d1, d2, d8, by_affiliate)
 
+    # Hourly comparison (nao bloqueante — falha silenciosa)
+    try:
+        from dashboards.google_ads.queries_hourly import get_hourly_comparison
+        hourly = get_hourly_comparison()
+    except Exception as e:
+        log.warning(f"Hourly comparison falhou (nao bloqueante): {e}")
+        hourly = None
+
     return {
         "today": today,
         "today_is_partial": True,
@@ -408,18 +422,28 @@ def get_dashboard_data() -> dict:
         "trend": trend,
         "by_affiliate": by_affiliate,
         "insights": insights,
-        "affiliate_ids": AFFILIATE_IDS,
+        "affiliate_ids": ALL_AFFILIATE_IDS,
         "cache_age_seconds": get_cache_age(),
         "query_started_at": query_started_at,
+        "channel": channel or "all",
+        "channel_label": CHANNELS[channel]["label"] if channel and channel in CHANNELS else "Consolidado",
+        "channels": {k: v["label"] for k, v in CHANNELS.items()},
+        "hourly": hourly,
     }
 
 
 # =========================================================================
 # INSIGHTS AUTOMATICOS
 # =========================================================================
-def _generate_insights(today: dict, d1: dict, d7: dict, by_aff: list) -> list:
+def _generate_insights(d1: dict, d2: dict, d8: dict, by_aff: list) -> list:
     """
     Gera insights em linguagem simples para a gestora.
+
+    Parametros com nomes claros:
+    - d1: dia principal (D-1, ontem — fechado)
+    - d2: dia comparativo (D-2, anteontem — fechado)
+    - d8: mesmo dia da semana passada (D-8 — fechado)
+    - by_aff: breakdown por affiliate do dia principal
 
     Regras:
     - Queda > 15% = alerta critico (vermelho)
@@ -430,7 +454,7 @@ def _generate_insights(today: dict, d1: dict, d7: dict, by_aff: list) -> list:
     """
     insights = []
 
-    # --- Alertas de variacao D-1 ---
+    # --- Alertas de variacao D-1 vs D-2 (dias fechados) ---
     metric_labels = {
         "reg": "Novos cadastros",
         "ftd": "Primeiros depositos",
@@ -443,47 +467,47 @@ def _generate_insights(today: dict, d1: dict, d7: dict, by_aff: list) -> list:
     }
 
     for key, label in metric_labels.items():
-        if d1[key] == 0:
+        if d2[key] == 0:
             continue
-        pct = (today[key] - d1[key]) / abs(d1[key]) * 100
+        pct = (d1[key] - d2[key]) / abs(d2[key]) * 100
 
         if pct <= -15:
             insights.append({
                 "level": "critical",
-                "message": f"{label} caiu {abs(pct):.0f}% comparado com ontem. "
+                "message": f"{label} caiu {abs(pct):.0f}% em D-1 vs D-2. "
                            f"Verificar campanhas e orcamento.",
             })
         elif pct <= -5:
             insights.append({
                 "level": "warning",
-                "message": f"{label} caiu {abs(pct):.0f}% vs ontem. Monitorar.",
+                "message": f"{label} caiu {abs(pct):.0f}% em D-1 vs D-2. Monitorar.",
             })
         elif pct >= 10:
             insights.append({
                 "level": "positive",
-                "message": f"{label} subiu {pct:.0f}% vs ontem.",
+                "message": f"{label} subiu {pct:.0f}% em D-1 vs D-2.",
             })
 
     # --- NGR negativo ---
-    if today["ngr"] < 0:
+    if d1["ngr"] < 0:
         insights.append({
             "level": "critical",
-            "message": f"NGR esta negativo (R$ {today['ngr']:,.2f}). "
-                       f"A operacao esta no prejuizo hoje.",
+            "message": f"NGR esta negativo em D-1 (R$ {d1['ngr']:,.2f}). "
+                       f"A operacao ficou no prejuizo.",
         })
 
     # --- Conversao baixa ---
-    if today["conv_pct"] < 25 and today["reg"] > 0:
+    if d1["conv_pct"] < 25 and d1["reg"] > 0:
         insights.append({
             "level": "warning",
-            "message": f"Taxa de conversao REG→FTD esta em {today['conv_pct']:.1f}% "
+            "message": f"Taxa de conversao REG->FTD em D-1 esta em {d1['conv_pct']:.1f}% "
                        f"(abaixo de 25%). Qualidade do trafego pode estar baixa.",
         })
 
     # --- Concentracao por affiliate ---
-    if by_aff and today["ngr"] != 0:
+    if by_aff and d1["ngr"] != 0:
         for aff in by_aff:
-            share = abs(aff["ngr"]) / max(abs(today["ngr"]), 1) * 100
+            share = abs(aff["ngr"]) / max(abs(d1["ngr"]), 1) * 100
             if share > 60:
                 insights.append({
                     "level": "warning",
@@ -491,12 +515,12 @@ def _generate_insights(today: dict, d1: dict, d7: dict, by_aff: list) -> list:
                                f"do NGR. Risco de dependencia.",
                 })
 
-    # --- Acumulado 7 dias ---
-    if today.get("date") and d7.get("date"):
+    # --- Comparativo semanal (D-1 vs D-8) ---
+    if d1.get("date") and d8.get("date"):
         insights.append({
             "level": "info",
-            "message": f"Ticket medio FTD hoje: R$ {today['ticket_medio_ftd']:,.2f}. "
-                       f"Conversao: {today['conv_pct']:.1f}%.",
+            "message": f"Ticket medio FTD em D-1: R$ {d1['ticket_medio_ftd']:,.2f}. "
+                       f"Conversao: {d1['conv_pct']:.1f}%.",
         })
 
     return insights
