@@ -406,7 +406,7 @@ def get_dashboard_data(channel=None) -> dict:
     # Hourly comparison (nao bloqueante — falha silenciosa)
     try:
         from dashboards.google_ads.queries_hourly import get_hourly_comparison
-        hourly = get_hourly_comparison()
+        hourly = get_hourly_comparison(channel)
     except Exception as e:
         log.warning(f"Hourly comparison falhou (nao bloqueante): {e}")
         hourly = None

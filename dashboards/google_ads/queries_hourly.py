@@ -12,7 +12,7 @@ from datetime import date, datetime, timedelta
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
 from db.athena import query_athena
-from dashboards.google_ads.config import AFFILIATE_IDS, CACHE_TTL_SECONDS
+from dashboards.google_ads.config import CHANNELS, ALL_AFFILIATE_IDS, CACHE_TTL_SECONDS
 
 log = logging.getLogger(__name__)
 
@@ -32,8 +32,13 @@ def _cached_h(key, fn):
     return result
 
 
-def _aff_filter():
-    return "(" + ", ".join(f"'{aid}'" for aid in AFFILIATE_IDS) + ")"
+def _aff_filter(channel=None):
+    """Retorna filtro SQL por canal."""
+    if channel and channel != "all" and channel in CHANNELS:
+        ids = CHANNELS[channel]["affiliate_ids"]
+    else:
+        ids = ALL_AFFILIATE_IDS
+    return "(" + ", ".join(f"'{aid}'" for aid in ids) + ")"
 
 
 def _hora_corte_utc():
@@ -46,23 +51,23 @@ def _hora_corte_utc():
     return now_utc.hour  # hora atual UTC (parcial) — filtramos < este valor
 
 
-def get_hourly_comparison() -> dict:
+def get_hourly_comparison(channel=None) -> dict:
     """
     Retorna comparativo hoje vs ontem usando tabelas horárias.
 
     Mesmo recorte temporal: horas 0 até (hora_atual - 1).
     Assim o comparativo é justo — não compara dia parcial com dia fechado.
     """
-    return _cached_h("hourly_cmp", _query_hourly_comparison)
+    return _cached_h(f"hourly_cmp_{channel}", lambda: _query_hourly_comparison(channel))
 
 
-def _query_hourly_comparison() -> dict:
+def _query_hourly_comparison(channel=None) -> dict:
     """Executa queries horárias no Athena."""
     hoje = date.today().isoformat()
     ontem = (date.today() - timedelta(days=1)).isoformat()
     hora_corte = _hora_corte_utc()
     hora_corte_brt = max(hora_corte - 3, 0)
-    aff = _aff_filter()
+    aff = _aff_filter(channel)
 
     log.info(f"Hourly comparison: hoje={hoje}, ontem={ontem}, corte UTC={hora_corte} (BRT ~{hora_corte_brt}h)")
 
