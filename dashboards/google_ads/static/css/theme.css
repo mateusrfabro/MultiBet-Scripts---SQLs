@@ -1,0 +1,556 @@
+/*
+ * =====================================================================
+ * THEME — Dashboard Google Ads MultiBet
+ * =====================================================================
+ *
+ * GUIA PARA O DESIGNER:
+ *
+ * Este arquivo controla TODO o visual do dashboard.
+ * Para alterar cores, fontes ou espacamentos, mude APENAS as variaveis
+ * abaixo (secao :root). O restante do CSS usa essas variaveis.
+ *
+ * Nao precisa mexer no HTML, Python ou JavaScript.
+ * =====================================================================
+ */
+
+:root {
+    /* ===== PALETA DE CORES (alterar aqui) ===== */
+    --cor-fundo:            #0F1923;    /* fundo principal da pagina */
+    --cor-card:             #1A2735;    /* fundo dos cards e caixas */
+    --cor-card-hover:       #243447;    /* fundo do card ao passar o mouse */
+    --cor-borda-card:       #2D3F52;    /* borda sutil dos cards */
+
+    /* ===== TEXTO (alterar aqui) ===== */
+    --cor-texto:            #E8EAED;    /* texto principal (branco suave) */
+    --cor-texto-secundario: #8B9CAF;    /* texto secundario (cinza azulado) */
+    --cor-texto-discreto:   #5A6A7D;    /* labels discretos */
+
+    /* ===== DESTAQUES (alterar aqui) ===== */
+    --cor-destaque:         #4A9EFF;    /* azul — links, botoes, destaque geral */
+    --cor-destaque-ngr:     #FFB020;    /* dourado — NGR (o numero que importa) */
+
+    /* ===== INDICADORES (alterar aqui) ===== */
+    --cor-positivo:         #00C853;    /* verde — variacao positiva (subiu) */
+    --cor-positivo-bg:      rgba(0, 200, 83, 0.08);    /* fundo verde translucido */
+    --cor-negativo:         #FF5252;    /* vermelho — variacao negativa (caiu) */
+    --cor-negativo-bg:      rgba(255, 82, 82, 0.08);   /* fundo vermelho translucido */
+    --cor-neutro:           #78909C;    /* cinza — sem variacao */
+    --cor-alerta:           #FFB020;    /* amarelo — atencao */
+    --cor-alerta-bg:        rgba(255, 176, 32, 0.08);  /* fundo amarelo translucido */
+    --cor-info:             #4A9EFF;    /* azul — informativo */
+    --cor-info-bg:          rgba(74, 158, 255, 0.08);   /* fundo azul translucido */
+
+    /* ===== GRAFICOS (alterar aqui) ===== */
+    --cor-grafico-cassino:  #7C4DFF;    /* roxo — GGR Casino */
+    --cor-grafico-sport:    #00BFA5;    /* verde agua — GGR Sport */
+    --cor-grafico-ngr:      #FFB020;    /* dourado — linha NGR */
+    --cor-grafico-grid:     #1E3044;    /* linhas de grade */
+
+    /* ===== CORES POR AFFILIATE (alterar aqui) ===== */
+    --cor-aff-1:            #4A9EFF;    /* azul — affiliate 297657 */
+    --cor-aff-2:            #7C4DFF;    /* roxo — affiliate 445431 */
+    --cor-aff-3:            #00BFA5;    /* verde agua — affiliate 468114 */
+
+    /* ===== TIPOGRAFIA (alterar aqui) ===== */
+    --fonte-principal:      'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --fonte-numeros:        'JetBrains Mono', 'Fira Code', monospace;  /* numeros alinhados */
+    --tamanho-titulo:       24px;
+    --tamanho-subtitulo:    16px;
+    --tamanho-kpi-valor:    32px;       /* valor grande no KPI card */
+    --tamanho-kpi-label:    12px;       /* label pequeno no KPI card */
+    --tamanho-variacao:     13px;       /* texto da variacao % */
+    --tamanho-corpo:        14px;       /* texto geral */
+    --tamanho-pequeno:      12px;       /* notas, rodape */
+
+    /* ===== ESPACAMENTO (alterar aqui) ===== */
+    --padding-pagina:       24px;       /* margens laterais da pagina */
+    --padding-card:         24px;       /* padding interno dos cards */
+    --gap-cards:            16px;       /* espaco entre cards */
+    --gap-secoes:           32px;       /* espaco entre secoes do dashboard */
+    --border-radius:        12px;       /* arredondamento dos cantos */
+    --border-radius-small:  8px;        /* arredondamento menor (badges) */
+
+    /* ===== SOMBRAS (alterar aqui) ===== */
+    --sombra-card:          0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+
+/* =====================================================================
+ * RESET E BASE
+ * ===================================================================== */
+
+*, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: var(--fonte-principal);
+    font-size: var(--tamanho-corpo);
+    color: var(--cor-texto);
+    background-color: var(--cor-fundo);
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* =====================================================================
+ * HEADER — barra superior fixa
+ * ===================================================================== */
+
+.header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: var(--cor-card);
+    border-bottom: 1px solid var(--cor-borda-card);
+    padding: 16px var(--padding-pagina);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.header-title {
+    font-size: var(--tamanho-titulo);
+    font-weight: 700;
+}
+
+.header-subtitle {
+    font-size: var(--tamanho-pequeno);
+    color: var(--cor-texto-secundario);
+}
+
+.header-updated {
+    font-size: var(--tamanho-pequeno);
+    color: var(--cor-texto-discreto);
+}
+
+.header-actions {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+/* =====================================================================
+ * FILTRO DE PERIODO — abas Hoje / D-1 / D-7
+ * ===================================================================== */
+
+.period-filter {
+    display: flex;
+    gap: 4px;
+    background: var(--cor-fundo);
+    padding: 4px;
+    border-radius: var(--border-radius-small);
+}
+
+.period-btn {
+    padding: 6px 16px;
+    border: none;
+    border-radius: 6px;
+    background: transparent;
+    color: var(--cor-texto-secundario);
+    font-size: var(--tamanho-pequeno);
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.period-btn:hover {
+    color: var(--cor-texto);
+    background: var(--cor-card-hover);
+}
+
+.period-btn.active {
+    background: var(--cor-destaque);
+    color: #fff;
+}
+
+/* =====================================================================
+ * CONTAINER PRINCIPAL
+ * ===================================================================== */
+
+.main-content {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: var(--padding-pagina);
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-secoes);
+}
+
+/* =====================================================================
+ * RESUMO EXECUTIVO — frase automatica no topo
+ * ===================================================================== */
+
+.executive-summary {
+    background: linear-gradient(135deg, var(--cor-card) 0%, #1f2d3d 100%);
+    border: 1px solid var(--cor-borda-card);
+    border-radius: var(--border-radius);
+    padding: var(--padding-card);
+}
+
+.executive-summary p {
+    font-size: var(--tamanho-subtitulo);
+    line-height: 1.6;
+    color: var(--cor-texto);
+}
+
+.executive-summary .highlight-number {
+    font-family: var(--fonte-numeros);
+    font-weight: 700;
+    color: var(--cor-destaque-ngr);
+}
+
+.executive-summary .highlight-positive {
+    color: var(--cor-positivo);
+    font-weight: 600;
+}
+
+.executive-summary .highlight-negative {
+    color: var(--cor-negativo);
+    font-weight: 600;
+}
+
+/* =====================================================================
+ * KPI CARDS — grid de metricas principais
+ * ===================================================================== */
+
+.kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--gap-cards);
+}
+
+.kpi-card {
+    background: var(--cor-card);
+    border: 1px solid var(--cor-borda-card);
+    border-radius: var(--border-radius);
+    padding: var(--padding-card);
+    transition: background 0.2s;
+}
+
+.kpi-card:hover {
+    background: var(--cor-card-hover);
+}
+
+.kpi-card.destaque-ngr {
+    border-color: var(--cor-destaque-ngr);
+    border-width: 2px;
+}
+
+.kpi-label {
+    font-size: var(--tamanho-kpi-label);
+    color: var(--cor-texto-secundario);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 8px;
+}
+
+.kpi-value {
+    font-family: var(--fonte-numeros);
+    font-size: var(--tamanho-kpi-valor);
+    font-weight: 700;
+    color: var(--cor-texto);
+    margin-bottom: 8px;
+}
+
+.kpi-card.destaque-ngr .kpi-value {
+    color: var(--cor-destaque-ngr);
+}
+
+/* ===== Badge de variacao (seta + percentual) ===== */
+
+.variacao {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 8px;
+    border-radius: var(--border-radius-small);
+    font-size: var(--tamanho-variacao);
+    font-weight: 500;
+}
+
+.variacao-up {
+    color: var(--cor-positivo);
+    background: var(--cor-positivo-bg);
+}
+
+.variacao-down {
+    color: var(--cor-negativo);
+    background: var(--cor-negativo-bg);
+}
+
+.variacao-neutral {
+    color: var(--cor-neutro);
+    background: rgba(120, 144, 156, 0.08);
+}
+
+.variacao-label {
+    font-size: var(--tamanho-pequeno);
+    color: var(--cor-texto-discreto);
+    margin-left: 4px;
+}
+
+/* =====================================================================
+ * GRAFICOS — containers
+ * ===================================================================== */
+
+.charts-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--gap-cards);
+}
+
+.chart-card {
+    background: var(--cor-card);
+    border: 1px solid var(--cor-borda-card);
+    border-radius: var(--border-radius);
+    padding: var(--padding-card);
+}
+
+.chart-title {
+    font-size: var(--tamanho-subtitulo);
+    font-weight: 600;
+    margin-bottom: 16px;
+}
+
+.chart-container {
+    position: relative;
+    height: 250px;
+}
+
+/* =====================================================================
+ * INSIGHTS — alertas automaticos
+ * ===================================================================== */
+
+.insights-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.insight-item {
+    padding: 12px 16px;
+    border-radius: var(--border-radius-small);
+    font-size: var(--tamanho-corpo);
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+}
+
+.insight-icon {
+    flex-shrink: 0;
+    width: 20px;
+    text-align: center;
+    font-weight: 700;
+}
+
+.insight-critical {
+    background: var(--cor-negativo-bg);
+    color: var(--cor-negativo);
+    border-left: 3px solid var(--cor-negativo);
+}
+
+.insight-warning {
+    background: var(--cor-alerta-bg);
+    color: var(--cor-alerta);
+    border-left: 3px solid var(--cor-alerta);
+}
+
+.insight-positive {
+    background: var(--cor-positivo-bg);
+    color: var(--cor-positivo);
+    border-left: 3px solid var(--cor-positivo);
+}
+
+.insight-info {
+    background: var(--cor-info-bg);
+    color: var(--cor-info);
+    border-left: 3px solid var(--cor-info);
+}
+
+/* =====================================================================
+ * TABELA — breakdown por affiliate
+ * ===================================================================== */
+
+.table-container {
+    background: var(--cor-card);
+    border: 1px solid var(--cor-borda-card);
+    border-radius: var(--border-radius);
+    padding: var(--padding-card);
+    overflow-x: auto;
+}
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: var(--tamanho-corpo);
+}
+
+.data-table th {
+    text-align: left;
+    padding: 10px 12px;
+    font-size: var(--tamanho-pequeno);
+    color: var(--cor-texto-secundario);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 1px solid var(--cor-borda-card);
+    white-space: nowrap;
+}
+
+.data-table td {
+    padding: 10px 12px;
+    font-family: var(--fonte-numeros);
+    border-bottom: 1px solid var(--cor-borda-card);
+    white-space: nowrap;
+}
+
+.data-table tr:last-child td {
+    border-bottom: none;
+}
+
+.data-table tr:hover td {
+    background: var(--cor-card-hover);
+}
+
+.data-table .row-total {
+    font-weight: 700;
+    border-top: 2px solid var(--cor-borda-card);
+}
+
+.data-table .col-right {
+    text-align: right;
+}
+
+/* =====================================================================
+ * LEGENDA — como ler este dashboard
+ * ===================================================================== */
+
+.legenda {
+    background: var(--cor-card);
+    border: 1px solid var(--cor-borda-card);
+    border-radius: var(--border-radius);
+    padding: var(--padding-card);
+}
+
+.legenda h3 {
+    font-size: var(--tamanho-subtitulo);
+    margin-bottom: 12px;
+}
+
+.legenda dl {
+    display: grid;
+    grid-template-columns: 120px 1fr;
+    gap: 4px 16px;
+    font-size: var(--tamanho-pequeno);
+}
+
+.legenda dt {
+    color: var(--cor-texto);
+    font-weight: 600;
+}
+
+.legenda dd {
+    color: var(--cor-texto-secundario);
+}
+
+/* =====================================================================
+ * FOOTER
+ * ===================================================================== */
+
+.footer {
+    text-align: center;
+    padding: 16px;
+    font-size: var(--tamanho-pequeno);
+    color: var(--cor-texto-discreto);
+    border-top: 1px solid var(--cor-borda-card);
+}
+
+/* =====================================================================
+ * BOTOES UTILITARIOS
+ * ===================================================================== */
+
+.btn {
+    padding: 6px 14px;
+    border: 1px solid var(--cor-borda-card);
+    border-radius: 6px;
+    background: var(--cor-card);
+    color: var(--cor-texto-secundario);
+    font-size: var(--tamanho-pequeno);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn:hover {
+    background: var(--cor-card-hover);
+    color: var(--cor-texto);
+}
+
+.btn-refresh {
+    border-color: var(--cor-destaque);
+    color: var(--cor-destaque);
+}
+
+/* =====================================================================
+ * LOADING STATE
+ * ===================================================================== */
+
+.loading {
+    text-align: center;
+    padding: 60px;
+    color: var(--cor-texto-secundario);
+}
+
+.loading-spinner {
+    display: inline-block;
+    width: 32px;
+    height: 32px;
+    border: 3px solid var(--cor-borda-card);
+    border-top: 3px solid var(--cor-destaque);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* =====================================================================
+ * RESPONSIVO — MOBILE (< 768px)
+ * ===================================================================== */
+
+@media (max-width: 768px) {
+    .kpi-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .charts-row {
+        grid-template-columns: 1fr;
+    }
+
+    .header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .kpi-value {
+        font-size: 24px;
+    }
+
+    .legenda dl {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 480px) {
+    .kpi-grid {
+        grid-template-columns: 1fr;
+    }
+
+    :root {
+        --padding-pagina: 12px;
+        --padding-card: 16px;
+    }
+}
