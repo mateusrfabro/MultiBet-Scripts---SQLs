@@ -29,6 +29,16 @@ Meu objetivo é crescer para gestor/gerente, então preciso entregar além do es
 > O Super Nova DB pode ser usado como destino (persistir resultados), mas nunca como fonte
 > até que o usuário confirme explicitamente que uma tabela foi validada.
 
+## Checklist PRE-TASK (OBRIGATORIO)
+Antes de responder qualquer task que envolva SQL, análise ou recomendação de tabelas:
+1. **Consultar MEMORY.md** — verificar feedbacks e limitações já documentadas
+2. **Buscar scripts existentes** em `scripts/` e `pipelines/` que já resolveram problema similar
+3. **Verificar se a tabela recomendada tem limitações conhecidas** — se a memória diz que tem problema, NÃO usar
+4. **Se não tem certeza, perguntar** — nunca enviar query não validada pra stakeholder
+
+> Regra nasceu em 25/03/2026: query ps_bi enviada ao Head sem consultar memória que já dizia
+> "dim_game INCOMPLETO". PG Soft sumiu dos resultados. Retrabalho evitável.
+
 ## Como devo ser ajudado
 1. **SQL:** sempre otimizado, com comentários explicando cada bloco,
    pensando que o banco é read-only no Athena (motor Trino/Presto)
@@ -61,13 +71,23 @@ Meu objetivo é crescer para gestor/gerente, então preciso entregar além do es
 
 ### Regras obrigatórias Athena SQL — validadas pelo arquiteto (17/03/2026)
 
-**REGRA DE OURO — Filtro de Partição `dt` (fund_ec2):**
-Sempre incluir antes do filtro de timestamp — evita Full Scan no S3 (custo AWS alto):
-`f.dt IN ('2026-03-16', '2026-03-17')` — incluir todas as datas do período.
+**REGRA DE OURO — Filtro de Partição (fund_ec2):**
+Sempre incluir filtro temporal antes de outros predicados — evita Full Scan no S3 (custo AWS alto).
+> NOTA: `dt` pode nao existir como coluna visivel em todas as tabelas (particao Iceberg implicita).
+> Se `dt` nao funcionar, filtrar diretamente pelo timestamp:
+> `WHERE c_start_time >= TIMESTAMP '2026-03-16' AND c_start_time < TIMESTAMP '2026-03-17'`
+> Validar com `SHOW COLUMNS FROM tabela` antes de usar `dt`.
 
-**Campo de valor:** `c_confirmed_amount_in_inhouse_ccy` (líquido confirmado) — NÃO `c_amount_in_ecr_ccy`
+**Campo de valor:** `c_amount_in_ecr_ccy` (centavos BRL, dividir por 100.0)
+> CORRECAO 31/03/2026: `c_confirmed_amount_in_inhouse_ccy` NAO EXISTE na tabela.
+> Validado empiricamente pelo Mauro (bronze_correcoes_mauro_v1.md, 20/03/2026).
 
-**Status:** `c_txn_status = 'txn_confirmed_success'` — NÃO `'SUCCESS'` (era Redshift)
+**Status por database (ATENCAO — sao DIFERENTES):**
+- `fund_ec2.tbl_real_fund_txn`: `c_txn_status = 'SUCCESS'`
+- `cashier_ec2.tbl_cashier_deposit`: `c_txn_status = 'txn_confirmed_success'`
+- `cashier_ec2.tbl_cashier_cashout`: status = `'co_success'`
+> CORRECAO 31/03/2026: a regra anterior dizia `'txn_confirmed_success'` generico,
+> mas isso so vale para cashier. fund_ec2 usa `'SUCCESS'`. Validado empiricamente.
 
 **Sintaxe Presto:** Cast = `TIMESTAMP '2026-03-16'` | Rollback = `COUNT_IF(c_txn_type = 72)` | Timezone = `AT TIME ZONE 'UTC' AT TIME ZONE 'America/Sao_Paulo'`
 
