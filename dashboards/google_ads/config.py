@@ -20,7 +20,7 @@ CHANNELS = {
     },
     "meta": {
         "label": "Meta Ads",
-        "affiliate_ids": ["464673"],
+        "affiliate_ids": ["532570", "532571", "464673"],
         "color": "#1877F2",
     },
 }

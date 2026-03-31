@@ -5,10 +5,10 @@ Popula multibet.game_image_mapping com URLs de imagem para todos os jogos.
 
 Fontes:
   1. CSV gerado pelo scraper (capturar_jogos_pc.py) — nome + game_image_url
-  2. Redshift (Pragmatic Solutions)                 — provider_game_id + vendor_id
+  2. Athena (bireports_ec2)                         — provider_game_id + vendor_id
 
 O CSV é a fonte principal de imagens (extraídas direto do site multi.bet.br).
-O Redshift complementa com metadados do catálogo (vendor, game_id).
+O Athena complementa com metadados do catálogo (vendor, game_id).
 
 Execução:
     python pipelines/game_image_mapper.py [--scraper]
@@ -29,7 +29,7 @@ from datetime import datetime, timezone
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
-from db.redshift import query_redshift
+from db.athena import query_athena
 from db.supernova import execute_supernova, get_supernova_connection
 
 import psycopg2.extras
@@ -68,14 +68,14 @@ CREATE INDEX IF NOT EXISTS idx_gim_game_name_upper
     ON multibet.game_image_mapping (game_name_upper);
 """
 
-# ─── SQL Redshift ─────────────────────────────────────────────────────────────
+# ─── SQL Athena ──────────────────────────────────────────────────────────────
 # Catálogo completo de jogos ativos para enriquecer com provider_game_id e vendor_id
-QUERY_REDSHIFT_GAMES = """
+QUERY_ATHENA_GAMES = """
 SELECT
     UPPER(TRIM(c_game_desc))  AS game_name_upper,
     c_vendor_id               AS vendor_id,
     c_game_id                 AS provider_game_id
-FROM lake.vw_bireports_vendor_games_mapping_data
+FROM bireports_ec2.tbl_vendor_games_mapping_data
 WHERE c_status = 'active'
   AND c_game_id IS NOT NULL
   AND c_game_desc IS NOT NULL
@@ -150,7 +150,7 @@ def run_scraper():
 
 def refresh():
     """
-    Lê CSV + Redshift, faz upsert no Super Nova DB.
+    Lê CSV + Athena, faz upsert no Super Nova DB.
     Estratégia: UPSERT (INSERT ON CONFLICT UPDATE).
     """
     # 1. Lê CSV do scraper
@@ -171,57 +171,57 @@ def refresh():
 
     log.info(f"{len(csv_map)} jogos únicos no CSV (por nome).")
 
-    # 3. Redshift — catálogo de jogos (metadados)
-    log.info("Buscando catálogo de jogos no Redshift...")
+    # 3. Athena — catálogo de jogos (metadados)
+    log.info("Buscando catálogo de jogos no Athena (bireports_ec2)...")
     try:
-        df_games = query_redshift(QUERY_REDSHIFT_GAMES)
-        log.info(f"{len(df_games)} jogos no catálogo Redshift.")
+        df_games = query_athena(QUERY_ATHENA_GAMES, database="bireports_ec2")
+        log.info(f"{len(df_games)} jogos no catálogo Athena.")
 
         # Monta dicionário nome_upper → {vendor_id, provider_game_id}
         # Prioriza pragmaticplay em caso de duplicatas
-        redshift_map = {}
+        athena_map = {}
         for _, row in df_games.iterrows():
             key = row["game_name_upper"]
-            if key not in redshift_map:
-                redshift_map[key] = {
+            if key not in athena_map:
+                athena_map[key] = {
                     "vendor_id": row["vendor_id"],
                     "provider_game_id": str(row["provider_game_id"]),
                 }
             elif row["vendor_id"] == "pragmaticplay":
                 # Pragmatic tem prioridade
-                redshift_map[key] = {
+                athena_map[key] = {
                     "vendor_id": row["vendor_id"],
                     "provider_game_id": str(row["provider_game_id"]),
                 }
     except Exception as e:
-        log.warning(f"Falha ao consultar Redshift (continuando só com CSV): {e}")
-        redshift_map = {}
+        log.warning(f"Falha ao consultar Athena (continuando só com CSV): {e}")
+        athena_map = {}
 
-    # 4. Merge: CSV (imagens) + Redshift (metadados)
+    # 4. Merge: CSV (imagens) + Athena (metadados)
     # Todos os jogos únicos (união dos dois conjuntos)
-    all_names = set(csv_map.keys()) | set(redshift_map.keys())
-    log.info(f"{len(all_names)} jogos únicos no total (CSV + Redshift).")
+    all_names = set(csv_map.keys()) | set(athena_map.keys())
+    log.info(f"{len(all_names)} jogos únicos no total (CSV + Athena).")
 
     now_utc = datetime.now(timezone.utc)
     records = []
 
     for name_upper in all_names:
         csv_entry = csv_map.get(name_upper, {})
-        rs_entry = redshift_map.get(name_upper, {})
+        athena_entry = athena_map.get(name_upper, {})
 
         game_name = csv_entry.get("nome", name_upper.title())
         game_image_url = csv_entry.get("url")
-        vendor_id = rs_entry.get("vendor_id")
-        provider_game_id = rs_entry.get("provider_game_id")
+        vendor_id = athena_entry.get("vendor_id")
+        provider_game_id = athena_entry.get("provider_game_id")
         game_slug = f"/pb/gameplay/{slugify(game_name)}/real-game"
 
         # Determina a fonte
-        if csv_entry and rs_entry:
-            source = "scraper+redshift"
+        if csv_entry and athena_entry:
+            source = "scraper+athena"
         elif csv_entry:
             source = "scraper"
         else:
-            source = "redshift"
+            source = "athena"
 
         records.append((
             game_name,

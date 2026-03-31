@@ -191,6 +191,21 @@ def refresh():
         how="left",
     )
 
+    # Fallback para variantes (ex: "ZEUS VS HADES – GODS OF WAR 250"):
+    # Remove sufixos numéricos (250, 1000, etc.) e tenta match com o jogo base.
+    mask_no_img = df["game_image_url"].isna()
+    if mask_no_img.any():
+        mapping_lookup = df_mapping_dedup.set_index("game_name_upper")
+        for idx in df[mask_no_img].index:
+            name = df.at[idx, "game_name_upper"]
+            # Remove sufixo numerico (ex: " 250", " 1000") para tentar match com base
+            base_name = re.sub(r"\s+\d+$", "", name).strip()
+            if base_name != name and base_name in mapping_lookup.index:
+                row = mapping_lookup.loc[base_name]
+                df.at[idx, "game_image_url"] = row["game_image_url"]
+                df.at[idx, "game_slug"] = row["game_slug"]
+                log.info(f"  Fallback variante: '{name}' → imagem de '{base_name}'")
+
     # Fallback: gera game_slug para jogos que não estão no mapeamento
     mask_no_slug = df["game_slug"].isna()
     if mask_no_slug.any():

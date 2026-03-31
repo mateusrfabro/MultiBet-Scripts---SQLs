@@ -454,6 +454,42 @@ SELECT
 FROM ps_bi.dim_user du
 ```
 
+### 22. Signup Info — Device Distribution (ecr_ec2.tbl_ecr_signup_info) — NOVO
+
+```sql
+-- Bronze: athena_bronze.tbl_ecr_signup_info
+-- ADICIONADO: unica fonte de device/canal de cadastro
+SELECT
+    si.c_ecr_id,
+    si.c_channel,               -- Mobile/Desktop/Tablet
+    si.c_sub_channel,           -- Detalhe do canal
+    si.c_os_browser_type,       -- SO/Browser
+    si.c_device_id,             -- ID do dispositivo
+    si.c_hostname,              -- Dominio de origem
+    si.c_created_time
+FROM ecr_ec2.tbl_ecr_signup_info si
+```
+
+### 23. Bonus Summary Details — BTR (bonus_ec2.tbl_bonus_summary_details) — NOVO
+
+```sql
+-- Bronze: athena_bronze.tbl_bonus_summary_details
+-- ADICIONADO: necessario para BTR (c_actual_issued_amount)
+SELECT
+    bs.c_ecr_id,
+    bs.c_bonus_id,
+    bs.c_ecr_bonus_id,
+    bs.c_actual_issued_amount,   -- Valor real emitido (para BTR)
+    bs.c_issued_drp,
+    bs.c_issued_crp,
+    bs.c_issued_wrp,
+    bs.c_issued_rrp,
+    bs.c_offered_crp,
+    bs.c_offered_rrp,
+    bs.c_offered_drp
+FROM bonus_ec2.tbl_bonus_summary_details bs
+```
+
 ---
 
 ## TABELAS PARA VALIDACAO CRUZADA (NAO replicar como Bronze)
@@ -476,7 +512,7 @@ NAO devem entrar na Bronze — usar apenas para **comparar** com os calculos da 
 
 ## RESUMO FINAL
 
-**21 tabelas Bronze — Dados brutos:**
+**23 tabelas Bronze — Dados brutos:**
 
 | # | Database | Tabela | Dominio |
 |---|----------|--------|---------|
@@ -501,8 +537,12 @@ NAO devem entrar na Bronze — usar apenas para **comparar** com os calculos da 
 | 19 | bireports_ec2 | tbl_vendor_games_mapping_data | Game Images |
 | 20 | ps_bi | dim_game | Catalogo (dimensao) |
 | 21 | ps_bi | dim_user | Player (dimensao) |
+| 22 | ecr_ec2 | tbl_ecr_signup_info | Device Distribution (NOVO) |
+| 23 | bonus_ec2 | tbl_bonus_summary_details | BTR / Bonus Issued (NOVO) |
 
-**TOTAL: 21 tabelas Bronze (19 _ec2 brutos + 2 dimensoes ps_bi)**
+**TOTAL: 23 tabelas Bronze (21 _ec2 brutos + 2 dimensoes ps_bi)**
+
+**Todas as 23 validadas:** SHOW COLUMNS + SELECT LIMIT 5 no Athena
 
 **NAO incluido:**
 - BigQuery/Smartico — fase 2

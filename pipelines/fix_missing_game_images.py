@@ -1,8 +1,12 @@
 """
 Fix: Inserir game_image_url faltantes na tabela multibet.game_image_mapping
 ============================================================================
-Jogos identificados sem imagem no pipeline grandes_ganhos (18/03/2026).
-URLs extraídas manualmente do site multi.bet.br via DevTools.
+Jogos identificados sem imagem no pipeline grandes_ganhos.
+URLs extraídas do site multi.bet.br via scraper Playwright ou DevTools.
+
+Historico:
+    - 18/03/2026: Speed Blackjack 47, Speed Roleta Brasileira
+    - 26/03/2026: Zeus vs Hades - Gods of War 250 (variante 250x, mesma imagem do base)
 
 Execução:
     python pipelines/fix_missing_game_images.py
@@ -48,6 +52,12 @@ MISSING_GAMES = [
     {
         "game_name": "Speed Roleta Brasileira",
         "game_image_url": "https://multi.bet.br/uploads/games/MUL//alea_pla18974/alea_pla18974.webp",
+    },
+    {
+        # Variante 250x do Zeus vs Hades - mesmo jogo, mesma imagem do base (ppvs15godsofwar)
+        # Site multi.bet.br nao tem variante separada - 26/03/2026
+        "game_name": "Zeus vs Hades \u2013 Gods of War 250",
+        "game_image_url": "https://multi.bet.br//uploads/games/MUL//ppvs15godsofwar/ppvs15godsofwar.webp",
     },
 ]
 

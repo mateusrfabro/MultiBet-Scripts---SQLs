@@ -71,6 +71,55 @@ Adicionar a linha:
 ## Logs
 Os logs ficam em `pipelines/logs/grandes_ganhos_YYYY-MM-DD.log`.
 
+## ETL Aquisicao Trafego — cron horario (a cada 60 min)
+
+Alimenta `multibet.aquisicao_trafego_diario` no Super Nova DB.
+Consumido pela aba "Aquisicao Trafego" do front `db.supernovagaming.com.br`.
+
+### Deploy
+
+```bash
+# 1. Copiar pipeline e wrapper (ja estao no ec2_deploy/)
+# pipelines/etl_aquisicao_trafego_diario.py
+# run_etl_aquisicao_trafego.sh
+# db/athena.py
+
+# 2. Instalar pyathena (se ainda nao tiver)
+source venv/bin/activate
+pip install pyathena>=3.0
+
+# 3. Garantir variaveis no .env
+# ATHENA_AWS_ACCESS_KEY_ID=...
+# ATHENA_AWS_SECRET_ACCESS_KEY=...
+# ATHENA_S3_STAGING=s3://aws-athena-query-results-803633136520-sa-east-1/
+# ATHENA_REGION=sa-east-1
+# BASTION_HOST=...
+# SUPERNOVA_HOST=...
+# SUPERNOVA_PASS=...
+
+# 4. Testar manualmente
+python3 pipelines/etl_aquisicao_trafego_diario.py --days 1
+
+# 5. Dar permissao e agendar
+chmod +x run_etl_aquisicao_trafego.sh
+crontab -e
+```
+
+### Crontab
+
+```
+# ETL Aquisicao Trafego — a cada hora (minuto 10, evita colisao com outros ETLs)
+10 * * * * /home/ec2-user/multibet/run_etl_aquisicao_trafego.sh
+```
+
+> Roda a cada hora no minuto 10 (ex: 00:10, 01:10, ..., 23:10 UTC).
+> Reprocessa D-2 + D-1 + hoje (parcial). Idempotente (DELETE + INSERT).
+
+### Logs
+```bash
+tail -f pipelines/logs/etl_aquisicao_trafego_$(date +%Y-%m-%d).log
+```
+
 ## Bot Anti-Abuse — Campanha Multiverso
 
 Monitora os 6 Fortune games (PG Soft) em tempo real, detecta fraude e alerta no Slack.
