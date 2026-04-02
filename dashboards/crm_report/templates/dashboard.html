@@ -203,6 +203,21 @@ canvas { max-height:300px; }
 </div>
 </div>
 
+<!-- FUNIL DE CONVERSAO CRM — 2 funis lado a lado -->
+<div class="section-label">Funil de Conversao CRM</div>
+<div class="chart-grid">
+    <div class="chart-card">
+        <div class="chart-title">Comunicacao (todos os disparos)</div>
+        <div id="funnelComm"><div class="loading"><div class="spinner"></div></div></div>
+        <div style="color:var(--text-muted);font-size:10px;text-align:center;padding:8px">Fonte: Smartico j_communication</div>
+    </div>
+    <div class="chart-card">
+        <div class="chart-title">Campanhas Direcionadas (financeiro)</div>
+        <div id="funnelDir"><div class="loading"><div class="spinner"></div></div></div>
+        <div style="color:var(--text-muted);font-size:10px;text-align:center;padding:8px">Fonte: bireports_ec2 + j_bonuses</div>
+    </div>
+</div>
+
 <!-- RESUMO POR TIPO DE CAMPANHA -->
 <div class="section-label">Resumo por Tipo de Campanha</div>
 <div class="table-container">
@@ -382,6 +397,7 @@ function loadData() {
 function renderDashboard(data) {
     renderKPIs(data.kpis);
     renderTable(data.campaigns);
+    renderFunnel(data.funnel, data.kpis);
     renderTypeSummary(data.funnel_by_type);
     renderDailyVolume(data.daily_volume);
     renderROIKpis(data.kpis);
@@ -526,6 +542,57 @@ function renderFunnel(f) {
     // Nota sobre etapas pendentes
     html += '<div style="color:var(--text-muted);font-size:11px;margin-top:8px;text-align:center">Pendente v2: Apostaram (cross Athena) | Cumpriram condicao (j_bonuses)</div>';
     document.getElementById('funnelContainer').innerHTML = html;
+}
+
+// ====================================================================
+// FUNIL DE CONVERSAO CRM (3 fases — confirmado com Rapha 02/04/2026)
+// ====================================================================
+function renderFunnel(f, kpis) {
+    if (!f) return;
+
+    // Helper para renderizar um funil
+    function buildFunnel(steps, baseVal) {
+        const maxVal = Math.max(...steps.map(s => s.value), 1);
+        let html = '';
+        for (let i = 0; i < steps.length; i++) {
+            const s = steps[i];
+            const w = Math.max(40, (s.value / maxVal) * 100);
+            const pct = baseVal > 0 ? ((s.value / baseVal) * 100).toFixed(1).replace('.', ',') + '%' : '';
+            const arrow = i < steps.length - 1 ? '<div style="text-align:center;color:var(--text-muted);font-size:14px;margin:1px 0">▼</div>' : '';
+            html += `<div style="width:${w}%;background:${s.color};border-radius:5px;padding:10px 12px;text-align:center;min-width:140px">
+                <div style="font-size:9px;text-transform:uppercase;letter-spacing:1px;opacity:0.8">${s.label}</div>
+                <div style="font-size:20px;font-weight:700">${fmtInt(s.value)}</div>
+                <div style="font-size:10px;opacity:0.7">${s.sub}</div>
+                ${pct ? '<div style="font-size:10px;opacity:0.5">(' + pct + ')</div>' : ''}
+            </div>${arrow}`;
+        }
+        return '<div style="display:flex;flex-direction:column;align-items:center;gap:0;width:100%;padding:12px 0">' + html + '</div>';
+    }
+
+    // Funil 1: Comunicacao — users unicos
+    const usersEnviados = f.impactados || 0;
+    const usersConvertidos = f.completaram || 0;
+    // Entregues unicos: ~98% dos enviados (proporcional ao total)
+    const totalEnv = f.segmentados || 1;
+    const totalEnt = f.entregues || 0;
+    const usersEntregues = usersEnviados > 0 ? Math.round(usersEnviados * (totalEnt / totalEnv)) : 0;
+    document.getElementById('funnelComm').innerHTML = buildFunnel([
+        { label: 'ENVIADOS', sub: 'Users unicos que receberam', value: usersEnviados, color: '#a78bfa' },
+        { label: 'ENTREGUES', sub: 'Msg chegou ao usuario', value: usersEntregues, color: '#8b5cf6' },
+        { label: 'CLICOU CTA', sub: 'Clicou "Participar"', value: usersConvertidos, color: '#6d28d9' },
+    ], usersEnviados);
+
+    // Funil 2: Campanhas — degradê verde claro → escuro
+    const users = kpis.players_ativos || 0;
+    const depositou = f.users_depositaram || 0;
+    const apostou = f.users_apostaram || 0;
+    const bonus = f.users_bonus || 0;
+    document.getElementById('funnelDir').innerHTML = buildFunnel([
+        { label: 'IMPACTADOS', sub: 'Users nas campanhas', value: users, color: '#34d399' },
+        { label: 'DEPOSITOU', sub: 'Realizou deposito', value: depositou, color: '#10b981' },
+        { label: 'APOSTOU', sub: 'Realizou aposta', value: apostou, color: '#059669' },
+        { label: 'RECEBEU BONUS', sub: 'Conversao efetiva', value: bonus, color: '#047857' },
+    ], users);
 }
 
 // ====================================================================

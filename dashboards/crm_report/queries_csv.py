@@ -311,6 +311,12 @@ def get_funnel(date_from, date_to, campaign_type=None, alcance=None):
     conv = _i(df["convertidos"].sum())
     u_env = _i(df["users_enviados"].sum())
     u_conv = _i(df["users_convertidos"].sum())
+    # Dados extraidos BigQuery + Athena para campanhas direcionadas (02/04/2026)
+    # TODO: automatizar no extract_crm_report_csvs.py
+    u_bonus = 3228
+    u_depositaram = 4015
+    u_apostaram = 4019
+    u_dep_e_apost = 3940
     base = env if env > 0 else 1
 
     return {
@@ -327,6 +333,10 @@ def get_funnel(date_from, date_to, campaign_type=None, alcance=None):
         "clicados": cli,
         "convertidos": conv,
         "completaram": u_conv,
+        "users_bonus": u_bonus,
+        "users_depositaram": u_depositaram,
+        "users_apostaram": u_apostaram,
+        "users_dep_e_apost": u_dep_e_apost,
         "pct_entregues": round(ent / base * 100, 1),
         "pct_abertos": round(abe / base * 100, 1),
         "pct_clicados": round(cli / base * 100, 1),
@@ -347,7 +357,7 @@ def get_funnel_by_type(date_from, date_to):
     # Converter colunas numericas
     for c in ["users", "fin_users", "total_ggr", "ngr"]:
         if c in df.columns:
-            df[c] = pd.to_numeric(df[c], errors="coerce").fillna(0)
+            df.loc[:, c] = pd.to_numeric(df[c], errors="coerce").fillna(0)
 
     agg = df.groupby("campaign_type").agg(
         oferecidos=("users", "sum"),
