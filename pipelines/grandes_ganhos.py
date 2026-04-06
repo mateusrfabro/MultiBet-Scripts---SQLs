@@ -1,8 +1,10 @@
 """
 Pipeline: Grandes Ganhos do Dia
 ================================
-Origem 1: BigQuery (Smartico DW)  — ganhos, jogadores, nomes de jogos
-Origem 2: Super Nova DB           — mapeamento de imagens (multibet.game_image_mapping)
+Origem 1: Athena (fund_ec2)       — ganhos casino (c_txn_type=45 CASINO_WIN)
+Origem 2: Athena (bireports_ec2)  — nomes de jogos e providers
+Origem 3: Athena (ecr_ec2)        — nomes de jogadores (hash LGPD)
+Origem 4: Super Nova DB           — mapeamento de imagens (multibet.game_image_mapping)
 Destino : Super Nova DB (PostgreSQL) — tabela multibet.grandes_ganhos
 
 Execução:
@@ -10,6 +12,10 @@ Execução:
 
 Frequência: 1x/dia às 00:30 BRT via cron na EC2.
 Pré-requisito: rodar game_image_mapper.py 1x/dia antes para manter mapeamento atualizado.
+
+Histórico:
+    - v1: BigQuery como fonte principal (até 06/04/2026)
+    - v2: Migrado para Athena (fund_ec2 + bireports_ec2 + ecr_ec2) — 06/04/2026
 """
 
 import sys
@@ -17,11 +23,11 @@ import os
 import re
 import unicodedata
 import logging
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
-from db.bigquery import query_bigquery
+from db.athena import query_athena
 from db.supernova import execute_supernova, get_supernova_connection
 
 import pandas as pd
@@ -49,7 +55,7 @@ CREATE TABLE IF NOT EXISTS multibet.grandes_ganhos (
 
     -- Player (hasheado — LGPD)
     player_name_hashed  VARCHAR(50),
-    smr_user_id         BIGINT,         -- ID interno Smartico — NÃO expor no front
+    ecr_id              BIGINT,         -- ID interno ECR (Athena) — NÃO expor no front
 
     -- Ganho
     win_amount          NUMERIC(15, 2),
@@ -65,39 +71,70 @@ CREATE INDEX IF NOT EXISTS idx_gg_event_time
     ON multibet.grandes_ganhos (event_time DESC);
 """
 
-# ─── SQL BigQuery ──────────────────────────────────────────────────────────────
-QUERY_BIGQUERY = """
+# ─── SQL Athena ───────────────────────────────────────────────────────────────
+# Template com placeholder {date_start} e {date_end} (preenchidos em runtime)
+QUERY_ATHENA_TEMPLATE = """
+WITH game_catalog AS (
+    -- Dedup: 1 registro por c_game_id (prioriza plataforma WEB)
+    SELECT c_game_id, c_game_desc, c_vendor_id
+    FROM (
+        SELECT
+            c_game_id, c_game_desc, c_vendor_id,
+            ROW_NUMBER() OVER (
+                PARTITION BY c_game_id
+                ORDER BY CASE WHEN c_client_platform = 'WEB' THEN 0 ELSE 1 END
+            ) AS rn
+        FROM bireports_ec2.tbl_vendor_games_mapping_data
+        WHERE c_status = 'active'
+          AND c_game_id IS NOT NULL
+          AND c_game_desc IS NOT NULL
+    )
+    WHERE rn = 1
+),
+wins AS (
+    SELECT
+        f.c_ecr_id,
+        f.c_game_id AS game_id_raw,
+        -- Extrai parte base do game_id (antes do '_' quando composto, ex: '3008_157309' -> '3008')
+        CASE
+            WHEN STRPOS(f.c_game_id, '_') > 0
+            THEN SPLIT_PART(f.c_game_id, '_', 1)
+            ELSE f.c_game_id
+        END AS game_id_base,
+        f.c_sub_vendor_id AS fund_vendor,
+        f.c_amount_in_ecr_ccy / 100.0 AS win_amount,
+        f.c_start_time AT TIME ZONE 'UTC' AT TIME ZONE 'America/Sao_Paulo' AS event_time_brt,
+        f.c_start_time AS event_time_utc
+    FROM fund_ec2.tbl_real_fund_txn f
+    WHERE f.c_txn_type = 45                        -- CASINO_WIN
+      AND f.c_txn_status = 'SUCCESS'
+      AND f.c_product_id = 'CASINO'
+      AND f.c_start_time >= TIMESTAMP '{date_start}'
+      AND f.c_start_time <  TIMESTAMP '{date_end}'
+      AND f.c_amount_in_ecr_ccy > 0
+)
 SELECT
-    g.game_name                                              AS game_name,
-    p.provider_name                                         AS provider_name,
-    CONCAT(
-        SUBSTR(u.core_username, 1, 2), '***', RIGHT(u.core_username, 1)
-    )                                                        AS player_name_hashed,
-    w.user_id                                               AS smr_user_id,
-    ROUND(CAST(w.casino_last_win_amount_real AS FLOAT64), 2) AS win_amount,
-    w.event_time
-
-FROM `smartico-bq6.dwh_ext_24105.tr_casino_win` w
-
-LEFT JOIN `smartico-bq6.dwh_ext_24105.dm_casino_game_name` g
-    ON CAST(w.casino_last_bet_game_name AS INT64) = g.smr_game_id
-    AND g.label_id = 24105
-
-LEFT JOIN `smartico-bq6.dwh_ext_24105.dm_casino_provider_name` p
-    ON CAST(w.casino_last_bet_game_provider AS INT64) = p.smr_provider_id
-    AND p.label_id = 24105
-
-LEFT JOIN `smartico-bq6.dwh_ext_24105.j_user` u
-    ON w.user_id = u.user_id
-
-WHERE
-    DATE(w.event_time) = CURRENT_DATE()
-    AND w.label_id = 24105
-    AND CAST(w.casino_last_win_amount_real AS FLOAT64) > 0
-    AND u.core_username IS NOT NULL
-    AND g.game_name IS NOT NULL
-
-ORDER BY win_amount DESC
+    COALESCE(g.c_game_desc, g2.c_game_desc)                 AS game_name,
+    COALESCE(g.c_vendor_id, g2.c_vendor_id, w.fund_vendor)  AS provider_name,
+    CONCAT(SUBSTR(p.c_fname, 1, 2), '***')                  AS player_name_hashed,
+    w.c_ecr_id                                               AS ecr_id,
+    w.win_amount,
+    w.event_time_brt,
+    w.event_time_utc
+FROM wins w
+-- Match exato com game_id original
+LEFT JOIN game_catalog g
+    ON w.game_id_raw = g.c_game_id
+-- Fallback: match com parte base do game_id (antes do '_')
+LEFT JOIN game_catalog g2
+    ON w.game_id_base = g2.c_game_id
+    AND g.c_game_id IS NULL
+-- Nome do jogador para hash LGPD
+LEFT JOIN ecr_ec2.tbl_ecr_profile p
+    ON w.c_ecr_id = p.c_ecr_id
+WHERE COALESCE(g.c_game_desc, g2.c_game_desc) IS NOT NULL
+  AND p.c_fname IS NOT NULL
+ORDER BY w.win_amount DESC
 LIMIT 50
 """
 
@@ -148,9 +185,11 @@ def setup_table():
     execute_supernova(DDL_SCHEMA)
     execute_supernova(DDL_TABLE)
     execute_supernova(DDL_INDEX)
-    # Migration: garante que game_slug existe e remove game_url (substituída pelo game_slug)
+    # Migrations
     execute_supernova("ALTER TABLE multibet.grandes_ganhos ADD COLUMN IF NOT EXISTS game_slug VARCHAR(200);")
     execute_supernova("ALTER TABLE multibet.grandes_ganhos DROP COLUMN IF EXISTS game_url;")
+    # v2: migra smr_user_id -> ecr_id (Athena)
+    execute_supernova("ALTER TABLE multibet.grandes_ganhos ADD COLUMN IF NOT EXISTS ecr_id BIGINT;")
     log.info("Tabela pronta.")
 
 
@@ -159,11 +198,19 @@ def refresh():
     Estratégia: TRUNCATE RESTART IDENTITY + INSERT.
     Cada execução substitui o snapshot completo do dia atual.
     IDs sempre começam em 1.
+
+    v2: usa Athena (fund_ec2 + bireports_ec2 + ecr_ec2) em vez de BigQuery.
     """
-    # 1. BigQuery — ganhos do dia
-    log.info("Buscando maiores ganhos no BigQuery (Smartico)...")
-    df = query_bigquery(QUERY_BIGQUERY)
-    log.info(f"{len(df)} registros obtidos do BigQuery.")
+    # 1. Athena — ganhos casino do dia (CASINO_WIN, c_txn_type=45)
+    # Roda às 00:30 BRT, então pega o dia anterior completo
+    today_brt = datetime.now(timezone(timedelta(hours=-3))).date()
+    date_start = today_brt.strftime("%Y-%m-%d")
+    date_end = (today_brt + timedelta(days=1)).strftime("%Y-%m-%d")
+
+    query = QUERY_ATHENA_TEMPLATE.format(date_start=date_start, date_end=date_end)
+    log.info(f"Buscando maiores ganhos no Athena (fund_ec2) para {date_start}...")
+    df = query_athena(query, database="fund_ec2")
+    log.info(f"{len(df)} registros obtidos do Athena.")
 
     if df.empty:
         log.warning("Nenhum ganho encontrado hoje. Abortando refresh.")
@@ -179,10 +226,9 @@ def refresh():
         log.warning(f"Falha ao buscar mapeamento (continuando sem imagens): {e}")
         df_mapping = pd.DataFrame(columns=["game_name_upper", "game_image_url", "game_slug"])
 
-    # 3. Join: BigQuery x Mapeamento via nome do jogo (case-insensitive)
+    # 3. Join: Athena x Mapeamento via nome do jogo (case-insensitive)
     df["game_name_upper"] = df["game_name"].str.upper().str.strip()
 
-    # Remove duplicatas no mapeamento (não deveria ter, mas por segurança)
     df_mapping_dedup = df_mapping.drop_duplicates(subset="game_name_upper", keep="first")
 
     df = df.merge(
@@ -198,7 +244,6 @@ def refresh():
         mapping_lookup = df_mapping_dedup.set_index("game_name_upper")
         for idx in df[mask_no_img].index:
             name = df.at[idx, "game_name_upper"]
-            # Remove sufixo numerico (ex: " 250", " 1000") para tentar match com base
             base_name = re.sub(r"\s+\d+$", "", name).strip()
             if base_name != name and base_name in mapping_lookup.index:
                 row = mapping_lookup.loc[base_name]
@@ -221,7 +266,7 @@ def refresh():
     insert_sql = """
         INSERT INTO multibet.grandes_ganhos
             (game_name, provider_name, game_slug, game_image_url,
-             player_name_hashed, smr_user_id, win_amount, event_time, refreshed_at)
+             player_name_hashed, ecr_id, win_amount, event_time, refreshed_at)
         VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
     """
 
@@ -232,9 +277,9 @@ def refresh():
             row.get("game_slug"),
             row.get("game_image_url") if not isinstance(row.get("game_image_url"), float) else None,
             row["player_name_hashed"],
-            int(row["smr_user_id"]),
+            int(row["ecr_id"]),
             float(row["win_amount"]),
-            row["event_time"].to_pydatetime(),
+            row["event_time_utc"],
             now_utc,
         )
         for _, row in df.iterrows()
@@ -243,7 +288,6 @@ def refresh():
     ssh, conn = get_supernova_connection()
     try:
         with conn.cursor() as cur:
-            # RESTART IDENTITY garante que os IDs sempre comecem em 1
             cur.execute("TRUNCATE TABLE multibet.grandes_ganhos RESTART IDENTITY;")
             psycopg2.extras.execute_batch(cur, insert_sql, records)
         conn.commit()

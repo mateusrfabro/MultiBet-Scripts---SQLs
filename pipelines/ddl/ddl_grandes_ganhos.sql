@@ -3,8 +3,11 @@
 -- Banco: Super Nova DB (supernova_db)
 -- Criado por: Mateus Fabro
 -- Descrição: Maiores ganhos do dia por jogo.
---   Origem 1: BigQuery Smartico (ganhos, jogadores, nomes)
---   Origem 2: Redshift Pragmatic (slug e image_url do jogo)
+--   Origem 1: Athena fund_ec2 (ganhos casino, c_txn_type=45)
+--   Origem 2: Athena bireports_ec2 (nomes jogos/providers)
+--   Origem 3: Athena ecr_ec2 (nomes jogadores, hash LGPD)
+--   Origem 4: Super Nova DB (mapeamento imagens)
+-- Histórico: v1 BigQuery (até 06/04/2026) → v2 Athena
 -- ============================================================
 
 CREATE SCHEMA IF NOT EXISTS multibet;
@@ -14,13 +17,13 @@ CREATE TABLE IF NOT EXISTS multibet.grandes_ganhos (
 
     -- Jogo
     game_name           VARCHAR(255),       -- ex: FORTUNE SNAKE
-    provider_name       VARCHAR(100),       -- ex: PRAGMATICPLAY
+    provider_name       VARCHAR(100),       -- ex: pragmaticplay, alea_evolution
     game_slug           VARCHAR(200),       -- Path de acesso ao jogo no site (ex: /pb/gameplay/aviator/real-game)
     game_image_url      VARCHAR(500),       -- URL do thumbnail no CDN do provedor
 
-    -- Player (LGPD: nome hasheado, ex: "Ri***s")
+    -- Player (LGPD: nome hasheado, ex: "Ri***")
     player_name_hashed  VARCHAR(50),
-    smr_user_id         BIGINT,             -- ID interno Smartico — NÃO expor no front
+    ecr_id              BIGINT,             -- ID interno ECR (Athena) — NÃO expor no front
 
     -- Ganho
     win_amount          NUMERIC(15, 2),     -- valor em BRL
