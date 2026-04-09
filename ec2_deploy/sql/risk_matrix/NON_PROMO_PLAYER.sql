@@ -30,6 +30,7 @@ recently_active AS (
   WHERE t.c_start_time >= CURRENT_TIMESTAMP - INTERVAL '7' DAY
     AND t.c_start_time <  CURRENT_TIMESTAMP
     AND t.c_txn_type IN (27, 28, 41, 43, 59, 127) -- apostas
+    AND t.c_txn_status = 'SUCCESS'
 ),
 
 -- Jogadores que usaram bonus nos ultimos 7 dias

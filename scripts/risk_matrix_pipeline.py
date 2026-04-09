@@ -345,6 +345,12 @@ def compute_scores(df: pd.DataFrame) -> pd.DataFrame:
         axis=1,
     )
 
+    # SEM SCORE: score_norm e score_bruto = NULL (evita que CRM interprete 41.2 como Mediano)
+    # Usa pd.Int64Dtype para manter integer nullable (sem converter para float)
+    df["score_bruto"] = df["score_bruto"].astype("Int64")
+    df.loc[df["tier"] == "SEM SCORE", "score_norm"] = None
+    df.loc[df["tier"] == "SEM SCORE", "score_bruto"] = pd.NA
+
     # Remove coluna auxiliar
     df = df.drop(columns=["tags_ativas"])
 
@@ -515,7 +521,7 @@ def export_legenda(run_date: str) -> Path:
         "COLUNAS DE SCORE",
         "-" * 40,
         "score_bruto     : Soma de todos os scores das tags ativas",
-        "score_norm      : Score normalizado 0-100 (formula: (bruto+25)/50*100)",
+        "score_norm      : Score normalizado 0-100 (formula: (bruto+35)/85*100)",
         "tier            : Classificacao baseada no score_norm",
         "",
         "TIERS",
@@ -528,9 +534,9 @@ def export_legenda(run_date: str) -> Path:
         "",
         "FORMULA DE NORMALIZACAO",
         "-" * 40,
-        "  score_norm = (score_bruto + 25) / 50 * 100, limitado [0, 100]",
-        "  Onde: -25 = p05 empirico, +25 = p95 empirico",
-        "  Pior caso teorico: -90 | Melhor caso: +166",
+        "  score_norm = (score_bruto + 35) / 85 * 100, limitado [0, 100]",
+        "  Onde: -35 = P05 calibrado, +50 = P95 calibrado, range = 85",
+        "  Pior caso teorico: -115 | Melhor caso: +166",
         "",
         "FONTE DE DADOS",
         "-" * 40,

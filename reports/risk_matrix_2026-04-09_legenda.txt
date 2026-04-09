@@ -1,7 +1,7 @@
 ======================================================================
 LEGENDA — Matriz de Risco MultiBet
 Data: 2026-04-09
-Gerado: 2026-04-09 17:22:22
+Gerado: 2026-04-09 19:12:57
 ======================================================================
 
 COLUNAS DE IDENTIFICACAO
@@ -38,7 +38,7 @@ COLUNAS DE TAGS (0 = nao aplicavel, valor = score da tag)
 COLUNAS DE SCORE
 ----------------------------------------
 score_bruto     : Soma de todos os scores das tags ativas
-score_norm      : Score normalizado 0-100 (formula: (bruto+25)/50*100)
+score_norm      : Score normalizado 0-100 (formula: (bruto+35)/85*100)
 tier            : Classificacao baseada no score_norm
 
 TIERS
@@ -51,9 +51,9 @@ TIERS
 
 FORMULA DE NORMALIZACAO
 ----------------------------------------
-  score_norm = (score_bruto + 25) / 50 * 100, limitado [0, 100]
-  Onde: -25 = p05 empirico, +25 = p95 empirico
-  Pior caso teorico: -90 | Melhor caso: +166
+  score_norm = (score_bruto + 35) / 85 * 100, limitado [0, 100]
+  Onde: -35 = P05 calibrado, +50 = P95 calibrado, range = 85
+  Pior caso teorico: -115 | Melhor caso: +166
 
 FONTE DE DADOS
 ----------------------------------------

@@ -44,6 +44,7 @@ activity_days AS (
   WHERE t.c_start_time >= (SELECT start_ts FROM params)
     AND t.c_start_time <  (SELECT end_ts FROM params)
     AND t.c_txn_type IN (27, 28, 41, 43, 59, 127) -- apostas
+    AND t.c_txn_status = 'SUCCESS'
   GROUP BY t.c_ecr_id
 ),
 

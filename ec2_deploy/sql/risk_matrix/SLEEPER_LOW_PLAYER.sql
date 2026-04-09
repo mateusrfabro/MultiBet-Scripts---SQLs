@@ -32,6 +32,7 @@ activity_summary AS (
   FROM fund_ec2.tbl_real_fund_txn t
   WHERE t.c_start_time >= (SELECT start_ts FROM params)
     AND t.c_start_time <  (SELECT end_ts FROM params)
+    AND t.c_txn_status = 'SUCCESS'
   GROUP BY t.c_ecr_id
 ),
 

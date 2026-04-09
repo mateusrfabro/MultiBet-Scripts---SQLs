@@ -35,6 +35,7 @@ concurrent_sessions AS (
     AND t.c_start_time <  (SELECT end_ts FROM params)
     AND t.c_txn_type IN (27, 28, 41, 43, 59, 127)  -- apostas
     AND t.c_session_id IS NOT NULL
+    AND t.c_txn_status = 'SUCCESS'
   GROUP BY t.c_ecr_id, CAST(t.c_start_time AS DATE), EXTRACT(HOUR FROM t.c_start_time)
   HAVING COUNT(DISTINCT t.c_session_id) >= 3  -- 3+ sessoes na mesma hora (Notion spec)
 ),

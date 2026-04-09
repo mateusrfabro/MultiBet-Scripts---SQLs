@@ -31,6 +31,7 @@ old_activity AS (
   FROM fund_ec2.tbl_real_fund_txn t
   WHERE t.c_start_time >= (SELECT start_ts FROM params)
     AND t.c_start_time <  CURRENT_TIMESTAMP - INTERVAL '30' DAY
+    AND t.c_txn_status = 'SUCCESS'
   GROUP BY t.c_ecr_id
 ),
 
@@ -43,6 +44,7 @@ recent_activity AS (
   FROM fund_ec2.tbl_real_fund_txn t
   WHERE t.c_start_time >= CURRENT_TIMESTAMP - INTERVAL '14' DAY
     AND t.c_start_time <  CURRENT_TIMESTAMP
+    AND t.c_txn_status = 'SUCCESS'
   GROUP BY t.c_ecr_id
 ),
 

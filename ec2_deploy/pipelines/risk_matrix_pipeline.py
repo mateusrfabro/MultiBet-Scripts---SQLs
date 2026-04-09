@@ -315,6 +315,12 @@ def compute_scores(df: pd.DataFrame) -> pd.DataFrame:
         lambda r: "SEM SCORE" if r["tags_ativas"] == 0 else classify_tier(r["score_norm"]),
         axis=1,
     )
+
+    # SEM SCORE: score_norm e score_bruto = NULL
+    df["score_bruto"] = df["score_bruto"].astype("Int64")
+    df.loc[df["tier"] == "SEM SCORE", "score_norm"] = None
+    df.loc[df["tier"] == "SEM SCORE", "score_bruto"] = pd.NA
+
     df = df.drop(columns=["tags_ativas"])
 
     return df
@@ -474,7 +480,7 @@ def export_legenda(run_date: str) -> Path:
         "COLUNAS DE SCORE",
         "-" * 40,
         "score_bruto     : Soma de todos os scores das tags ativas",
-        "score_norm      : Score normalizado 0-100 (formula: (bruto+25)/50*100)",
+        "score_norm      : Score normalizado 0-100 (formula: (bruto+35)/85*100)",
         "tier            : Classificacao baseada no score_norm",
         "",
         "TIERS",

@@ -22,8 +22,9 @@ brand AS (
   GROUP BY c_partner_id
 ),
 
--- GGR por jogador (bets - wins - rollbacks) em BRL
+-- GGR por jogador (bets - wins) em BRL
 -- fund_ec2 usa centavos, dividir por 100
+-- Nota: c_txn_status='SUCCESS' ja exclui rollbacks, nao precisa calcular separado
 player_ggr AS (
   SELECT
     t.c_ecr_id AS user_id,
@@ -31,8 +32,6 @@ player_ggr AS (
              THEN t.c_amount_in_ecr_ccy ELSE 0 END) / 100.0 AS total_bets_brl,
     SUM(CASE WHEN t.c_txn_type IN (45, 80, 112)
              THEN t.c_amount_in_ecr_ccy ELSE 0 END) / 100.0 AS total_wins_brl,
-    SUM(CASE WHEN t.c_txn_type IN (72, 76, 61, 63, 91, 113)
-             THEN t.c_amount_in_ecr_ccy ELSE 0 END) / 100.0 AS total_rollbacks_brl,
     COUNT(DISTINCT CAST(t.c_start_time AS DATE)) AS active_days
   FROM fund_ec2.tbl_real_fund_txn t
   WHERE t.c_start_time >= (SELECT start_ts FROM params)
