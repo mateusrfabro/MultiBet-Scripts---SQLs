@@ -268,7 +268,12 @@ git push origin main
 
 ## 7. Proximos passos (em ordem)
 
-1. **[FEITO]** Commitar tudo no git (a8686e3 + 217d4ef + 6e50b0c)
+1. **[FEITO]** Commitar tudo no git (a8686e3 + 217d4ef + 6e50b0c + da927e8 + 20a32e6)
+
+1b. **[FEITO — 20/04/2026 18:20 BRT]** Schema v1.3 aplicado em producao via
+   `scripts/apply_pcr_schema_v13.py` — rating agora e VARCHAR(10), views
+   recriadas com NEW no ORDER BY. Proximo ciclo do pipeline PCR grava
+   snapshot com rating NEW naturalmente.
 
 2. **[EM ANDAMENTO — Raphael + Castrin]** Decidir PCR_RATING_NEW
    - Codigo ja em shadow mode (tabela grava NEW, push nao envia)
