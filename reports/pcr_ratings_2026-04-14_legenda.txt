@@ -1,0 +1,65 @@
+PLAYER CREDIT RATING (PCR) — Legenda
+=====================================
+Snapshot: 2026-04-14 | Janela: ultimos 90 dias (D-1 a D-90)
+Fonte: ps_bi.fct_player_activity_daily + ps_bi.dim_user + bireports_ec2.tbl_ecr (Athena)
+Base: 159.829 jogadores ativos (apostou ou depositou no periodo)
+Destino: multibet.pcr_ratings (Super Nova DB) — atualiza diariamente 03:30 BRT
+
+COLUNAS
+-------
+  player_id         = ID interno do jogador (ecr_id, 18 digitos)
+  external_id       = ID externo (Smartico user_ext_id) — usar para joins com CRM
+  rating            = Classificacao PCR: E, D, C, B, A, S (ver escala abaixo)
+  pvs               = Player Value Score (0-100) — score numerico do rating
+  ggr_total         = Gross Gaming Revenue em BRL (apostas - ganhos do jogador)
+  ngr_total         = Net Gaming Revenue em BRL (GGR - BTR - RCA)
+  total_deposits    = Depositos totais em BRL
+  total_cashouts    = Saques totais em BRL
+  num_deposits      = Quantidade de depositos no periodo
+  days_active       = Dias com atividade no periodo
+  recency_days      = Dias desde ultima atividade (menor = mais recente)
+  product_type      = CASINO, SPORT ou MISTO (quem joga ambos)
+  casino_rounds     = Rodadas de casino
+  sport_bets        = Apostas esportivas
+  bonus_issued      = Bonus emitido em BRL
+  bonus_ratio       = Bonus / Depositos (0 = sem bonus, >1 = altamente dependente)
+  wd_ratio          = Saques / Depositos (>1 = saca mais que deposita)
+  net_deposit       = Depositos - Saques em BRL (negativo = player lucrativo pro player)
+  margem_ggr        = GGR / Turnover (margem da casa sobre o jogador)
+  ggr_por_dia       = GGR medio por dia ativo em BRL
+  affiliate_id      = ID do afiliado de aquisicao (pode ser numerico ou gclid)
+  c_category        = Status da conta (ver valores abaixo) — USAR PARA FILTRAR
+  registration_date = Data de cadastro do jogador
+
+ESCALA DE RATINGS (E-S v1.2)
+-----------------------------
+  S = Top 1%      — Whale (1.599 jogadores, GGR R$6.2M)
+  A = 92-99%      — VIP (11.188 jogadores, GGR R$13.8M)
+  B = 75-92%      — Em crescimento (27.171 jogadores, GGR R$4.1M)
+  C = 50-75%      — Regular (39.957 jogadores, GGR R$-4.3M)
+  D = 25-50%      — Casual (39.957 jogadores, GGR R$-2.7M)
+  E = Bottom 25%  — Engajamento minimo (39.957 jogadores, GGR R$-731K)
+
+VALORES DE c_category (status da conta)
+---------------------------------------
+  real_user   = Conta real ativa (141.292 — 88.4%)
+  play_user   = Conta demo (6.859 — 4.3%)
+  rg_closed   = Fechada por jogo responsavel (4.762 — 3.0%)
+  fraud       = Fraude (3.382 — 2.1%)
+  closed      = Fechada (2.305 — 1.4%)
+  rg_cool_off = Cooling off - jogo responsavel (1.224 — 0.8%)
+
+  SUGESTAO: filtrar c_category = 'real_user' para analise de jogadores ativos reais.
+
+FORMULA PVS (0-100)
+-------------------
+  +25 GGR Total          | +15 Deposito Total    | +12 Recencia (mais recente = melhor)
+  +10 Margem GGR/Turnover| +10 Num Depositos     | +8  Dias Ativos
+  +5  Mix Produto (misto = bonus) | +5 Taxa Atividade | -10 Sensibilidade a Bonus (penalizador)
+
+ATUALIZACAO
+-----------
+  Pipeline: pipelines/pcr_pipeline.py
+  Cron EC2: 06:30 UTC (03:30 BRT) — diario
+  Banco: SELECT * FROM multibet.pcr_atual ORDER BY pvs DESC;
+  Resumo: SELECT * FROM multibet.pcr_resumo;

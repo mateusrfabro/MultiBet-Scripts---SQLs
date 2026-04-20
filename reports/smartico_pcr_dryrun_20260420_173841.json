@@ -1,0 +1,266 @@
+{
+  "generated_at": "2026-04-20T17:38:41.352475",
+  "total_events": 10,
+  "sample": [
+    {
+      "player": {
+        "player_id": "704747881792139901",
+        "user_ext_id": "30416557",
+        "rating": "S",
+        "pvs": 81.57,
+        "snapshot_date": "2026-04-20",
+        "tag_aplicada": "PCR_RATING_S"
+      },
+      "payload": {
+        "eid": "bc51ad03-d056-44a8-804e-95fcd480262a",
+        "event_date": 1776717521352,
+        "ext_brand_id": "multibet",
+        "user_ext_id": "30416557",
+        "event_type": "update_profile",
+        "payload": {
+          "^core_external_markers": [
+            "PCR_RATING_*"
+          ],
+          "+core_external_markers": [
+            "PCR_RATING_S"
+          ],
+          "skip_cjm": true
+        }
+      }
+    },
+    {
+      "player": {
+        "player_id": "639277961791998861",
+        "user_ext_id": "30275517",
+        "rating": "A",
+        "pvs": 70.55,
+        "snapshot_date": "2026-04-20",
+        "tag_aplicada": "PCR_RATING_A"
+      },
+      "payload": {
+        "eid": "5ab53861-9ca5-477e-965c-a5f66984786e",
+        "event_date": 1776717521352,
+        "ext_brand_id": "multibet",
+        "user_ext_id": "30275517",
+        "event_type": "update_profile",
+        "payload": {
+          "^core_external_markers": [
+            "PCR_RATING_*"
+          ],
+          "+core_external_markers": [
+            "PCR_RATING_A"
+          ],
+          "skip_cjm": true
+        }
+      }
+    },
+    {
+      "player": {
+        "player_id": "890071766951262747",
+        "user_ext_id": "535151766951262",
+        "rating": "E",
+        "pvs": 28.1,
+        "snapshot_date": "2026-04-20",
+        "tag_aplicada": "PCR_RATING_E"
+      },
+      "payload": {
+        "eid": "d38293e5-9999-4f29-b7bf-781b467ca830",
+        "event_date": 1776717521352,
+        "ext_brand_id": "multibet",
+        "user_ext_id": "535151766951262",
+        "event_type": "update_profile",
+        "payload": {
+          "^core_external_markers": [
+            "PCR_RATING_*"
+          ],
+          "+core_external_markers": [
+            "PCR_RATING_E"
+          ],
+          "skip_cjm": true
+        }
+      }
+    },
+    {
+      "player": {
+        "player_id": "977661771784688773",
+        "user_ext_id": "655561771784688",
+        "rating": "A",
+        "pvs": 70.54,
+        "snapshot_date": "2026-04-20",
+        "tag_aplicada": "PCR_RATING_A"
+      },
+      "payload": {
+        "eid": "579874ba-e72d-4045-8496-1f25ad6b8ddd",
+        "event_date": 1776717521352,
+        "ext_brand_id": "multibet",
+        "user_ext_id": "655561771784688",
+        "event_type": "update_profile",
+        "payload": {
+          "^core_external_markers": [
+            "PCR_RATING_*"
+          ],
+          "+core_external_markers": [
+            "PCR_RATING_A"
+          ],
+          "skip_cjm": true
+        }
+      }
+    },
+    {
+      "player": {
+        "player_id": "641157221791460297",
+        "user_ext_id": "29736953",
+        "rating": "C",
+        "pvs": 45.81,
+        "snapshot_date": "2026-04-20",
+        "tag_aplicada": "PCR_RATING_C"
+      },
+      "payload": {
+        "eid": "16593e5c-8741-4a13-8c24-0ef0f9386e92",
+        "event_date": 1776717521352,
+        "ext_brand_id": "multibet",
+        "user_ext_id": "29736953",
+        "event_type": "update_profile",
+        "payload": {
+          "^core_external_markers": [
+            "PCR_RATING_*"
+          ],
+          "+core_external_markers": [
+            "PCR_RATING_C"
+          ],
+          "skip_cjm": true
+        }
+      }
+    },
+    {
+      "player": {
+        "player_id": "478865121792075369",
+        "user_ext_id": "30352025",
+        "rating": "B",
+        "pvs": 58.3,
+        "snapshot_date": "2026-04-20",
+        "tag_aplicada": "PCR_RATING_B"
+      },
+      "payload": {
+        "eid": "40bec0b6-63c7-48df-b84a-6e8e0534b2de",
+        "event_date": 1776717521352,
+        "ext_brand_id": "multibet",
+        "user_ext_id": "30352025",
+        "event_type": "update_profile",
+        "payload": {
+          "^core_external_markers": [
+            "PCR_RATING_*"
+          ],
+          "+core_external_markers": [
+            "PCR_RATING_B"
+          ],
+          "skip_cjm": true
+        }
+      }
+    },
+    {
+      "player": {
+        "player_id": "295842331791694945",
+        "user_ext_id": "29971601",
+        "rating": "D",
+        "pvs": 35.74,
+        "snapshot_date": "2026-04-20",
+        "tag_aplicada": "PCR_RATING_D"
+      },
+      "payload": {
+        "eid": "936209cb-fb57-449d-8483-6919fffe776a",
+        "event_date": 1776717521352,
+        "ext_brand_id": "multibet",
+        "user_ext_id": "29971601",
+        "event_type": "update_profile",
+        "payload": {
+          "^core_external_markers": [
+            "PCR_RATING_*"
+          ],
+          "+core_external_markers": [
+            "PCR_RATING_D"
+          ],
+          "skip_cjm": true
+        }
+      }
+    },
+    {
+      "player": {
+        "player_id": "987521773514787657",
+        "user_ext_id": "944241773514787",
+        "rating": "B",
+        "pvs": 58.31,
+        "snapshot_date": "2026-04-20",
+        "tag_aplicada": "PCR_RATING_B"
+      },
+      "payload": {
+        "eid": "7cc0eb30-f52a-4c03-9a04-237433366c3d",
+        "event_date": 1776717521352,
+        "ext_brand_id": "multibet",
+        "user_ext_id": "944241773514787",
+        "event_type": "update_profile",
+        "payload": {
+          "^core_external_markers": [
+            "PCR_RATING_*"
+          ],
+          "+core_external_markers": [
+            "PCR_RATING_B"
+          ],
+          "skip_cjm": true
+        }
+      }
+    },
+    {
+      "player": {
+        "player_id": "859251764442203579",
+        "user_ext_id": "401661764442203",
+        "rating": "S",
+        "pvs": 79.66,
+        "snapshot_date": "2026-04-20",
+        "tag_aplicada": "PCR_RATING_S"
+      },
+      "payload": {
+        "eid": "8fc0a0e4-e868-4f00-81b8-c4021245702a",
+        "event_date": 1776717521352,
+        "ext_brand_id": "multibet",
+        "user_ext_id": "401661764442203",
+        "event_type": "update_profile",
+        "payload": {
+          "^core_external_markers": [
+            "PCR_RATING_*"
+          ],
+          "+core_external_markers": [
+            "PCR_RATING_S"
+          ],
+          "skip_cjm": true
+        }
+      }
+    },
+    {
+      "player": {
+        "player_id": "140176151792213767",
+        "user_ext_id": "30490423",
+        "rating": "C",
+        "pvs": 45.81,
+        "snapshot_date": "2026-04-20",
+        "tag_aplicada": "PCR_RATING_C"
+      },
+      "payload": {
+        "eid": "388b1fe1-a561-46a8-b4f9-8291010c4e35",
+        "event_date": 1776717521352,
+        "ext_brand_id": "multibet",
+        "user_ext_id": "30490423",
+        "event_type": "update_profile",
+        "payload": {
+          "^core_external_markers": [
+            "PCR_RATING_*"
+          ],
+          "+core_external_markers": [
+            "PCR_RATING_C"
+          ],
+          "skip_cjm": true
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,39 @@
+PLAYER CREDIT RATING (PCR) — Legenda
+Snapshot: 2026-04-08 | Janela: ultimos 90 dias
+Fonte: ps_bi.fct_player_activity_daily + dim_user (Athena)
+
+COLUNAS:
+  player_id       = ID interno do jogador (ecr_id, 18 digitos)
+  external_id     = ID externo (Smartico user_ext_id)
+  rating          = Classificacao PCR: D, C, B, A, AA, AAA
+  pvs             = Player Value Score (0-100)
+  ggr_total       = Gross Gaming Revenue em BRL (apostas - ganhos)
+  ngr_total       = Net Gaming Revenue em BRL (GGR - BTR - RCA)
+  total_deposits  = Depositos totais em BRL
+  total_cashouts  = Saques totais em BRL
+  num_deposits    = Quantidade de depositos
+  days_active     = Dias com atividade no periodo
+  recency_days    = Dias desde ultima atividade
+  product_type    = CASINO, SPORT ou MISTO (casino+sport)
+  casino_rounds   = Rodadas de casino
+  sport_bets      = Apostas esportivas
+  bonus_issued    = Bonus emitido em BRL
+  bonus_ratio     = Bonus / Depositos (0 = sem bonus, >1 = alto)
+  wd_ratio        = Saques / Depositos (>1 = saca mais que deposita)
+  net_deposit     = Depositos - Saques em BRL
+  margem_ggr      = GGR / Turnover (margem da casa sobre o jogador)
+  ggr_por_dia     = GGR / Dias ativos
+  affiliate_id    = ID do afiliado de aquisicao
+
+RATINGS:
+  AAA = Whale saudavel (top 4%) — alto valor, risco minimo
+  AA  = VIP (top 4-12%) — alto valor, monitoramento proativo
+  A   = Premium (top 12-25%) — bom jogador, consistente
+  B   = Engajado (25-45%) — em desenvolvimento
+  C   = Regular (45-65%) — valor baixo
+  D   = Casual (bottom 35%) — sem engajamento ou prejuizo
+
+FORMULA PVS (0-100):
+  +25 GGR Total | +15 Deposito | +12 Recencia | +10 Margem
+  +10 Num Depositos | +8 Dias Ativos | +5 Mix Produto
+  +5 Taxa Atividade | -10 Sensibilidade Bonus
