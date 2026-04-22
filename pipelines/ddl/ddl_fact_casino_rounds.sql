@@ -31,9 +31,16 @@ CREATE TABLE IF NOT EXISTS multibet.fact_casino_rounds (
     jackpot_contribution    NUMERIC(18,2) DEFAULT 0,
     free_spins_bet          NUMERIC(18,2) DEFAULT 0,
     free_spins_win          NUMERIC(18,2) DEFAULT 0,
+    provider_display_name   VARCHAR(50),                 -- v4.2: enriquecido via game_image_mapping
+    game_category_front     VARCHAR(20),                 -- v4.2: bucket do front (Fortune/Crash/Live/...)
     refreshed_at            TIMESTAMPTZ DEFAULT NOW(),
     PRIMARY KEY (dt, game_id)
 );
+
+-- v4.2 idempotente: garante que instalacoes anteriores ganhem as 2 colunas
+ALTER TABLE multibet.fact_casino_rounds
+    ADD COLUMN IF NOT EXISTS provider_display_name VARCHAR(50),
+    ADD COLUMN IF NOT EXISTS game_category_front   VARCHAR(20);
 
 CREATE INDEX IF NOT EXISTS idx_fcr_vendor ON multibet.fact_casino_rounds (vendor_id, dt);
 CREATE INDEX IF NOT EXISTS idx_fcr_ggr ON multibet.fact_casino_rounds (dt, ggr_total DESC);

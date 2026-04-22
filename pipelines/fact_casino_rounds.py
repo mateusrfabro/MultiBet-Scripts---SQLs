@@ -30,6 +30,7 @@ Execucao:
 """
 
 import sys, os, logging
+import pandas as pd
 from datetime import datetime, timezone
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
@@ -70,9 +71,18 @@ CREATE TABLE IF NOT EXISTS multibet.fact_casino_rounds (
     jackpot_contribution    NUMERIC(18,2) DEFAULT 0,
     free_spins_bet          NUMERIC(18,2) DEFAULT 0,
     free_spins_win          NUMERIC(18,2) DEFAULT 0,
+    provider_display_name   VARCHAR(50),                 -- v4.2: vem de game_image_mapping
+    game_category_front     VARCHAR(20),                 -- v4.2: vem de game_image_mapping
     refreshed_at            TIMESTAMPTZ DEFAULT NOW(),
     PRIMARY KEY (dt, game_id)
 );
+"""
+
+# Idempotente: garante que tabelas pre-existentes (pre-v4.2) ganhem as 2 colunas.
+DDL_ALTER_V42 = """
+ALTER TABLE multibet.fact_casino_rounds
+    ADD COLUMN IF NOT EXISTS provider_display_name VARCHAR(50),
+    ADD COLUMN IF NOT EXISTS game_category_front   VARCHAR(20);
 """
 
 DDL_INDEX = """
@@ -193,11 +203,62 @@ def setup_table():
     log.info("Criando tabela fact_casino_rounds...")
     execute_supernova(DDL_SCHEMA)
     execute_supernova(DDL_TABLE)
+    execute_supernova(DDL_ALTER_V42)  # v4.2: idempotente p/ tabelas antigas
     try:
         execute_supernova(DDL_INDEX)
     except Exception as e:
         log.warning(f"Indices ja existem ou erro menor: {e}")
     log.info("Tabela pronta.")
+
+
+def load_enrichment_lookup():
+    """
+    Carrega mapping da game_image_mapping p/ enriquecer a fact.
+    Retorna 2 Series indexadas (p/ match por game_id e por game_name_upper).
+    """
+    log.info("Carregando game_image_mapping p/ enrichment (v4.2)...")
+    sql = """
+        SELECT provider_game_id,
+               UPPER(TRIM(game_name)) AS game_name_upper,
+               provider_display_name,
+               game_category_front
+        FROM multibet.game_image_mapping
+        WHERE provider_display_name IS NOT NULL
+           OR game_category_front IS NOT NULL
+    """
+    ssh, conn = get_supernova_connection()
+    try:
+        lookup = pd.read_sql(sql, conn)
+    finally:
+        conn.close()
+        if ssh:
+            ssh.close()
+    log.info(f"  lookup: {len(lookup):,} linhas em game_image_mapping")
+    return lookup
+
+
+def enrich_df(df: pd.DataFrame, lookup: pd.DataFrame) -> pd.DataFrame:
+    """
+    Enriquece o df do Athena com provider_display_name e game_category_front.
+    Prioriza match por game_id; fallback por UPPER(TRIM(game_name)).
+    """
+    # Match 1: game_id exato
+    by_gid = lookup.dropna(subset=["provider_game_id"]).drop_duplicates("provider_game_id").set_index("provider_game_id")
+    df["provider_display_name"] = df["game_id"].map(by_gid["provider_display_name"])
+    df["game_category_front"]   = df["game_id"].map(by_gid["game_category_front"])
+
+    # Match 2: fallback por game_name (pra game_ids compostos que nao batem)
+    mask = df["provider_display_name"].isna() | df["game_category_front"].isna()
+    if mask.any():
+        by_name = lookup.dropna(subset=["game_name_upper"]).drop_duplicates("game_name_upper").set_index("game_name_upper")
+        keys = df.loc[mask, "game_name"].str.upper().str.strip()
+        df.loc[mask & df["provider_display_name"].isna(), "provider_display_name"] = keys.map(by_name["provider_display_name"])
+        df.loc[mask & df["game_category_front"].isna(),   "game_category_front"]   = keys.map(by_name["game_category_front"])
+
+    cobertura_prov = 100 * df["provider_display_name"].notna().mean()
+    cobertura_cat  = 100 * df["game_category_front"].notna().mean()
+    log.info(f"  Enrichment: display {cobertura_prov:.1f}% | category_front {cobertura_cat:.1f}%")
+    return df
 
 
 def refresh():
@@ -226,6 +287,9 @@ def refresh():
     for col, default in str_defaults.items():
         df[col] = df[col].astype(str).replace({"nan": default, "NaN": default, "None": default})
 
+    # v4.2: enriquece com provider_display_name + game_category_front (lookup em game_image_mapping)
+    df = enrich_df(df, load_enrichment_lookup())
+
     now_utc = datetime.now(timezone.utc)
 
     insert_sql = """
@@ -238,8 +302,9 @@ def refresh():
              hold_rate_pct, rtp_pct,
              jackpot_win, jackpot_contribution,
              free_spins_bet, free_spins_win,
+             provider_display_name, game_category_front,
              refreshed_at)
-        VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+        VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
     """
 
     records = []
@@ -269,6 +334,9 @@ def refresh():
             float(row["jackpot_contribution"] or 0),
             float(row["free_spins_bet"] or 0),
             float(row["free_spins_win"] or 0),
+            # v4.2: enrichment cols (NaN -> None p/ virar NULL no Postgres)
+            (row["provider_display_name"] if pd.notna(row["provider_display_name"]) else None),
+            (row["game_category_front"]   if pd.notna(row["game_category_front"])   else None),
             now_utc,
         ))
 
