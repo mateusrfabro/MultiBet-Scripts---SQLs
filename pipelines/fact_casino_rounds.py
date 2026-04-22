@@ -86,6 +86,13 @@ CREATE INDEX IF NOT EXISTS idx_fcr_category ON multibet.fact_casino_rounds (game
 # Agregamos por game_id x activity_date (removendo dimensao player)
 # Valores ja em BRL (sem divisao por 100)
 # Filtro test users via bireports_ec2.tbl_ecr
+#
+# FIX Gusta bloqueador #1 (10/04/2026):
+#   ps_bi.dim_game e INCOMPLETO (cobre 0.2% do turnover, PG Soft/Spribe/Evolution ausentes).
+#   Troca para bireports_ec2.tbl_vendor_games_mapping_data (catalogo completo, validado).
+#   Tratamento de game_ids compostos (ex: '7617_164515') via SPLIT_PART.
+#   Mantem ps_bi.dim_game SOMENTE como fallback para game_category (coluna nao existe
+#   em tbl_vendor_games_mapping_data).
 
 QUERY_ATHENA = """
 WITH valid_players AS (
@@ -94,23 +101,41 @@ WITH valid_players AS (
     WHERE c_test_user = false
 ),
 
--- Deduplicar dim_game: 1 linha por game_id
-game_cat AS (
-    SELECT game_id,
-           MAX(game_desc) AS game_name,
-           MAX(vendor_id) AS vendor_id,
-           MAX(game_category) AS game_category
-    FROM ps_bi.dim_game
-    GROUP BY game_id
+-- Catalogo principal: bireports (cobertura 99%+, inclui PG Soft, Spribe, Evolution, etc.)
+-- Deduplicado por game_id: prioriza registro com client_platform = 'WEB'
+--
+-- FIX Gusta v4.1 (10/04/2026): puxa TAMBEM c_game_category direto do bireports
+-- (coberura 97.9%: 2010 Slots + 641 Live + 58 NULL). Elimina dependencia do
+-- ps_bi.dim_game (que so cobre 0.2% do turnover) como fallback de categoria.
+-- Antes: 2.349 jogos caiam em 'Outros'. Depois: 97.9% classificados.
+game_catalog AS (
+    SELECT c_game_id, c_game_desc, c_vendor_id, c_game_category, c_game_type_desc
+    FROM (
+        SELECT
+            c_game_id, c_game_desc, c_vendor_id,
+            c_game_category, c_game_type_desc,
+            ROW_NUMBER() OVER (
+                PARTITION BY c_game_id
+                ORDER BY CASE WHEN c_client_platform = 'WEB' THEN 0 ELSE 1 END
+            ) AS rn
+        FROM bireports_ec2.tbl_vendor_games_mapping_data
+        WHERE c_status = 'active'
+          AND c_game_id IS NOT NULL
+          AND c_game_desc IS NOT NULL
+    )
+    WHERE rn = 1
 )
 
 SELECT
     fca.activity_date AS dt,
     fca.game_id,
-    COALESCE(gc.game_name, 'Desconhecido') AS game_name,
-    COALESCE(gc.vendor_id, COALESCE(MAX(fca.sub_vendor_id), 'unknown')) AS vendor_id,
+    -- Primeiro tenta match direto, depois com SPLIT_PART (game_ids compostos '7617_164515')
+    COALESCE(gc.c_game_desc, gc2.c_game_desc, 'Desconhecido') AS game_name,
+    COALESCE(gc.c_vendor_id, gc2.c_vendor_id,
+             COALESCE(MAX(fca.sub_vendor_id), 'unknown')) AS vendor_id,
     COALESCE(MAX(fca.sub_vendor_id), '') AS sub_vendor_id,
-    COALESCE(gc.game_category, 'Outros') AS game_category,
+    -- v4.1: categoria direto do bireports (97.9% cobertura). Fallback 'Outros' reduzido a ~2%.
+    COALESCE(gc.c_game_category, gc2.c_game_category, 'Outros') AS game_category,
 
     COUNT(DISTINCT fca.player_id) AS qty_players,
     CAST(SUM(fca.bet_count) AS INTEGER) AS total_rounds,
@@ -145,11 +170,21 @@ SELECT
     SUM(COALESCE(fca.free_spins_win_amount_local, 0)) AS free_spins_win
 
 FROM ps_bi.fct_casino_activity_daily fca
-LEFT JOIN game_cat gc ON fca.game_id = gc.game_id
+-- Match direto: game_id exato no catalogo bireports
+LEFT JOIN game_catalog gc
+    ON fca.game_id = gc.c_game_id
+-- Fallback: game_ids compostos ('7617_164515' -> '7617')
+LEFT JOIN game_catalog gc2
+    ON (CASE WHEN STRPOS(fca.game_id, '_') > 0
+             THEN SPLIT_PART(fca.game_id, '_', 1)
+             ELSE fca.game_id END) = gc2.c_game_id
+    AND gc.c_game_id IS NULL
 JOIN valid_players vp ON fca.player_id = vp.c_ecr_id
 WHERE fca.activity_date >= DATE '2025-10-01'
   AND LOWER(fca.product_id) = 'casino'
-GROUP BY fca.activity_date, fca.game_id, gc.game_name, gc.vendor_id, gc.game_category
+GROUP BY fca.activity_date, fca.game_id,
+         gc.c_game_desc, gc.c_vendor_id, gc.c_game_category,
+         gc2.c_game_desc, gc2.c_vendor_id, gc2.c_game_category
 ORDER BY 1 DESC, ggr_total DESC
 """
 
@@ -174,6 +209,22 @@ def refresh():
     if df.empty:
         log.warning("Nenhum dado retornado. Abortando.")
         return
+
+    # Sanitiza NULLs de texto ANTES do insert.
+    # Motivo: pandas carrega NULL do Athena como numpy.nan (float). Expressao
+    # `str(row["x"] or default)` NAO funciona: NaN e truthy (float != 0), entao
+    # retorna NaN e `str(NaN)` -> "nan"/"NaN" — vira string literal no Postgres
+    # e escapa do COALESCE do dashboard (vw_casino_by_provider / app.py Gusta).
+    str_defaults = {
+        "game_id":       "",
+        "game_name":     "Desconhecido",
+        "vendor_id":     "unknown",
+        "sub_vendor_id": "",
+        "game_category": "Outros",
+    }
+    df = df.fillna(str_defaults)
+    for col, default in str_defaults.items():
+        df[col] = df[col].astype(str).replace({"nan": default, "NaN": default, "None": default})
 
     now_utc = datetime.now(timezone.utc)
 

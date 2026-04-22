@@ -185,6 +185,17 @@ def refresh():
         log.warning("Nenhum dado retornado. Abortando.")
         return
 
+    # Sanitiza NULLs de texto ANTES do insert (ver memory/feedback_pandas_nan_or_default_bug.md).
+    str_defaults = {
+        "game_id":       "",
+        "game_name":     "Desconhecido",
+        "vendor_id":     "unknown",
+        "game_category": "Outros",
+    }
+    df = df.fillna(str_defaults)
+    for col, default in str_defaults.items():
+        df[col] = df[col].astype(str).replace({"nan": default, "NaN": default, "None": default})
+
     now_utc = datetime.now(timezone.utc)
 
     insert_sql = """
