@@ -37,6 +37,23 @@ CREATE INDEX IF NOT EXISTS idx_gg_event_time
     ON multibet.grandes_ganhos (event_time DESC);
 
 -- ============================================================
+-- v4 (2026-04-22): enriquecimento de catalogo (JOIN com game_image_mapping)
+-- Mantem retro-compat — front continua lendo os mesmos campos.
+-- Novas colunas alimentadas no refresh do pipeline grandes_ganhos.py.
+-- ============================================================
+ALTER TABLE multibet.grandes_ganhos
+    ADD COLUMN IF NOT EXISTS provider_display_name VARCHAR(50),
+    ADD COLUMN IF NOT EXISTS game_category         VARCHAR(30),
+    ADD COLUMN IF NOT EXISTS game_category_front   VARCHAR(20);
+
+COMMENT ON COLUMN multibet.grandes_ganhos.provider_display_name IS
+    'Nome amigavel do vendor (ex: alea_pgsoft -> "PG Soft"). Vem do game_image_mapping.';
+COMMENT ON COLUMN multibet.grandes_ganhos.game_category IS
+    'Categoria nativa Pragmatic: slots | live | drawgames. Vem do game_image_mapping.';
+COMMENT ON COLUMN multibet.grandes_ganhos.game_category_front IS
+    'Bucket front: Live | Crash | TV Shows | Bac Bo | Baccarat | Blackjack | Fortune | Slots.';
+
+-- ============================================================
 -- Consulta que o front-end/API deve usar:
 -- ============================================================
 /*

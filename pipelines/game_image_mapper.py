@@ -195,6 +195,152 @@ def build_game_slug(game_name: str, name_upper: str) -> str:
     return f"/pb/gameplay/{slugify(game_name)}/real-game"
 
 
+# ─── Provider display name (alea_pgsoft -> "PG Soft") ───────────────────────
+# Dict estatico — espelha o providerDisplayName da categories-multibet-api.
+# Adicionar novos vendors aqui quando entrar provider novo no catalogo.
+PROVIDER_DISPLAY_NAMES = {
+    "dummy":              "Dummy",
+    "pragmaticplay":      "Pragmatic Play",
+    "pragmaticexternal":  "Pragmatic Play",
+    "alea_pgsoft":        "PG Soft",
+    "alea_pg_soft":       "PG Soft",
+    "alea_hypetechgames": "Hypetech",
+    "alea_hacksawgaming": "Hacksaw Gaming",
+    "alea_galaxsys":      "Galaxsys",
+    "alea_7777gaming":    "7777 Gaming",
+    "alea_3oaksgaming":   "3 Oaks Gaming",
+    "alea_evolution":     "Evolution",
+    "alea_creedroomz":    "Creedroomz",
+    "alea_tadagaming":    "TaDa Gaming",
+    "alea_1x2gaming":     "1x2 Gaming",
+    "alea_platipus":      "Platipus",
+    "alea_spribe":        "Spribe",
+    "alea_caleta":        "Caleta",
+    "alea_redtiger":      "Red Tiger Gaming",
+    "alea_popok":         "PopOk",
+    "alea_netent":        "NetEnt",
+    "alea_wazdan":        "Wazdan",
+    "alea_playngo":       "PlayNGo",
+    "alea_redrake":       "Red Rake Gaming",
+    "alea_rubyplay":      "Ruby Play",
+    "alea_playtech":      "Playtech",
+    "alea_netgaming":     "NetGaming",
+    "alea_ezugi":         "Ezugi",
+    "alea_gamingcorps":   "Gaming Corps",
+    "alea_skywind":       "Skywind",
+    "alea_spinoro":       "Spinoro",
+    "alea_bigtimegaming": "Big Time Gaming",
+    "alea_skywindlive":   "Skywind Live",
+    "alea_pragmaticplay": "Pragmatic Play",
+}
+
+
+def display_provider_name(vendor_id: str | None) -> str | None:
+    """Retorna nome amigavel do vendor (ex: 'alea_pgsoft' -> 'PG Soft').
+    Se vendor desconhecido, retorna o vendor_id cru truncado a 50 chars
+    (coluna provider_display_name e VARCHAR(50) — defesa contra overflow).
+    """
+    if not vendor_id:
+        return None
+    return PROVIDER_DISPLAY_NAMES.get(str(vendor_id).strip().lower(), str(vendor_id)[:50])
+
+
+# ─── Categoria do front (8 buckets para carrosseis) ─────────────────────────
+# Replica a logica da categories-multibet-api (game.queries.ts).
+# Prioridade: Live (game_category nativo) -> Crash -> TV Shows -> Bac Bo
+#             -> Baccarat -> Blackjack -> Fortune -> Slots (fallback).
+# Usa game_category nativo (Athena) para Live; resto e regex no nome.
+CRASH_GAME_IDS_FRONT = {"8369", "1301", "1320"}  # Aviator, Spaceman, Big Bass Crash
+
+TV_SHOWS_PATTERNS_FRONT = [
+    "money time", "football blitz", "football studio", "monopoly",
+    "crazy time", "mega ball", "deal or no deal", "dream catcher",
+    "gonzo", "mega wheel", "funky time", "top card",
+]
+
+
+def categorize_front(
+    game_name: str | None,
+    game_category: str | None,
+    provider_game_id: str | None,
+) -> str:
+    """Classifica o jogo em 1 de 8 buckets do front.
+
+    DIVERGE da categories-multibet-api em 1 ponto: a gente da prioridade ao
+    REGEX DE NOME para jogos classicos de mesa (roulette/blackjack/baccarat/
+    bacbo) ANTES de confiar em `game_category` nativo. Motivo: o Athena
+    classifica varios jogos de roleta como `slots` (ex: 27 jogos da
+    Creedroomz, Speed Roleta Brasileira da Playtech) — confiar cego no
+    fonte cascateia o erro pro front. Validado empiricamente em 22/04/2026.
+    """
+    name_lower = (game_name or "").strip().lower()
+    cat_lower  = (game_category or "").strip().lower()
+    gid        = str(provider_game_id or "").strip()
+
+    # 1. Crash (nome ou IDs hardcoded — Aviator, Spaceman, Big Bass Crash)
+    #    Vem PRIMEIRO porque "crash" no nome e sinal forte (e Aviator nao
+    #    tem game_category nativo no Athena — ficaria sem classificacao).
+    #    Inclui plinko e mines (mecanicas de risk-game tipicas do segmento Crash).
+    if "crash" in name_lower or "plinko" in name_lower or "mines" in name_lower \
+            or gid in CRASH_GAME_IDS_FRONT:
+        return "Crash"
+
+    # 2. Mesa classica por NOME (override ao game_category fonte que erra)
+    #    Ordem importa: Bac Bo antes de Baccarat (pra nao roubar match).
+    if any(p in name_lower for p in ("bac bo", "bac-bo", "bacbo")):
+        return "Bac Bo"
+    if "baccarat" in name_lower:
+        return "Baccarat"
+    if "blackjack" in name_lower:
+        return "Blackjack"
+    if "roleta" in name_lower or "roulette" in name_lower:
+        return "Live"  # roletas vao em Live (sub-bucket via live_subtype='Roleta')
+
+    # 3. Live nativo (depois do override de mesa — pega LIVEs sem palavra-chave)
+    if cat_lower == "live":
+        return "Live"
+
+    # 4. TV Shows
+    for pattern in TV_SHOWS_PATTERNS_FRONT:
+        if pattern in name_lower:
+            return "TV Shows"
+
+    # 5. Fortune (PT-BR + EN)
+    if "fortune" in name_lower or "fortuna" in name_lower:
+        return "Fortune"
+
+    # 6. Slots (fallback)
+    return "Slots"
+
+
+def derive_game_category(
+    game_category_raw: str | None,
+    category_front: str | None,
+) -> str | None:
+    """Preenche game_category quando o Athena nao classificou (ex: Aviator/Spribe)
+    OU quando classificou errado (ex: roleta como slots).
+
+    Regra: bucket_front Live -> 'live'; Crash -> 'crash'. Resto preserva o
+    valor original (ou None). Garante coerencia entre as 2 colunas.
+    """
+    fronted = (category_front or "").strip().lower()
+    raw     = (game_category_raw or "").strip().lower() or None
+
+    if fronted == "live":
+        return "live"
+    if fronted == "crash":
+        return "crash"
+    if fronted in ("bac bo", "baccarat", "blackjack"):
+        return "live"  # mesa classica = live
+    # Followup auditor 22/04: cobertura 98% -> 99.9% — buckets que ficavam NULL
+    # quando Athena nao classificava o catalogo nativamente.
+    if fronted == "tv shows":
+        return "live"  # Crazy Time, Mega Ball, Monopoly Live = game shows ao vivo
+    if fronted in ("slots", "fortune"):
+        return "slots"  # Fortune Tiger/Ox sao slots tematicos da PG Soft
+    return raw
+
+
 # ─── Normalizacao de subtipo Live (regex v1) ─────────────────────────────────
 # Categoriza c_game_type_desc do bireports em 5 grupos para o front.
 # Validar manualmente apos primeiro refresh — pode precisar mais regras.
@@ -253,11 +399,22 @@ def load_csv(path: str) -> list[dict]:
 # ─── Pipeline ─────────────────────────────────────────────────────────────────
 
 def setup_table():
-    """Cria schema, tabela e índice (idempotente)."""
+    """Cria schema, tabela e índice (idempotente).
+    Aplica migrations das colunas v2/v3/v4 caso a tabela ja exista sem elas.
+    """
     log.info("Verificando/criando tabela multibet.game_image_mapping...")
     execute_supernova(DDL_SCHEMA)
     execute_supernova(DDL_TABLE)
     execute_supernova(DDL_INDEX)
+    # v4 migrations (idempotentes — seguro rodar mesmo se DDL ja foi aplicado)
+    execute_supernova(
+        "ALTER TABLE multibet.game_image_mapping "
+        "ADD COLUMN IF NOT EXISTS provider_display_name VARCHAR(50);"
+    )
+    execute_supernova(
+        "ALTER TABLE multibet.game_image_mapping "
+        "ADD COLUMN IF NOT EXISTS game_category_front VARCHAR(20);"
+    )
     log.info("Tabela pronta.")
 
 
@@ -368,8 +525,16 @@ def refresh():
         has_jackpot        = athena_entry.get("has_jackpot", False)
         is_active          = (status == "active") if status else None
 
+        # v4: Provider display name + bucket de categoria do front (8 buckets)
+        # ORDEM IMPORTA: categorize_front -> derive_game_category -> classify_live_subtype
+        # (live_subtype precisa do game_category JA derivado pra pegar roletas
+        # que vieram como 'slots' do Athena e foram corrigidas pra 'live')
+        provider_display_name = display_provider_name(vendor_id)
+        game_category_front   = categorize_front(game_name, game_category, provider_game_id)
+        # v4.1: derivar game_category quando Athena nao classificou ou classificou errado
+        game_category         = derive_game_category(game_category, game_category_front)
         # Subtipo Live normalizado (Roleta/Blackjack/Baccarat/GameShow/Outros)
-        live_subtype = classify_live_subtype(game_type_desc, game_category)
+        live_subtype          = classify_live_subtype(game_type_desc, game_category)
 
         # Source flag
         if csv_entry and athena_entry:
@@ -393,6 +558,7 @@ def refresh():
             game_type_desc, live_subtype, has_jackpot, is_active,
             rounds_24h, players_24h, popularity_rank_24h, now_utc,
             total_bet_24h, total_wins_24h,
+            provider_display_name, game_category_front,
         ))
 
     # ─── 5. Upsert no Super Nova DB ──────────────────────────────────────────
@@ -404,8 +570,9 @@ def refresh():
              product_id, sub_vendor_id, game_category, game_category_desc,
              game_type_desc, live_subtype, has_jackpot, is_active,
              rounds_24h, players_24h, popularity_rank_24h, popularity_window_end,
-             total_bet_24h, total_wins_24h)
-        VALUES (%s,%s,%s,%s,%s,%s,%s,%s, %s,%s,%s,%s, %s,%s,%s,%s, %s,%s,%s,%s, %s,%s)
+             total_bet_24h, total_wins_24h,
+             provider_display_name, game_category_front)
+        VALUES (%s,%s,%s,%s,%s,%s,%s,%s, %s,%s,%s,%s, %s,%s,%s,%s, %s,%s,%s,%s, %s,%s, %s,%s)
         ON CONFLICT (game_name_upper) DO UPDATE SET
             game_name             = EXCLUDED.game_name,
             provider_game_id      = COALESCE(EXCLUDED.provider_game_id, multibet.game_image_mapping.provider_game_id),
@@ -430,7 +597,10 @@ def refresh():
             total_bet_24h         = EXCLUDED.total_bet_24h,
             total_wins_24h        = EXCLUDED.total_wins_24h,
             popularity_rank_24h   = EXCLUDED.popularity_rank_24h,
-            popularity_window_end = EXCLUDED.popularity_window_end
+            popularity_window_end = EXCLUDED.popularity_window_end,
+            -- v4: provider amigavel + bucket front (sempre derivados, atualiza)
+            provider_display_name = EXCLUDED.provider_display_name,
+            game_category_front   = EXCLUDED.game_category_front
     """
 
     ssh, conn = get_supernova_connection()
@@ -454,6 +624,11 @@ def refresh():
     total_bet_sum  = sum(float(r[20] or 0) for r in records)
     total_wins_sum = sum(float(r[21] or 0) for r in records)
 
+    # v4: distribuicao por bucket de categoria do front
+    from collections import Counter
+    cat_front_counter = Counter(r[23] for r in records if r[23])
+    providers_named   = sum(1 for r in records if r[22])
+
     log.info(f"Upsert concluido: {len(records)} jogos processados.")
     log.info(f"  Com imagem:        {with_img}  | Sem imagem: {without_img}")
     log.info(f"  Categoria slots:   {slot_count}")
@@ -464,6 +639,20 @@ def refresh():
     log.info(f"  Turnover 24h:      R$ {total_bet_sum:>15,.2f}")
     log.info(f"  Wins 24h:          R$ {total_wins_sum:>15,.2f}")
     log.info(f"  Janela 24h ate:    {now_utc.isoformat()} UTC")
+    log.info(f"  Provider amigavel: {providers_named}/{len(records)} mapeados")
+    log.info(f"  Categoria front:   {dict(cat_front_counter.most_common())}")
+
+    # S1: alerta vendors desconhecidos — orienta atualizar PROVIDER_DISPLAY_NAMES
+    # quando provider novo entrar no catalogo (em vez de aparecer ID cru no front).
+    unknown_vendors = sorted({
+        r[3] for r in records
+        if r[3] and str(r[3]).strip().lower() not in PROVIDER_DISPLAY_NAMES
+    })
+    if unknown_vendors:
+        log.warning(
+            f"  Vendors SEM display name ({len(unknown_vendors)}) — "
+            f"atualizar PROVIDER_DISPLAY_NAMES: {unknown_vendors}"
+        )
 
     if without_img > 0:
         missing = [r[0] for r in records if r[4] is None][:10]
