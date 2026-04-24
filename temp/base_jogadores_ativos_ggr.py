@@ -18,7 +18,7 @@ Validacoes (19/03/2026):
 - c_deposit_allowed: false = bloqueio operacional (SIGAP, fraude, chargeback)
 """
 import sys
-sys.path.insert(0, "c:/Users/NITRO/OneDrive - PGX/MultiBet")
+sys.path.insert(0, "c:/Users/NITRO/OneDrive - PGX/Projetos - Super Nova/MultiBet")
 
 from db.athena import query_athena
 import pandas as pd
@@ -131,7 +131,7 @@ print(f"\n--- Top 10 Base 2 ---")
 print(base2.head(10).to_string())
 
 # Salvar Excel
-output_path = "c:/Users/NITRO/OneDrive - PGX/MultiBet/output/base_jogadores_ativos_ggr_v4_FINAL.xlsx"
+output_path = "c:/Users/NITRO/OneDrive - PGX/Projetos - Super Nova/MultiBet/output/base_jogadores_ativos_ggr_v4_FINAL.xlsx"
 cols = ["user_ext_id", "c_ecr_id", "ggr_real_brl",
         "ultima_atividade", "dias_inativo",
         "flag_ggr_neg_inativo", "motivo_bloqueio"]

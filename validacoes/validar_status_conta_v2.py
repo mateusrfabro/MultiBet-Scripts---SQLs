@@ -18,7 +18,7 @@ import logging
 import pandas as pd
 from datetime import datetime
 
-sys.path.insert(0, "c:/Users/NITRO/OneDrive - PGX/MultiBet")
+sys.path.insert(0, "c:/Users/NITRO/OneDrive - PGX/Projetos - Super Nova/MultiBet")
 from db.athena import query_athena
 from db.bigquery import query_bigquery
 
@@ -34,7 +34,7 @@ DATA_INICIO = "2026-01-01"
 # Como BRT = UTC-3, no pior caso pegamos registros ate 02:59 do "amanha" BRT,
 # o que e aceitavel (e melhor do que perder registros do dia atual).
 DATA_FIM_EXPR = "CURRENT_DATE + INTERVAL '1' DAY"  # ate o fim do dia UTC de hoje
-output_path = "c:/Users/NITRO/OneDrive - PGX/MultiBet/validacoes/"
+output_path = "c:/Users/NITRO/OneDrive - PGX/Projetos - Super Nova/MultiBet/validacoes/"
 ts = datetime.now().strftime("%Y%m%d_%H%M")
 
 # ---------------------------------------------------------------------------

@@ -1,0 +1,48 @@
+LEGENDA — cadastros_sem_ftd_meta_tiktok_2026-04-18_FINAL.csv
+============================================================
+Gerado em: 2026-04-19
+Periodo de cadastro: 2026-04-18 (sabado, dia fechado BRT)
+Fonte: ps_bi.dim_user (Athena) — dbt ja consolidou
+Demanda: Augusto (gestor de trafego Multibet) — disparo WhatsApp/SMS
+
+FILTROS APLICADOS
+-----------------
+- affiliate_id IN ('464673', '477668')  -> Meta e TikTok
+- signup_datetime (BRT) = 2026-04-18
+- ftd_date IS NULL  (nunca fez primeiro deposito)
+- is_test = false  (exclui contas de teste)
+
+DICIONARIO DE COLUNAS
+---------------------
+canal                 - Meta (464673) ou TikTok (477668)
+affiliate_id          - ID do afiliado/canal de trafego
+external_id           - ID externo do jogador (identificador Smartico)
+nome                  - Nome completo (first + last)
+first_name            - Primeiro nome — usar na personalizacao da msg
+mobile_number         - Celular (para disparo WhatsApp/SMS)
+email                 - E-mail (alternativa ou complemento)
+signup_datetime_brt   - Data/hora exata do cadastro em BRT
+tracker_id            - Sub-tracker dentro do afiliado (campanha)
+utm_campaign          - Campanha UTM (quando preenchida)
+
+TOTAL: 3,901 jogadores
+  - Meta:   2,152
+  - TikTok: 1,749
+
+COBERTURA DE CONTATO
+--------------------
+Com telefone: 3,901 (100.0%)
+Com nome:     3,901 (100.0%)
+
+OBSERVACOES
+-----------
+1. Base de REMARKETING — todos cadastraram nas Super Odds mas NAO converteram (sem FTD).
+2. Fuso: cadastro em horario BRT (America/Sao_Paulo), ponto-de-corte 00:00-23:59 de 2026-04-18.
+3. Validacao cruzada com BigQuery NAO foi feita — acesso BQ desativado em 19/04.
+   Caso algum jogador tenha feito FTD apos ~08h de 2026-04-19 (ultima carga dbt),
+   ele pode aparecer nesta lista. Para janela critica, regerar antes do disparo.
+
+GLOSSARIO
+---------
+FTD = First Time Deposit (primeiro deposito na casa)
+D-1 = ontem (dia fechado, dados consolidados)

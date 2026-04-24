@@ -1,0 +1,57 @@
+LEGENDA — sports_marco_afiliados.csv
+Periodo: 2026-03-01 a 2026-03-31 (BRT) — marco completo
+Fonte: Athena vendor_ec2.tbl_sports_book_info (granular por operacao)
+         + LEFT JOIN vendor_ec2.tbl_sports_book_bets_info (header do bilhete)
+Grao: 1 linha por OPERACAO financeira do bilhete (commit, payout, lock, refund, rollback, manual credit/debit)
+Janela: bilhetes com c_created_time em marco/2026 BRT
+        (operacoes posteriores dos mesmos bilhetes tambem entram, ex: payout que ocorreu em 02/04
+         de um bilhete criado em 30/03 — confirmar com auditoria se isso e desejado)
+Valores em BRL real (nao centavos)
+
+Mapeamento coluna PDF -> origem Athena:
+- id                       = tbl_sports_book_info.c_transaction_id (ID da OPERACAO)
+- source                   = tbl_sports_book_info.c_vendor_id (Sportradar, Altenar, PPBET)
+- ext_bet_transaction_id   = c_transaction_id (da operacao)
+- ext_ticket_id            = c_bet_slip_id
+- ext_bet_id               = bets_info.c_bet_id
+- type                     = c_operation_type (L=Lock, M=Commit, P=Payout, C=Cancel, R=Refund,
+                             MC=Manual Credit, MD=Manual Debit)
+- status                   = c_bet_slip_state (O=Open, C=Closed)
+- amount                   = c_amount (BRL real — valor da OPERACAO)
+- stake_amount             = bets_info.c_total_stake (BRL real — stake do bilhete todo)
+- freebet_amount           = bets_info.c_bonus_amount
+- gain_amount              = bets_info.c_total_return (NaN se bilhete aberto)
+- feature_amount           = c_transaction_fee_amount (taxa da operacao)
+- bet_type                 = bets_info.c_bet_type (PreLive | Live | Mixed)
+- odds                     = bets_info.c_total_odds
+- is_rollover              = TRUE se c_operation_type IN ('C','R')
+- is_resettlement          = TRUE se c_operation_type IN ('MC','MD')
+- is_settlement            = TRUE se c_operation_type = 'P'
+- is_combo_bonus           = (sem equivalente direto - NULL)
+- is_freebet               = bets_info.c_is_free
+- ext_freebet_id           = bets_info.c_pam_bonus_txn_id
+- ext_freebet_source       = (sem equivalente direto - NULL)
+- user_id                  = c_customer_id (external_id = Smartico user_ext_id)
+- sports_token_id          = (sem equivalente - NULL)
+- reference_transaction_id = c_bet_slip_id (referencia o bilhete pai)
+- reference_transaction_type = 'bet_slip'
+- sports_event_id          = (disponivel via tbl_sports_book_bet_details, nao incluido neste corte)
+- created_at               = bets_info.c_created_time (BRT) — criacao do BILHETE
+- updated_at               = bets_info.c_updated_time (BRT)
+- settled_at               = bets_info.c_bet_closure_time (BRT)
+- fee_type                 = c_transaction_fee_type (NONE, DB, CR) — EXTRA
+- affiliate_id             = ps_bi.dim_user.affiliate_id
+- affiliate_name           = ps_bi.dim_user.affiliate
+
+Filtros aplicados:
+- bets_info.c_created_time entre 2026-03-01 03:00:00 e 2026-04-01 03:00:00
+  (UTC equivalente a 01/03 00h a 01/04 00h BRT)
+- ps_bi.dim_user.is_test = false (jogadores de teste excluidos)
+- ps_bi.dim_user.signup_datetime < 2026-04-01 00:00 BRT (players cadastrados ate 31/03)
+- ps_bi.dim_user.affiliate_id IN (12 afiliados alvo)
+
+Observacoes:
+- 1 bilhete gera N linhas (1 por operacao). Ex: 1 bilhete comum = M (commit) + P (payout)
+- stake_amount/gain_amount/odds sao REPLICADOS do header do bilhete em todas as operacoes do mesmo slip
+- amount = valor da OPERACAO (diferente de stake_amount em payouts, rollbacks, etc.)
+- Valores ja em BRL real - NAO dividir por 100

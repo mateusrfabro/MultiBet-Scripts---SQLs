@@ -1,0 +1,40 @@
+{
+  "generated_at": "2026-04-10T11:01:13.874973",
+  "total_events": 1,
+  "sample": [
+    {
+      "player": {
+        "user_id": "391867671791742842",
+        "user_ext_id": "30019498",
+        "tier": "Mediano",
+        "score_norm": 47.1,
+        "active_tag_count": 3,
+        "tags_aplicadas": [
+          "RISK_ENGAGED_PLAYER",
+          "RISK_PROMO_CHAINER",
+          "RISK_SLEEPER_LOW_PLAYER",
+          "RISK_TIER_MEDIANO"
+        ]
+      },
+      "payload": {
+        "eid": "d1d67b70-3453-465c-9875-f0d1532dfa39",
+        "event_date": 1775829673874,
+        "ext_brand_id": "multibet",
+        "user_ext_id": "30019498",
+        "event_type": "update_profile",
+        "payload": {
+          "^core_external_markers": [
+            "RISK_*"
+          ],
+          "+core_external_markers": [
+            "RISK_ENGAGED_PLAYER",
+            "RISK_PROMO_CHAINER",
+            "RISK_SLEEPER_LOW_PLAYER",
+            "RISK_TIER_MEDIANO"
+          ],
+          "skip_cjm": true
+        }
+      }
+    }
+  ]
+}

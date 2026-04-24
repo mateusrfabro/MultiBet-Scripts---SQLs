@@ -16,7 +16,7 @@ import logging
 import pandas as pd
 from datetime import datetime
 
-sys.path.insert(0, "c:/Users/NITRO/OneDrive - PGX/MultiBet")
+sys.path.insert(0, "c:/Users/NITRO/OneDrive - PGX/Projetos - Super Nova/MultiBet")
 from db.redshift import query_redshift
 from db.bigquery import query_bigquery
 
@@ -28,7 +28,7 @@ log = logging.getLogger(__name__)
 # ---------------------------------------------------------------------------
 DATA_INICIO = "2026-01-01"
 DATA_FIM = "2026-03-18"  # exclusivo (< data_fim) -- atualizado em 17/03/2026
-output_path = "c:/Users/NITRO/OneDrive - PGX/MultiBet/validacoes/"
+output_path = "c:/Users/NITRO/OneDrive - PGX/Projetos - Super Nova/MultiBet/validacoes/"
 ts = datetime.now().strftime("%Y%m%d_%H%M")
 
 # ---------------------------------------------------------------------------

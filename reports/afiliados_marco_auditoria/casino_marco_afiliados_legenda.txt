@@ -1,0 +1,41 @@
+LEGENDA — casino_marco_afiliados.csv
+Periodo: 2026-03-01 a 2026-03-31 (BRT) — marco completo
+Fonte: Athena fund_ec2.tbl_real_fund_txn (filtrado c_product_id='CASINO' e c_txn_status='SUCCESS')
+Grao: 1 linha por transacao financeira de cassino (bet/win/rollback/etc.)
+Valores em BRL real (ja convertidos de centavos -> /100)
+
+Mapeamento coluna PDF -> origem Athena:
+- id                       = c_txn_id
+- provider                 = c_sub_vendor_id (pragmaticplay, hub88, pgsoft, alea_*, etc.)
+- reference                = c_txn_id (proxy - nao ha ref externa isolada na tabela)
+- type                     = descricao do c_txn_type (CASINO_BUYIN, CASINO_WIN, CASINO_BUYIN_CANCEL, etc.)
+- type_id                  = c_txn_type (int) — codigo interno Pragmatic
+- status                   = c_txn_status (filtrado SUCCESS)
+- amount                   = c_amount_in_ecr_ccy / 100.0 (BRL real)
+- user_id                  = c_ecr_id (ID interno 18 digitos)
+- game_id                  = c_game_id
+- round_id                 = c_session_id (sessao de jogo — proxy, nao ha round_id isolado)
+- round_details            = (sem equivalente direto - NULL)
+- is_freespin              = 1 se c_txn_type in (80=FREESPIN_WIN, 86=FREESPIN_WIN_CANCEL, 132=FREESPIN_BUYIN, 133=FREESPIN_BUYIN_CANCEL)
+- reference_transaction_id = (sem equivalente direto - NULL)
+- reference_transaction_type = (sem equivalente direto - NULL)
+- casino_session_id        = c_session_id
+- unix_timestamp           = to_unixtime(c_start_time)
+- created_at               = c_start_time (BRT)
+- updated_at               = NULL (coluna c_end_time nao existe em fund_ec2.tbl_real_fund_txn)
+- op_type                  = c_op_type (CR=credito, DB=debito) — EXTRA, nao esta no PDF
+- channel                  = c_channel (DESKTOP, MOBILE) — EXTRA
+- affiliate_id             = ps_bi.dim_user.affiliate_id
+- affiliate_name           = ps_bi.dim_user.affiliate
+
+Tipos de transacao casino principais:
+  27=BUYIN, 28=REBUY, 29=LEAVE_TABLE, 45=WIN, 65=JACKPOT_WIN, 72=BUYIN_CANCEL (rollback),
+  77=WIN_CANCEL, 80=FREESPIN_WIN, 91=REFUND_BET, 132=FREESPIN_BUYIN, 133=FREESPIN_BUYIN_CANCEL
+
+Filtros:
+- c_start_time entre 2026-03-01 03:00:00 e 2026-04-01 03:00:00 (UTC = 01/03 00h a 01/04 00h BRT)
+- c_product_id = 'CASINO'
+- c_txn_status = 'SUCCESS'
+- ps_bi.dim_user.is_test = false
+- ps_bi.dim_user.signup_datetime < 2026-04-01 00:00 BRT (players cadastrados ate 31/03)
+- ps_bi.dim_user.affiliate_id IN (12 afiliados alvo)

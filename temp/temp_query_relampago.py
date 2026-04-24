@@ -1,5 +1,5 @@
 import sys
-sys.path.insert(0, 'c:/Users/NITRO/OneDrive - PGX/MultiBet')
+sys.path.insert(0, 'c:/Users/NITRO/OneDrive - PGX/Projetos - Super Nova/MultiBet')
 from db.bigquery import query_bigquery
 
 # 1. Search for '120326' in client_action field (as substring of the numeric value)

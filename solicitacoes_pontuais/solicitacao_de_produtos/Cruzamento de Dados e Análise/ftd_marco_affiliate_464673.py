@@ -6,7 +6,7 @@ Objetivo: Listar jogadores que fizeram FTD em março (até hoje)
 """
 
 import sys
-sys.path.insert(0, "c:/Users/NITRO/OneDrive - PGX/MultiBet")
+sys.path.insert(0, "c:/Users/NITRO/OneDrive - PGX/Projetos - Super Nova/MultiBet")
 
 from db.redshift import query_redshift
 import pandas as pd
@@ -58,7 +58,7 @@ df = query_redshift(sql)
 print(f"Resultado: {len(df)} jogadores encontrados.")
 
 # Exportar Excel
-out_dir = "c:/Users/NITRO/OneDrive - PGX/MultiBet/Solicitações Pontuais/Solicitação de Produtos/Cruzamento de Dados e Análise/out"
+out_dir = "c:/Users/NITRO/OneDrive - PGX/Projetos - Super Nova/MultiBet/Solicitações Pontuais/Solicitação de Produtos/Cruzamento de Dados e Análise/out"
 import os
 os.makedirs(out_dir, exist_ok=True)
 

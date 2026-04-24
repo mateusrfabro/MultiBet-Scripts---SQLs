@@ -1,0 +1,74 @@
+LEGENDA — smartico_sent_2026-04-16.csv
+========================================================================
+Fonte: Super Nova DB `multibet.risk_tags` (snapshots 2026-04-16 vs 2026-04-15)
+Gerado por: ec2_deploy/pipelines/export_smartico_sent_today.py
+Automacao: EC2 cron `30 5 * * *` (05:30 UTC = 02:30 BRT)
+Script producao: pipelines/push_risk_to_smartico.py
+
+EXECUCAO DE HOJE 16/04/2026
+------------------------------------------------------------------------
+  Pipeline (calcula tags)....: 02:21 BRT - OK (156.190 jogadores)
+  Push Smartico..............: 02:30-02:31 BRT - OK
+  Snapshot atual.............: 156.190 jogadores
+  Snapshot anterior..........: 155.571 jogadores
+  Enviados (diff)............: 11.806 eventos
+  Falhas.....................: 0
+  API........................: apis6.smartico.ai/api/external/events/v2
+  Campo CRM..................: core_external_markers
+  skip_cjm...................: True (nao dispara automations)
+
+BREAKDOWN
+------------------------------------------------------------------------
+  NOVO (entrou na base hoje)........: 2.766
+  MUDOU_TAGS (tags diff vs ontem)...: 9.040
+
+DISTRIBUICAO POR TIER (snapshot atual dos 11.806 enviados)
+------------------------------------------------------------------------
+  Bom............ 5.225
+  Mediano........ 3.526
+  Muito Bom...... 1.904
+  Ruim............. 668
+  Muito Ruim....... 483
+
+COLUNAS
+------------------------------------------------------------------------
+  user_ext_id .............. ID Smartico do jogador (= dim_user.external_id)
+                             ESTE e o ID para o CRM conferir no painel
+  user_id_ecr .............. ID interno ECR (18 digitos)
+  tier_atual ............... Muito Bom | Bom | Mediano | Ruim | Muito Ruim
+  score_norm ............... Score normalizado 0-100 (P05=-35 -> 0, P95=50 -> 100)
+  tags_smartico_atual ...... Tags que foram ENVIADAS hoje (separador `|`)
+  tags_smartico_anterior ... Tags que estavam no snapshot anterior (para diff)
+  motivo ................... NOVO (nao existia ontem) | MUDOU_TAGS
+
+GLOSSARIO DE TAGS RISK_*
+------------------------------------------------------------------------
+  Comportamentais (21): REGULAR_DEPOSITOR, PROMO_ONLY, ZERO_RISK_PLAYER,
+  FAST_CASHOUT, SUSTAINED_PLAYER, NON_BONUS_DEPOSITOR, PROMO_CHAINER,
+  CASHOUT_AND_RUN, REINVEST_PLAYER, NON_PROMO_PLAYER, ENGAGED_PLAYER,
+  RG_ALERT_PLAYER, BEHAV_RISK_PLAYER, POTENCIAL_ABUSER, PLAYER_REENGAGED,
+  SLEEPER_LOW_PLAYER, VIP_WHALE_PLAYER, WINBACK_HI_VAL_PLAYER,
+  BEHAV_SLOTGAMER, MULTI_GAME_PLAYER, ROLLBACK_PLAYER
+
+  Tiers (5): RISK_TIER_MUITO_BOM | BOM | MEDIANO | RUIM | MUITO_RUIM
+
+  Operacao no Smartico (atomica):
+    remove_pattern: ["RISK_*"]  -> limpa qualquer tag RISK antiga
+    add_tags:       [tags novas] -> adiciona as do snapshot atual
+
+COMO O CRM DEVE CONFERIR
+------------------------------------------------------------------------
+  1. Pegar uma amostra de `user_ext_id` deste CSV
+  2. Abrir o perfil do jogador no Smartico
+  3. Verificar em `core_external_markers` se tem exatamente as tags
+     listadas em `tags_smartico_atual`
+  4. As tags RISK_* antigas nao devem aparecer duplicadas
+     (operacao atomica remove ^RISK_* antes de adicionar)
+
+OBSERVACOES
+------------------------------------------------------------------------
+  - Jogadores SEM SCORE (tier NULL) nao sao enviados.
+  - Jogadores inativos (>90 dias) mantem tags antigas no Smartico -
+    decisao consciente para o CRM poder reativa-los com contexto.
+  - O push envia SO o diff (mudancas), nao re-envia base toda diariamente.
+  - Proxima execucao automatica: 17/04/2026 02:30 BRT

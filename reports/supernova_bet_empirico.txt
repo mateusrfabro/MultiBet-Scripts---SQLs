@@ -1,0 +1,152 @@
+INVESTIGACAO EMPIRICA — SUPERNOVA_BET
+Objetivo: mapear valores reais de cada campo critico
+
+======================================================================
+  1. TRANSACTIONS — tipos e status
+======================================================================
+  type: CASINO_DEBIT               84688 txns
+  type: CASINO_CREDIT              27231 txns
+  type: DEPOSIT                     1032 txns
+  type: WITHDRAW                     157 txns
+  type: BONUS_CREDIT                  81 txns
+  type: BONUS_DEBIT                   19 txns
+  type: ADJUSTMENT_CREDIT             15 txns
+  type: BONUS_CONVERSION               4 txns
+  type: ADJUSTMENT_DEBIT               4 txns
+
+  CASINO_DEBIT > COMPLETED                  84688
+  CASINO_CREDIT > COMPLETED                 27231
+  DEPOSIT > EXPIRED                           375
+  DEPOSIT > COMPLETED                         324
+  DEPOSIT > FAILED                            274
+  WITHDRAW > COMPLETED                         90
+  BONUS_CREDIT > COMPLETED                     81
+  DEPOSIT > PENDING                            59
+  WITHDRAW > CANCELLED                         33
+  WITHDRAW > FAILED                            31
+  BONUS_DEBIT > COMPLETED                      19
+  ADJUSTMENT_CREDIT > COMPLETED                15
+  BONUS_CONVERSION > COMPLETED                  4
+  ADJUSTMENT_DEBIT > COMPLETED                  4
+  WITHDRAW > REJECTED                           3
+
+======================================================================
+  2. TRANSACTIONS — campos de valor
+======================================================================
+  type                 status              min        max        avg  real_amt   fee  locked
+  ------------------------------------------------------------------------------------------
+  ADJUSTMENT_CREDIT    COMPLETED        100.00   15000.00    1206.67        15     0       0
+  ADJUSTMENT_DEBIT     COMPLETED        200.00     400.00     350.00         4     0       0
+  BONUS_CONVERSION     COMPLETED        445.25     900.00     636.31         4     0       0
+  BONUS_CREDIT         COMPLETED         50.00    5000.00     734.57        81     0       0
+  BONUS_DEBIT          COMPLETED        109.41    5000.00    1022.07        19     0       0
+  CASINO_CREDIT        COMPLETED          0.00   65200.00      89.65     27231     0       0
+  CASINO_DEBIT         COMPLETED          0.00   10000.00      30.12     84688     0       0
+  DEPOSIT              COMPLETED        100.00    5010.00     689.82       297     0       0
+  DEPOSIT              EXPIRED          100.00   20000.00     973.15         0     0       0
+  DEPOSIT              FAILED           100.00   35000.00    1147.28         0     0       0
+  DEPOSIT              PENDING          100.00   10000.00     867.80         0     0       0
+  WITHDRAW             CANCELLED        100.00   30000.00    2849.67         0     0       0
+  WITHDRAW             COMPLETED        100.00    5000.00     850.13         0     0       0
+  WITHDRAW             FAILED           100.00    4500.00     558.10         0     0       0
+  WITHDRAW             REJECTED         100.00     900.00     500.00         0     0       0
+
+======================================================================
+  3. BETS — categories e status
+======================================================================
+  LOSS / SETTLED               57342 rows
+  WIN / SETTLED                27188 rows
+  WAGER / PLACED                  84 rows
+
+  cat/status            amt_min  amt_max  win_min    win_max  bonus_min  bonus_max
+  LOSS/SETTLED             0.00 10000.00     0.00       0.00       0.00    2000.00
+  WAGER/PLACED             0.00   686.35     0.00       0.00       0.00    1000.00
+  WIN/SETTLED              0.00 10000.00     0.02   65200.00       0.00    6100.00
+
+======================================================================
+  4. BETS — como calcular GGR corretamente
+======================================================================
+  LOSS.amount total:      Rs 1,172,066.25
+  WIN.amount total:       Rs   934,041.97
+  WIN.win_amount total:   Rs 2,441,322.78
+  WAGER.amount total:     Rs     7,977.19
+  WAGER.win_amount total: Rs         0.00
+  GGR v1 (LOSS.amt - WIN.win_amt):  Rs -1,269,256.53
+  GGR v2 (SUM amt - SUM win_amt):   Rs  -327,237.37
+  GGR matriz_financeiro (view):      Rs   110,998.23
+  MATCH v1 vs view? NAO — diverge -1380255
+  MATCH v2 vs view? NAO — diverge -438236
+
+======================================================================
+  5. CASINO_USER_GAME_METRICS — cross-check
+======================================================================
+  total_bet_amount:  Rs 2,549,853.17
+  total_win_amount:  Rs 2,441,322.78
+  net_revenue (GGR): Rs   108,530.39
+  MATCH vs view? NAO — diverge -2468
+
+======================================================================
+  6. USERS — campos e distribuicao
+======================================================================
+  role:
+    USER                   1444
+    ADMIN                     9
+    VIEWER                    4
+    SUPER_ADMIN               1
+    MAINTAINER                1
+  active:
+    True                   1459
+  blocked:
+    False                  1459
+  is_affiliate:
+    False                  1456
+    True                      3
+
+  Com email: 770/1459  |  Com phone: 1458/1459
+
+======================================================================
+  7. WALLETS — tipos e estados
+======================================================================
+  type: BONUS        1458
+  type: REAL         1458
+  BONUS    bloqueadas:0  com_saldo:64  total:Rs     22296.17
+  REAL     bloqueadas:0  com_saldo:160  total:Rs     74582.54
+
+======================================================================
+  8. BONUS — programas e status
+======================================================================
+  Welcome Bonus 100% | type:FIRST_DEPOSIT | match:100.00% | rollover:75.00x | max_saq:3.00x | min_dep:200.0000 | ativo:True
+  bonus_activations status: ACTIVE            60
+  bonus_activations status: CANCELLED         15
+  bonus_activations status: COMPLETED          4
+
+======================================================================
+  9. PAYMENT METHODS — config
+======================================================================
+  PAYIN    Easypaisa                 code:pk_payin_easypaisa             ativo:True min:200.00 max:50000.00
+  PAYIN    Easypaisa Pay In          code:pka_easypaisa_payin            ativo:False min:300.00 max:0.00
+  PAYIN    Jazzcash                  code:pk_payin_jazzcash              ativo:True min:100.00 max:50000.00
+  PAYOUT   Easypaisa                 code:pk_payout_easypaisa            ativo:True min:500.00 max:50000.00
+  PAYOUT   Jazzcash                  code:pk_payout_jazzcash             ativo:True min:500.00 max:50000.00
+
+======================================================================
+  10. USER_MARKETING_EVENTS — tipos
+======================================================================
+  Register               1456
+  Deposit                 290
+  FTD                     232
+
+======================================================================
+  11. WEBHOOK_ENDPOINTS — integrações
+======================================================================
+  Nubo integration | type:standard | ativo:True | events:['Register', 'Login', 'DepositCreation', 'Deposit', 'FTD', 'Withdrawal']
+  Keitaro | type:composed | ativo:True | events:['Register', 'Deposit', 'FTD']
+
+======================================================================
+  12. TIMESTAMPS — timezone check
+======================================================================
+  tabela                 tipo                                min                          max
+  transactions           timestamp without time zone         2026-03-25 17:20:36.821144+00:00 2026-04-09 13:43:22.074691+00:00
+  bets                   timestamp without time zone         2026-03-27 15:57:16.485000+00:00 2026-04-09 13:43:05.795000+00:00
+  users                  timestamp without time zone         2026-03-11 13:28:10.775923+00:00 2026-04-09 13:42:28.579574+00:00
+  bonus_activations      timestamp with time zone            2026-04-03 01:23:53.625925+00:00 2026-04-09 12:49:59.007870+00:00

@@ -1,0 +1,89 @@
+======================================================================
+  RELATORIO DE DISTRIBUICAO DE BONUS, FREESPINS E CASHBACK
+  Periodo: Marco/2026 (01/03 a 31/03)
+  Fonte: fund_ec2.tbl_bonus_sub_fund_txn (Athena/Iceberg)
+  Gerado: 06/04/2026 09:06 BRT
+======================================================================
+
+1. VALIDACAO CRUZADA — Athena vs Redshift (Fev/26)
+--------------------------------------------------
+   Migracao de Redshift para Athena validada com sucesso.
+   Divergencia < 1% em todas as categorias.
+
+   Bonus Concedido (OFFER_BONUS)          Athena: R$ 1,399,100.67  Ref: R$ 1,399,100.67  (+0.0%)
+   Bonus Convertido (ISSUE_BONUS)         Athena: R$ 1,369,470.89  Ref: R$ 1,369,470.89  (+0.0%)
+   Bonus Dropped                          Athena: R$   107,565.84  Ref: R$   107,565.84  (+0.0%)
+   Bonus Expirado                         Athena: R$    16,388.82  Ref: R$    16,388.82  (+0.0%)
+   Bonus Issue Drop Debit                 Athena: R$    17,834.56  Ref: R$    17,834.56  (+0.0%)
+   Freespin Wins                          Athena: R$   272,115.04  Ref: R$   272,115.04  (+0.0%)
+
+
+2. FECHAMENTO MAR/26
+--------------------------------------------------
+
+   Tipo                                       Concedido        Utilizado
+   ----------------------------------- ---------------- ----------------
+   Bonus                               R$   741,855.53  R$ 1,521,085.34
+   Freespins (Wins)                    R$ 1,159,934.33                 —
+   Total                               R$ 1,901,789.86  R$ 1,521,085.34
+
+
+3. AUDITORIA — Taxa de Churn de Bonus
+--------------------------------------------------
+
+   Mes         Churn Total   Expirado    Dropped   Convertido
+   ---------- ------------ ---------- ---------- ------------
+   Fev/26            9.4%       1.1%       7.1%        90.6%
+   Mar/26           17.6%       3.2%      13.3%        82.4%
+
+   Churn moderado — avaliar campanhas com alto dropped.
+
+
+4. NOTA: UTILIZADO > CONCEDIDO
+--------------------------------------------------
+   O valor utilizado (convertido) ser maior que o concedido no
+   mesmo mes acontece porque bonus concedidos em meses anteriores
+   ainda estavam ativos e foram utilizados neste periodo.
+   O jogador recebe o bonus num mes, mas so cumpre o wagering e
+   converte em outro. A concessao entra no mes de origem, mas a
+   utilizacao entra no mes em que de fato aconteceu (carry-over).
+
+
+5. COMPARATIVO HISTORICO
+--------------------------------------------------
+
+   Mes         Bonus Concedido    Freespin Wins  Total Concedido
+   ---------- ---------------- ---------------- ----------------
+   Dez/25     R$ 7,588,476.11  R$   528,723.13  R$ 8,117,199.24
+   Jan/26     R$   937,041.91  R$   407,060.96  R$ 1,344,102.87
+   Fev/26     R$ 1,399,100.67  R$   272,115.04  R$ 1,671,215.71
+   Mar/26     R$   741,855.53  R$ 1,159,934.33  R$ 1,901,789.86
+
+   Variacao Fev/26 -> Mar/26: +13.8%
+
+
+6. PONTO DE ATENCAO: CASHBACK
+--------------------------------------------------
+   O Cashback em dinheiro real NAO e registrado nas tabelas de bonus.
+   E distribuido via BackOffice como ajuste manual.
+   Necessario confirmar com a plataforma se houve distribuicao de
+   cashback em Mar/26 para complementar o total.
+
+
+7. GLOSSARIO
+--------------------------------------------------
+   Bonus Concedido (OFFER_BONUS) = bonus creditado ao jogador
+   Bonus Convertido (ISSUE_BONUS) = bonus convertido em real cash (wagering cumprido)
+   Bonus Expirado = bonus nao utilizado dentro do prazo
+   Bonus Dropped = bonus cancelado pelo jogador ou sistema
+   Freespin Wins = valor monetario ganho em rodadas gratis
+   Churn = % de bonus que 'morreu' sem ser convertido (expirado + dropped)
+   Carry-over = bonus concedido num mes mas utilizado em outro
+
+   Fonte: fund_ec2.tbl_bonus_sub_fund_txn (Athena/Iceberg)
+   Fuso: dados em UTC, convertidos para BRT (UTC-3) nos filtros
+   Valores: centavos BRL / 100.0
+   Coluna de valor: c_txn_amount
+   Excluidos: c_txn_amount <= 0 (transacoes zeradas)
+   Periodo: 01/03/2026 00:00 BRT a 01/04/2026 00:00 BRT
+======================================================================

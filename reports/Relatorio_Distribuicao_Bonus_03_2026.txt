@@ -1,0 +1,40 @@
+Relatório de Distribuição de bonus, Freespins e Cashbacks
+
+Período: Março de 2026
+
+1. Resumo
+
+Em Março de 2026, foram distribuídos R$ 1.901.789,86 em Bônus e Freespins aos
+nossos jogadores com base nas informações disponibilizadas na plataforma.
+
+Nota: O valor de Cashback distribuído via BackOffice não está incluído neste
+total. Necessário confirmar com a plataforma o valor de cashback do período
+para complementar.
+
+2. Tabela de Distribuição
+
+Abaixo, segue a tabela com a distribuição do mês:
+
+Tipo                    Valor
+Bônus                   R$      741.855,53
+Freespins               R$    1.159.934,33
+CashBack                R$      pendente*
+Total (s/ Cashback)     R$    1.901.789,86
+
+* Cashback é distribuído via BackOffice como ajuste manual e não consta nas
+  tabelas de bônus da plataforma. Valor será adicionado após confirmação.
+
+3. Método e Fonte
+
+O relatório foi feito utilizando dados extraídos da base de dados da plataforma
+(Pragmatic Solutions) via AWS Athena (Iceberg Data Lake), onde levantamos os
+valores distribuídos no período.
+
+Tabela: fund_ec2.tbl_bonus_sub_fund_txn
+Período: 01/03/2026 a 31/03/2026 (horário de Brasília)
+Fuso horário: dados armazenados em UTC, convertidos para BRT (UTC-3)
+Valores: armazenados em centavos BRL, convertidos para reais (/100)
+
+Validação: dados cruzados com extração anterior (Redshift) para Fev/26 com
+divergência de 0,0% em todas as categorias, confirmando a integridade da
+migração para Athena.

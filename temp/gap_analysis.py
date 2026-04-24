@@ -2,7 +2,7 @@
 Gap Analysis: tracker_ids e affiliate_ids no Athena vs dim_marketing_mapping
 """
 import sys
-sys.path.insert(0, "c:/Users/NITRO/OneDrive - PGX/MultiBet")
+sys.path.insert(0, "c:/Users/NITRO/OneDrive - PGX/Projetos - Super Nova/MultiBet")
 from db.athena import query_athena
 import pandas as pd
 

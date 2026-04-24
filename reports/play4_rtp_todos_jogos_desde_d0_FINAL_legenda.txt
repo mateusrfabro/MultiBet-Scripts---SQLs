@@ -1,0 +1,90 @@
+LEGENDA — play4_rtp_todos_jogos_desde_d0_FINAL.csv
+======================================================================
+
+CONTEXTO
+--------
+Demanda: Head (20/04/2026) — "quero ver como ta o RTP de todos os jogos,
+100%, nos ultimos 30d. desde o D0 da operacao."
+
+Janela: 27/03/2026 a 23/04/2026
+        (28 dias — operacao tem 25d, "ultimos 30d" == "desde D0")
+
+Fontes:
+  - casino_user_game_metrics (supernova_bet, validada 09/04/2026) — rodadas, win, bet
+  - casino_games.rtp          — RTP do catalogo do banco (pode estar defasado)
+  - rtp_oficial_2j_games.csv  — planilha oficial 2J Games, source of truth
+    (sheet: https://docs.google.com/spreadsheets/d/1jU7XNjp02nmp0A29tnCUbw01gHsN9AIM)
+Filtro: 72 contas teste excluidas (heuristica + logica dev), 4 whitelist DP/SQ
+
+Separador CSV: ponto-e-virgula (;)
+Encoding: UTF-8 com BOM (abre no Excel BR sem acentos quebrados)
+Casas decimais: ponto (.)
+
+COLUNAS
+-------
+rank               Ordem: ANOMALOS primeiro, depois altos, abaixo, normais, amostra baixa.
+                   Dentro de cada grupo, maior delta primeiro.
+jogo               Nome do jogo conforme catalogo do provider.
+provider           Provider ativo — atualmente 100% "2J Game".
+ativo              Sim/Nao — se o jogo esta marcado como ativo no catalogo.
+rtp_oficial_2j_pct        RTP oficial informado pela 2J Games na planilha (source of truth).
+                          Vazio se o jogo nao consta na planilha do provider.
+rtp_cfg_banco_pct         RTP gravado em supernova_bet.casino_games.rtp
+                          (snapshot do banco — pode estar defasado vs 2J).
+delta_banco_vs_oficial_pp rtp_cfg_banco - rtp_oficial_2j. Positivo/negativo alto =
+                          catalogo do banco desatualizado, precisa sync com provider.
+rtp_obs_pct               RTP observado = ganho / apostado x 100 (em %). Vazio se sem apostas.
+delta_pp                  RTP observado - RTP de referencia (oficial 2J se disponivel;
+                          senao, rtp do banco).
+                          Positivo = casa devolveu mais que o esperado.
+                          Negativo = casa ganhou mais que o esperado.
+dias_ativo         Dias distintos com pelo menos 1 aposta no periodo.
+players_distintos  Jogadores reais distintos que apostaram.
+rodadas            Total de giros/spins no periodo.
+apostado_brl       Turnover em BRL (conversao triangulada via USD).
+apostado_pkr       Turnover na moeda original da operacao (Rupia Paquistanesa).
+ganho_brl          Valor pago aos jogadores em BRL.
+ganho_pkr          Valor pago em PKR.
+ggr_brl            Gross Gaming Revenue da casa em BRL (apostado - ganho). Negativo = casa perdeu.
+ggr_pkr            GGR em PKR.
+veredito           Classificacao — ver criterios abaixo.
+
+CRITERIOS DE VEREDITO
+---------------------
+ANOMALO (+15pp)        Delta > +15pp com >=500 giros. Revisar urgente com provider.
+alto (+5pp)            Delta entre +5 e +15pp. Monitorar — pode ser tendencia ou volatilidade.
+acima / abaixo         Delta moderado. Operacao normal.
+abaixo (casa ganha)    Delta < -5pp. Casa esta ganhando mais que o config prometia —
+                       pode indicar RTP cfg errado pra cima (revisar) ou jogo com
+                       caracteristica de baixa variancia.
+normal                 Delta entre -5 e +5pp. Oscilacao natural dentro do esperado.
+amostra baixa          < 500 giros no periodo inteiro. Ignorar — ruido estatistico alto.
+
+POR QUE >=500 GIROS?
+Com RTP tipico ~95% e variancia alta por jogada, 500 giros dao desvio padrao
+de ~5pp no RTP observado. Abaixo disso o ruido mata qualquer conclusao — mesmo
+um RTP config 95% pode "observar" 120% ou 70% por puro azar/sorte do jogador.
+
+MOEDA E CONVERSAO
+-----------------
+Operacao Play4Tune roda 100% em PKR (Rupia Paquistanesa).
+BRL (Real) e convertido via triangulacao USD usando a tabela
+`currency_exchange_rates` do proprio supernova_bet (fonte: openexchangerate-free,
+atualizada 2x/dia).
+
+Taxa usada neste relatorio: 1 PKR = R$ 0.017795
+Snapshot: 24/04/2026 00:02 UTC
+
+COMO INTERPRETAR
+----------------
+1. Jogos com delta DENTRO de -5 a +5pp e amostra >=500 giros = operacao saudavel.
+2. Jogos ANOMALOS ou ALTOS = investigar:
+   - 1 jogador apostando muito pontualmente (volatilidade) ou
+   - bug/config errado do provider.
+3. Jogos com amostra baixa = insuficiente pra concluir. Revisitar quando
+   acumular volume.
+4. Para diagnostico PRODUTO (jogo quebrado?): janela >=30d.
+   Para DETECCAO DE EVENTO (jogador suspeito agora?): janela <=7d.
+
+GERADO EM: 24/04/2026 12:13 BRT
+SCRIPT: scripts/report_rtp_todos_jogos_desde_d0.py

@@ -1,0 +1,193 @@
+================================================================
+ANALISE DIARIA PLAY4TUNE — 10/04/2026
+================================================================
+Fonte: Super Nova Bet DB (supernova_bet.public)
+Timezone: PKT (Asia/Karachi, UTC+5) — operacao no Paquistao
+Moeda: PKR (Rupia Paquistanesa)
+Snapshot: ~22:50 PKT (dia praticamente fechado)
+
+================================================================
+RESUMO EXECUTIVO — POR QUE O TURNOVER CAIU
+================================================================
+
+Turnover de hoje (Rs 116.7K) caiu 77% vs anteontem (Rs 943K).
+A queda nao e linear — o pico de 08/04 foi atipico (whale + bonus
+convertendo). O nivel de hoje esta dentro da media historica da
+casa (Rs 50-130K/dia ate 06/04), mas ABAIXO do esperado.
+
+3 causas raiz identificadas:
+
+1) PROCESSADOR DE PAGAMENTO TRAVANDO (CRITICO)
+   - 73 tentativas de deposito hoje, apenas 21 concluiram (28.8%)
+   - 52 depositos PENDING travados = Rs 44.4K parados
+   - Easypaisa: 34/42 (81%) presos em PENDING
+   - Jazzcash: 18/31 (58%) presos em PENDING
+   - Comparativo: 08/04 teve 49 OK e ZERO PENDING (problema NOVO)
+   - Os Rs 44.4K travados nao viraram bets — esse e o "turnover faltante"
+
+2) WHALE UNICO REGREDINDO (mehmood88)
+   - 08/04: Rs 547K turnover (77% do dia)
+   - 09/04: Rs 303K turnover (63% do dia)
+   - 10/04: Rs 95K turnover (41% do dia)
+   - Concentracao perigosa: depender de 1 jogador para 60-77% do turnover
+   - Boa noticia: nao e churn — esta jogando, mas em volume menor (cooldown apos 2 dias intensos)
+
+3) CONVERSAO CADASTRO -> FTD QUEBRADA
+   - 120 novos cadastros hoje, apenas 7 FTDs (5.8% de conversao)
+   - Comparativo dias anteriores: aquisicao bombando (160-181 cadastros)
+     mas FTD nao acompanha — provavelmente ligado ao item 1 (deposito travado)
+   - 21 jogadores ativos hoje vs 49 no pico de 08/04 (-57%)
+
+================================================================
+NUMEROS DO DIA (10/04/2026 PKT)
+================================================================
+                            Hoje      Ontem     Var
+Turnover (Rs)            116,773    512,138   -77.2%
+GGR (Rs)                  17,138     22,283   -23.1%
+NGR (Rs)                  17,138     22,283   -23.1%
+Hold %                      1.48%      1.15%   +0.33pp
+Clientes ativos               18         24   -25.0%
+Bets totais                7,008      8,630   -18.8%
+Novos cadastros (PKT)        120        171   -29.8%
+FTDs                           7         29   -75.9%
+Depositos COMPLETED           21         29   -27.6%
+Depositos PENDING             52          1  +5100%  <-- ALERTA
+Saques COMPLETED               7         na     -
+
+Fonte: vw_totais_gerais (oficial) + transactions/bets/users
+
+================================================================
+HISTORICO ULTIMOS 8 DIAS (PKT)
+================================================================
+DIA         APOSTADO      PAGO      GGR   HOLD%  ATIVOS
+10/04        116,773    99,635   17,138   1.48%      18  <-- HOJE
+09/04        512,138   489,855   22,283   1.15%      24
+08/04        943,106   956,003  -12,898  -0.44%      42  <-- pico, casa perdeu
+07/04        558,131   522,872   35,259   0.76%      44
+06/04         65,689    49,698   15,991   1.06%      21
+05/04         63,045    54,828    8,217   0.13%      14
+04/04         72,845    57,509   15,336   0.21%      11
+03/04         89,953   107,291  -17,338  -0.19%      13
+
+Insight: o salto de 07-08/04 (44->42 ativos com 558K-943K) foi
+anomalia. A media historica saudavel e ~80K turnover/dia com
+15-25 ativos. Hoje (116K, 18 ativos) e UM DIA NORMAL — o que da
+sensacao de "turnover baixo" e a comparacao com o pico.
+
+================================================================
+TOP 5 JOGOS HOJE (PKT)
+================================================================
+JOGO                   RODADAS   TURNOVER     PAYOUT      GGR
+CRASH                       14    95,420     70,280   25,140  <-- whale (mehmood88)
+MYTHICAL ANIMALS            13    52,260     41,387   10,874
+GOLDEN OX                1,351    26,545     27,629   -1,084
+TRUMP IT                 1,125     5,737      6,216     -480
+SUPER ACE                  386     5,228      5,521     -293
+
+NOTA: CRASH e MYTHICAL ANIMALS sao high-stake (poucas rodadas,
+valores altos). Os demais sao slots tradicionais (rodadas
+massivas, ticket pequeno). 95% do GGR hoje vem do CRASH.
+
+================================================================
+TOP 5 JOGADORES (ULTIMOS 3 DIAS PKT)
+================================================================
+USERNAME       PID         10/04     09/04     08/04     TOTAL
+mehmood88      y9eAgK4wl  95,420   303,110   547,940 1,054,939  <-- whale
+ajmal          LVjXgnWA4  52,575    93,751         -   146,326
+newsaher       9q2jgjWHf  24,421    15,098         -    39,519
+wajidrie       blAsL3tsa   5,537     8,391     9,915    37,193
+mirzaibrar     VYXSTVmH9   1,383         -    20,716    22,099
+
+DIAGNOSTICO: top 2 jogadores (mehmood88 + ajmal) representam 80%
+do turnover dos ultimos 3 dias. Concentracao MUITO alta — risco
+operacional alto.
+
+================================================================
+DEPOSITOS PENDING — DETALHE POR METODO (HOJE PKT)
+================================================================
+METODO        OK   PEND  FAIL  EXPIR  TOTAL  RS_OK   RS_PEND
+Easypaisa      8     34     0      0     42  4,200   24,102  <-- 81% travados
+Jazzcash      13     18     0      0     31  9,500   20,301  <-- 58% travados
+
+ACAO IMEDIATA: investigar com infra/devops por que depositos
+estao ficando em PENDING ao inves de concluir/expirar como nos
+dias anteriores. Pode ser:
+- Webhook de callback do gateway falhando
+- Provider lento na confirmacao
+- Mudanca recente em integracao Easypaisa
+
+================================================================
+RECOMENDACOES (em ordem de prioridade)
+================================================================
+
+1) URGENTE — Resolver PENDING dos gateways
+   - 52 depositos travados = Rs 44.4K parados = Rs ~30-40K de
+     turnover potencial perdido por dia
+   - Comparar config Easypaisa/Jazzcash vs ontem (08/04 nao tinha
+     PENDING nenhum, hoje 71%)
+   - Verificar webhook_deliveries para falhas recentes
+
+2) ALTA — Reduzir dependencia de whales
+   - 1 jogador (mehmood88) representando 60-77% do turnover diario
+     e risco extremo. Se ele churn-ar, perdemos metade da operacao
+   - CRM precisa diversificar ativacao: campanha para 14-20 mid
+     stakes que jogam ~Rs 5-10K/dia
+
+3) MEDIA — Investigar funil aquisicao -> FTD
+   - 120 cadastros / 7 FTDs hoje = 5.8% (baixissimo)
+   - Provavelmente ligado ao item 1 (deposito travado), mas vale
+     monitorar amanha apos correcao para confirmar
+
+4) MEDIA — Diversificar portfolio de jogos high-stake
+   - 95% do GGR vindo do CRASH e perigoso (1 jogo + 1 jogador)
+   - Promover MYTHICAL ANIMALS / outros titulos para spread
+
+================================================================
+LEGENDA / GLOSSARIO
+================================================================
+
+Colunas:
+- Turnover (apostado): valor total de bets WAGERED no dia (PKR)
+- Payout (pago): valor total de WIN devolvido ao jogador (PKR)
+- GGR: Gross Gaming Revenue = Apostado - Pago. Receita bruta.
+- NGR: Net Gaming Revenue = GGR - bonus convertidos pagos
+- Hold %: GGR / Apostado. Margem da casa. Esperado: 2-5% saudavel
+- Clientes ativos: usuarios distintos com bets confirmadas no dia
+- FTD: First Time Deposit (primeiro deposito do jogador)
+- PEND/PENDING: deposito iniciado mas nao confirmado pelo gateway
+- EXPIR/EXPIRED: deposito que ultrapassou janela de tempo
+
+Status transactions (Play4Tune):
+- DEPOSIT: COMPLETED, PENDING, FAILED, EXPIRED
+- WITHDRAW: COMPLETED, AWAITING_APPROVAL, CANCELLED, FAILED, REJECTED
+  (NAO e WITHDRAWAL — atencao na escrita)
+
+Como interpretar Hold %:
+- < 0%: casa perdeu (jogador ganhou). Acontece quando whale ganha
+- 0-2%: hold abaixo do esperado, normal em dias de poucos players
+- 2-5%: saudavel para casino slots
+- > 5%: dia bom para a casa
+
+Whale: jogador que sozinho representa >20% do volume diario.
+Risco: se ele para de jogar, GGR despenca proporcionalmente.
+
+Timezone:
+- Banco armazena em UTC (timestamp without time zone)
+- Operacao roda em PKT (UTC+5)
+- Toda metrica acima foi convertida para PKT para refletir o
+  "dia operacional" do Paquistao
+
+Fontes:
+- Tabela bets, transactions, users, casino_games
+- View vw_totais_gerais (oficial, valores podem diferir levemente
+  da query direta em bets devido a filtros internos da view)
+
+================================================================
+PROXIMOS PASSOS
+================================================================
+- [ ] Castrin / DevOps: validar webhook callbacks Easypaisa/Jazzcash
+- [ ] CRM: campanha de ativacao para mid-stakes (top 5-20)
+- [ ] Monitorar amanha: se PENDING resolver, esperar pico FTDs
+- [ ] Adicionar alerta automatico: se PENDING ratio > 30%, slack
+
+Report gerado automaticamente.

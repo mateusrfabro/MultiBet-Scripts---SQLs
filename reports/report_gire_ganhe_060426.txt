@@ -1,0 +1,45 @@
+MENSAGEM 1 — Report
+======================================================================
+Segmentacao Gire e Ganhe | Promocao GIRE_GANHE_060426
+| Periodo: 06/04 15h-23h59 BRT
+
+Jogo: Big Bass Splash (pragmaticplay).
+Do segmento com opt-in (1307 usuarios marcados), 262 jogaram Big Bass Splash no periodo (06/04 15h-23h59 BRT).
+Total apostado: R$ 14,435.50.
+
+Distribuicao por faixa:
+
+  * Faixa 4 (>=R$300): 13 jogadores — R$ 6,721.50 (47% do volume)
+  * Faixa 3 (R$100-R$299,99): 22 jogadores — R$ 3,484.30 (24% do volume)
+  * Faixa 2 (R$50-R$99,99): 23 jogadores — R$ 1,617.20 (11% do volume)
+  * Faixa 1 (R$10-R$49,99): 52 jogadores — R$ 1,291.10 (9% do volume)
+  * Abaixo de R$10: 149 jogadores — R$ 257.40
+  * Desclassificados (rollback): 6 jogador(es)
+  * Nao jogou no periodo: 1045 jogadores
+
+Elegiveis para pagamento: 110 jogadores.
+
+Ponto de atencao: Apenas 20% dos marcados efetivamente jogaram no periodo.
+Faixa 4 (>=R$300) concentra 47% do volume com 13 jogador(es).
+6 desclassificado(s) por rollback.
+
+MENSAGEM 2 — Validacoes
+======================================================================
+Validacoes realizadas:
+
+1. Jogo confirmado no catalogo Athena: Big Bass Splash (game_id=vs10txbigbass, pragmaticplay).
+2. Usuarios extraidos do Smartico (export CSV do segmento 31392) — 1307 com opt-in confirmado.
+3. Valores confirmados em centavos (c_amount_in_ecr_ccy, Pragmatic v1.3) — divisao por 100 aplicada no SQL.
+4. Status c_txn_status = 'SUCCESS' validado empiricamente no schema fund_ec2.
+5. Rollbacks (txn_type=72): 6 jogadores desclassificados.
+6. Mapeamento de IDs validado: Smartico user_ext_id = external_id via ps_bi.dim_user.
+7. Cada jogador aparece em apenas uma faixa (a mais alta atingida) — sem duplicidade de pagamento.
+8. Periodo em UTC: 2026-04-06 18:00:00 -> 2026-04-07 02:59:59 (equivalente a 06/04 15h – 23h59 BRT).
+9. Dados extraidos do Athena (Iceberg Data Lake) — banco operacional principal do projeto.
+10. Turnover = soma acumulada de bets (txn_type=27) no Big Bass Splash (Wallet Share do evento).
+11. Cross-validacao BigQuery: N/A (acesso suspenso desde 06/04/2026).
+12. CSV inclui TODOS os jogadores com atividade — elegiveis e nao elegiveis separados.
+
+MENSAGEM 3 — ZIP
+======================================================================
+Enviar: segmentacao_gire_ganhe_060426_FINAL.zip

@@ -1,0 +1,80 @@
+*PLAY4TUNE — Top jogadores afundando o GGR*
+Periodo: 13/04 a 19/04/2026
+Moedas: BRL + PKR (1 PKR = R$ 0.017850)
+Fonte: casino_user_game_metrics
+
+*GGR da casa no periodo:* R$ 2.478,38 (Rs 138.847,59)
+*Turnover total:* R$ 38.838,20 (Rs 2.175.853,98)
+*Jogadores ativos (reais):* 232
+*Com GGR negativo (exibidos):* 20
+
+*TOP 10 — jogadores que mais afundaram:*
+ 1. m33kwhBFIWQVNN11 (PID U7YWl7QKE, 1d conta)
+    Apostou R$ 682,32 (Rs 38.225,75)
+    Ganhou  R$ 778,77 (Rs 43.629,66)
+    *GGR casa: R$ -96,46 (Rs -5.403,91)* | 18 jogos | payout 114.1%
+      - RAMPAGE BUFFALO (2J Game): 420 giros, GGR R$ -34,83 (Rs -1.951,40), payout 157.2%
+      - ZEUS POWER (2J Game): 690 giros, GGR R$ -28,99 (Rs -1.624,00), payout 127.6%
+
+ 2. UVqEndzgaFQGpfa8 (PID mY71B9rhj, 5d conta)
+    Apostou R$ 104,44 (Rs 5.851,00)
+    Ganhou  R$ 174,18 (Rs 9.758,14)
+    *GGR casa: R$ -69,74 (Rs -3.907,14)* | 5 jogos | payout 166.8%
+      - WILD BOUNTY SHOWDOWN (2J Game): 94 giros, GGR R$ -37,53 (Rs -2.102,50), payout 225.1%
+      - RAILROAD RICHES (2J Game): 31 giros, GGR R$ -29,19 (Rs -1.635,30), payout 451.7%
+
+ 3. j6EcreTzsnpbZfFd (PID VxTgczsuN, 3d conta)
+    Apostou R$ 221,84 (Rs 12.428,50)
+    Ganhou  R$ 272,92 (Rs 15.290,11)
+    *GGR casa: R$ -51,08 (Rs -2.861,61)* | 3 jogos | payout 123.0%
+      - MYTHICAL ANIMALS (2J Game): 11 giros, GGR R$ -52,90 (Rs -2.963,50), payout 124.3%
+      - RAILROAD RICHES (2J Game): 30 giros, GGR R$ 0,81 (Rs 45,27), payout 66.5%
+
+ 4. hGMXL4yGaidcZZSf (PID fKQOhodvz, 5d conta)
+    Apostou R$ 410,02 (Rs 22.970,80)
+    Ganhou  R$ 454,65 (Rs 25.470,94)
+    *GGR casa: R$ -44,63 (Rs -2.500,14)* | 25 jogos | payout 110.9%
+      - WILD BANDITO (2J Game): 3.301 giros, GGR R$ -34,99 (Rs -1.960,40), payout 114.8%
+      - BELL DEER (2J Game): 164 giros, GGR R$ -14,57 (Rs -816,10), payout 199.5%
+
+ 5. aFhKRG9dfD3WvU6B (PID dV19s3ZPz, 1d conta)
+    Apostou R$ 324,97 (Rs 18.206,25)
+    Ganhou  R$ 359,53 (Rs 20.142,05)
+    *GGR casa: R$ -34,55 (Rs -1.935,80)* | 11 jogos | payout 110.6%
+      - WILD BANDITO (2J Game): 467 giros, GGR R$ -35,36 (Rs -1.981,00), payout 124.3%
+      - FORTUNE DRAGON (2J Game): 168 giros, GGR R$ -15,61 (Rs -874,61), payout 152.9%
+
+ 6. 2YRq8Bm2gsD1H3Ej (PID glTyJI0ZG, 7d conta)
+    Apostou R$ 49,25 (Rs 2.759,30)
+    Ganhou  R$ 82,18 (Rs 4.603,80)
+    *GGR casa: R$ -32,92 (Rs -1.844,50)* | 7 jogos | payout 166.8%
+      - MONEY MANIA (2J Game): 113 giros, GGR R$ -45,45 (Rs -2.546,00), payout 325.3%
+      - FORTUNE TIGER (2J Game): 31 giros, GGR R$ -1,78 (Rs -99,90), payout 171.6%
+
+ 7. wAfmH24AfwTbiOAy (PID rN8h5sh4b, 2d conta)
+    Apostou R$ 285,73 (Rs 16.007,65)
+    Ganhou  R$ 316,08 (Rs 17.707,85)
+    *GGR casa: R$ -30,35 (Rs -1.700,20)* | 2 jogos | payout 110.6%
+      - GATES OF OLYMPUS (2J Game): 727 giros, GGR R$ -30,37 (Rs -1.701,60), payout 110.6%
+      - ROMA (2J Game): 3 giros, GGR R$ 0,02 (Rs 1,40), payout 55.6%
+
+ 8. pcOR3zeHzjyJYEPV (PID 4V52sJUMm, 2d conta)
+    Apostou R$ 141,98 (Rs 7.954,00)
+    Ganhou  R$ 171,89 (Rs 9.630,10)
+    *GGR casa: R$ -29,92 (Rs -1.676,10)* | 7 jogos | payout 121.1%
+      - TRUMP IT (2J Game): 21 giros, GGR R$ -33,11 (Rs -1.855,20), payout 320.9%
+      - MEDUSA UNLEASHED (2J Game): 67 giros, GGR R$ -32,93 (Rs -1.844,60), payout 162.7%
+
+ 9. HzHjxBQSwHPXv2G5 (PID 8AuDO5eVZ, 2d conta)
+    Apostou R$ 307,49 (Rs 17.226,95)
+    Ganhou  R$ 334,38 (Rs 18.733,15)
+    *GGR casa: R$ -26,89 (Rs -1.506,20)* | 17 jogos | payout 108.7%
+      - ANDAR BAHAR (2J Game): 1 giros, GGR R$ -17,85 (Rs -1.000,00), payout 200.0%
+      - FRUIT MARY (2J Game): 67 giros, GGR R$ -12,57 (Rs -704,00), payout 171.9%
+
+10. 3XLJO3w8KUaWYivh (PID VEZnpNvpi, 3d conta)
+    Apostou R$ 889,29 (Rs 49.821,40)
+    Ganhou  R$ 916,08 (Rs 51.322,10)
+    *GGR casa: R$ -26,79 (Rs -1.500,70)* | 11 jogos | payout 103.0%
+      - 88 FORTUNES (2J Game): 165 giros, GGR R$ -165,19 (Rs -9.254,60), payout 187.4%
+      - LEPRECHAUN'S COIN (2J Game): 72 giros, GGR R$ -26,88 (Rs -1.506,00), payout 181.4%

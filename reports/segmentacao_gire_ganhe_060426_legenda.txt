@@ -1,0 +1,27 @@
+LEGENDA — Segmentacao GIRE_GANHE_060426
+========================================
+
+Colunas:
+  user_ext_id    — ID externo do jogador (Smartico)
+  screen_name    — Nome de exibicao do jogador
+  ecr_id         — ID interno Pragmatic (18 digitos)
+  turnover_brl   — Total apostado no Big Bass Splash no periodo (R$)
+  wins_brl       — Total ganho pelo jogador (R$)
+  rollback_brl   — Valor de rollbacks (R$). Se > 0, jogador desclassificado
+  ggr_brl        — GGR = turnover - wins (positivo = casa ganhou)
+  bet_count      — Quantidade de apostas realizadas
+  faixa          — Classificacao: Faixa 1 (R$10-49,99), Faixa 2 (R$50-99,99),
+                   Faixa 3 (R$100-299,99), Faixa 4 (>=R$300), Abaixo de R$10
+  status         — Elegivel / Desclassificado (rollback) / Abaixo do minimo
+  has_optin      — True se o jogador estava na lista de opt-in do Smartico
+  affiliate_id   — ID do afiliado
+
+Regras:
+  - Cada jogador aparece em UMA unica faixa (a mais alta que atingiu)
+  - Rollback desclassifica automaticamente
+  - Turnover = soma de todas as bets (txn_type=27) no Big Bass Splash
+  - Periodo: 06/04/2026 15h-23h59 BRT
+
+Fonte: fund_ec2.tbl_real_fund_txn (Athena Iceberg Data Lake)
+Jogo: Big Bass Splash (game_id consultado em ps_bi.dim_game)
+Gerado: 08/04/2026 16:39 BRT

@@ -1,0 +1,1275 @@
+================================================================================
+MAPEAMENTO SUPER NOVA BET DB — 2026-04-09 09:34
+================================================================================
+
+Versão: PostgreSQL 15.14 on aarch64-unknown-linux-gnu, compiled by gcc (GCC) 7.3.1 20180712 (Red Hat 7.3.1-17), 64-bit
+
+Schemas encontrados (4): pg_temp_7, pg_toast_temp_7, platform, public
+
+--- Schema: pg_temp_7 (vazio) ---
+
+--- Schema: pg_toast_temp_7 (vazio) ---
+
+================================================================================
+SCHEMA: platform (3 objetos)
+================================================================================
+
+  [TABLE] platform.access_log — 0 linhas
+  Colunas (7):
+    id                                       integer                   NOT NULL DEFAULT nextval('platform.access_log_id_seq'::regclass)
+    username                                 character varying(50)    
+    tenant_id                                character varying(10)    
+    ip_address                               character varying(50)    
+    action                                   character varying(100)   
+    details                                  text                     
+    created_at                               timestamp with time zone  DEFAULT now()
+
+  [TABLE] platform.tenants — 1 linhas
+  Colunas (5):
+    tenant_id                                character varying(10)     NOT NULL
+    name                                     character varying(100)    NOT NULL
+    schema_name                              character varying(50)     NOT NULL
+    color                                    character varying(10)     DEFAULT '#FFFFFF'::character varying
+    active                                   boolean                   DEFAULT true
+  Sample (top 3):
+    tenant_id | name | schema_name | color | active
+    T-0050 | Play4 | public | #3B82F6 | True
+
+  [TABLE] platform.users — 1 linhas
+  Colunas (10):
+    id                                       integer                   NOT NULL DEFAULT nextval('platform.users_id_seq'::regclass)
+    username                                 character varying(50)     NOT NULL
+    password                                 character varying(255)    NOT NULL
+    tenant_id                                character varying(10)    
+    role                                     character varying(20)     DEFAULT 'viewer'::character varying
+    active                                   boolean                   DEFAULT true
+    created_at                               timestamp with time zone  DEFAULT now()
+    permissions                              jsonb                     DEFAULT '{}'::jsonb
+    must_change_password                     boolean                   DEFAULT false
+    email                                    character varying(100)    DEFAULT ''::character varying
+  Sample (top 3):
+    id | username | password | tenant_id | role | active | created_at | permissions | must_change_password | email
+    1 | admin | $2b$12$ZQfUM1jp1fML4VSZR0RL6.b2galsMhs19e21OFNN2gH | T-0050 | admin | True | 2026-04-04 23:10:06.775764+00:00 | {} | False | 
+
+================================================================================
+SCHEMA: public (68 objetos)
+================================================================================
+
+  [TABLE] public.admin_audit_logs — 366 linhas
+  Colunas (10):
+    id                                       uuid                      NOT NULL
+    admin_id                                 uuid                      NOT NULL
+    admin_email                              character varying(255)    NOT NULL
+    action                                   character varying(20)     NOT NULL
+    resource                                 character varying(255)    NOT NULL
+    resource_id                              character varying(255)   
+    details                                  jsonb                    
+    ip_address                               character varying(50)    
+    status_code                              integer                   NOT NULL
+    created_at                               timestamp with time zone  NOT NULL DEFAULT now()
+  Sample (top 3):
+    id | admin_id | admin_email | action | resource | resource_id | details | ip_address | status_code | created_at
+    019d0150-6e77-75a5-9b85-2a4227af053f | 019cdd15-5d16-76fd-a3bc-6f652970b76a | karin@karinzitta.dev | PATCH | /admin/site-settings/019cfc38-275f-757c-807b-5c8cf | 019cfc38-275f-757c-807b-5c8cfaeed74b | {'logo': 'blob:https://imgur.com/0157824e-dcb9-436 | 35.171.187.173 | 200 | 2026-03-18 14:19:01.629346+00:00
+    019d0152-7a2d-763e-88b5-74bf88657c0e | 019cdd15-5d16-76fd-a3bc-6f652970b76a | karin@karinzitta.dev | PATCH | /admin/banners/019cfd00-d75a-7156-ac77-0e9277f4674 | 019cfd00-d75a-7156-ac77-0e9277f46749 | {'link': '/?deposit=true&value=2000', 'path': 'pat | 3.81.100.164 | 200 | 2026-03-18 14:21:15.695436+00:00
+    019d0153-305e-7253-ac72-4dda6d531b9d | 019cdd15-5d16-76fd-a3bc-6f652970b76a | karin@karinzitta.dev | PATCH | /admin/banners/019cfd00-d75a-7156-ac77-0e9277f4674 | 019cfd00-d75a-7156-ac77-0e9277f46749 | {'link': '/?deposit=true&value=2000', 'path': 'pat | 3.214.184.77 | 200 | 2026-03-18 14:22:02.336138+00:00
+
+  [TABLE] public.banners — 4 linhas
+  Colunas (11):
+    id                                       uuid                      NOT NULL
+    site_settings_id                         uuid                     
+    path                                     character varying(255)    NOT NULL
+    link                                     character varying(500)   
+    order                                    integer                   NOT NULL DEFAULT 0
+    is_active                                boolean                   NOT NULL DEFAULT true
+    created_at                               timestamp with time zone  NOT NULL DEFAULT now()
+    updated_at                               timestamp with time zone  NOT NULL DEFAULT now()
+    device                                   USER-DEFINED              NOT NULL DEFAULT 'DESKTOP'::banner_device
+    location                                 USER-DEFINED              NOT NULL DEFAULT 'HOME'::banner_location
+    content                                  jsonb                     NOT NULL DEFAULT '{}'::jsonb
+  Sample (top 3):
+    id | site_settings_id | path | link | order | is_active | created_at | updated_at | device | location | content
+    019d6398-4498-76ee-af18-ea5457ea37ba | 019cfc38-275f-757c-807b-5c8cfaeed74b | Main Banner 03 | /?deposit=true&value=1000 | 2 | True | 2026-04-06 16:20:16.667518+00:00 | 2026-04-08 12:45:50.499841+00:00 | DESKTOP | HOME | {'backgroundImage': 'site-assets://019d6364-9cbf-7
+    019d6398-b89f-7177-bdae-6f2bbdef5a16 | 019cfc38-275f-757c-807b-5c8cfaeed74b | Main banner 04 | /?deposit=true&value=1000 | 3 | True | 2026-04-06 16:20:46.370679+00:00 | 2026-04-08 12:46:00.176546+00:00 | DESKTOP | HOME | {'backgroundImage': 'site-assets://019d6367-b110-7
+    019d4e60-fefd-72cd-b6b1-699451a54e15 | 019cfc38-275f-757c-807b-5c8cfaeed74b | Main banner 01 | /?deposit=true&value=1000 | 0 | True | 2026-04-02 13:27:52.831404+00:00 | 2026-04-06 15:37:04.313018+00:00 | DESKTOP | HOME | {'backgroundImage': 'site-assets://019d21bc-a77c-7
+
+  [TABLE] public.bets — 83986 linhas
+  Colunas (19):
+    id                                       uuid                      NOT NULL
+    user_id                                  uuid                      NOT NULL
+    provider_id                              character varying         NOT NULL
+    game_id                                  uuid                      NOT NULL
+    session_id                               character varying         NOT NULL
+    round_id                                 character varying         NOT NULL
+    provider_tx_id                           character varying         NOT NULL
+    provider_round_id                        character varying         NOT NULL
+    amount                                   numeric(18,4)             NOT NULL DEFAULT 0
+    bonus_amount                             numeric(18,4)             NOT NULL DEFAULT 0
+    category                                 character varying         NOT NULL
+    status                                   character varying         NOT NULL
+    pre_cash_balance                         numeric(18,4)             NOT NULL
+    pre_bonus_balance                        numeric(18,4)             NOT NULL
+    post_cash_balance                        numeric(18,4)            
+    post_bonus_balance                       numeric(18,4)            
+    created_at                               timestamp without time zone NOT NULL
+    updated_at                               timestamp without time zone NOT NULL
+    win_amount                               numeric(18,4)             NOT NULL DEFAULT 0
+  Sample (top 3):
+    id | user_id | provider_id | game_id | session_id | round_id | provider_tx_id | provider_round_id | amount | bonus_amount | category | status | pre_cash_balance | pre_bonus_balance | post_cash_balance | post_bonus_balance | created_at | updated_at | win_amount
+    4f49f0f5-1bfe-488d-b53a-3c2147f9ad85 | 019d2fec-ecc8-761f-8f70-8d07f25fa627 | 2j | 70d435f7-c3f8-4c36-a2a6-c29c2331b509 | 019d2fec-ecc8-761f-8f70-8d07f25fa627-155883-177462 | 019d2fec-ecc8-761f-8f70-8d07f25fa627-155883-177462 | 019d2fec-ecc8-761f-8f70-8d07f25fa627-1774627106339 | 019d2fec-ecc8-761f-8f70-8d07f25fa627-155883-177462 | 20.0000 | 0.0000 | WAGER | PLACED | 280.0000 | 0.0000 | NULL | NULL | 2026-03-27 15:58:26.445000 | 2026-03-27 15:58:26.445000 | 0.0000
+    b0f12ea5-8780-4813-821c-89bd69d22c76 | 019d2fec-ecc8-761f-8f70-8d07f25fa627 | 2j | 70d435f7-c3f8-4c36-a2a6-c29c2331b509 | 019d2fec-ecc8-761f-8f70-8d07f25fa627-155883-177462 | 019d2fec-ecc8-761f-8f70-8d07f25fa627-155883-177462 | 019d2fec-ecc8-761f-8f70-8d07f25fa627-1774627036376 | 019d2fec-ecc8-761f-8f70-8d07f25fa627-155883-177462 | 20.0000 | 0.0000 | WIN | SETTLED | 300.0000 | 0.0000 | 283.1200 | 0.0000 | 2026-03-27 15:57:16.485000 | 2026-03-27 16:01:24.481000 | 23.1200
+    ac9fb45d-06af-4a42-969d-5e64f9d8105f | 019d2fec-ecc8-761f-8f70-8d07f25fa627 | 2j | 70d435f7-c3f8-4c36-a2a6-c29c2331b509 | 019d2fec-ecc8-761f-8f70-8d07f25fa627-155890-177462 | 019d2fec-ecc8-761f-8f70-8d07f25fa627-155890-177462 | 019d2fec-ecc8-761f-8f70-8d07f25fa627-1774627490630 | 019d2fec-ecc8-761f-8f70-8d07f25fa627-155890-177462 | 20.0000 | 0.0000 | WAGER | PLACED | 263.1200 | 0.0000 | NULL | NULL | 2026-03-27 16:04:50.738000 | 2026-03-27 16:04:50.738000 | 0.0000
+
+  [TABLE] public.bonus_activations — 77 linhas
+  Colunas (15):
+    id                                       uuid                      NOT NULL
+    user_id                                  uuid                      NOT NULL
+    program_id                               uuid                      NOT NULL
+    deposit_transaction_id                   uuid                     
+    currency_id                              uuid                      NOT NULL
+    deposit_amount                           numeric(18,4)             NOT NULL
+    bonus_amount                             numeric(18,4)             NOT NULL
+    rollover_target                          numeric(18,4)             NOT NULL
+    rollover_progress                        numeric(18,4)             NOT NULL DEFAULT 0
+    max_withdraw_amount                      numeric(18,4)             NOT NULL
+    status                                   character varying(20)     NOT NULL DEFAULT 'ACTIVE'::character varying
+    completed_at                             timestamp with time zone 
+    cancelled_at                             timestamp with time zone 
+    created_at                               timestamp with time zone  NOT NULL DEFAULT now()
+    updated_at                               timestamp with time zone  NOT NULL DEFAULT now()
+  Sample (top 3):
+    id | user_id | program_id | deposit_transaction_id | currency_id | deposit_amount | bonus_amount | rollover_target | rollover_progress | max_withdraw_amount | status | completed_at | cancelled_at | created_at | updated_at
+    019d66e1-e8ff-772a-8166-0b84be1d563e | 019d66e0-6fab-722c-a0b7-fb96b011570d | 019d50ee-6aa6-763f-ab6b-67a4ebf6b047 | 019d66e1-1f37-743f-b14e-fc44fe1f4014 | 019cdd15-5c7d-74df-a586-bdf7026b5df5 | 500.0000 | 500.0000 | 37500.0000 | 984.0000 | 1500.0000 | CANCELLED | NULL | 2026-04-07 08:26:08.397000+00:00 | 2026-04-07 07:39:34.527782+00:00 | 2026-04-07 08:26:08.400323+00:00
+    019d696b-468b-755e-abd0-73494530ab80 | 019d696a-9c5f-7334-ab55-09dbabbe7362 | 019d50ee-6aa6-763f-ab6b-67a4ebf6b047 | 019d696a-b3eb-72af-9cd9-76d6050135f4 | 019cdd15-5c7d-74df-a586-bdf7026b5df5 | 1000.0000 | 1000.0000 | 75000.0000 | 3895.0000 | 3000.0000 | ACTIVE | NULL | NULL | 2026-04-07 19:28:51.340385+00:00 | 2026-04-07 19:35:20.984047+00:00
+    019d68d6-f2e5-76f8-a895-f5a71d844641 | 019d68d2-a03d-75c4-81c6-a12651657ed1 | 019d50ee-6aa6-763f-ab6b-67a4ebf6b047 | 019d68d6-8790-736e-811b-a12533d6111a | 019cdd15-5c7d-74df-a586-bdf7026b5df5 | 200.0000 | 200.0000 | 15000.0000 | 5385.0000 | 600.0000 | ACTIVE | NULL | NULL | 2026-04-07 16:46:50.599664+00:00 | 2026-04-08 03:22:05.183348+00:00
+
+  [TABLE] public.bonus_coupon_redemptions — 0 linhas
+  Colunas (6):
+    id                                       uuid                      NOT NULL DEFAULT uuid_generate_v4()
+    coupon_id                                uuid                      NOT NULL
+    user_id                                  uuid                      NOT NULL
+    transaction_id                           uuid                     
+    created_at                               timestamp without time zone NOT NULL DEFAULT now()
+    status                                   USER-DEFINED              NOT NULL DEFAULT 'CLAIMED'::redemption_status_enum
+
+  [TABLE] public.bonus_coupons — 1 linhas
+  Colunas (11):
+    id                                       uuid                      NOT NULL DEFAULT uuid_generate_v4()
+    code                                     character varying(50)     NOT NULL
+    amount                                   numeric(36,18)            NOT NULL DEFAULT 0.000000000000000000
+    currency_id                              uuid                      NOT NULL
+    max_redemptions                          integer                  
+    current_redemptions                      integer                   NOT NULL DEFAULT 0
+    expires_at                               timestamp without time zone
+    active                                   boolean                   NOT NULL DEFAULT true
+    created_at                               timestamp without time zone NOT NULL DEFAULT now()
+    updated_at                               timestamp without time zone NOT NULL DEFAULT now()
+    secret_key                               character varying(255)   
+  Sample (top 3):
+    id | code | amount | currency_id | max_redemptions | current_redemptions | expires_at | active | created_at | updated_at | secret_key
+    019d63b8-e137-70a2-8a37-cc485baf0997 | WILLIAMN | 50.000000000000000000 | 019cdd15-5c7d-74df-a586-bdf7026b5df5 | NULL | 0 | NULL | True | 2026-04-06 16:55:53.914793 | 2026-04-08 19:49:24.624204 | 4mZsKPcBAL51
+
+  [TABLE] public.bonus_programs — 1 linhas
+  Colunas (11):
+    id                                       uuid                      NOT NULL
+    name                                     character varying(255)    NOT NULL
+    type                                     character varying(50)     NOT NULL
+    match_percent                            numeric(5,2)              NOT NULL
+    max_bonus_amount                         numeric(18,4)             NOT NULL
+    rollover_multiplier                      numeric(5,2)              NOT NULL
+    max_withdraw_multiplier                  numeric(5,2)              NOT NULL
+    min_deposit_amount                       numeric(18,4)             NOT NULL DEFAULT 0
+    active                                   boolean                   NOT NULL DEFAULT true
+    created_at                               timestamp with time zone  NOT NULL DEFAULT now()
+    updated_at                               timestamp with time zone  NOT NULL DEFAULT now()
+  Sample (top 3):
+    id | name | type | match_percent | max_bonus_amount | rollover_multiplier | max_withdraw_multiplier | min_deposit_amount | active | created_at | updated_at
+    019d50ee-6aa6-763f-ab6b-67a4ebf6b047 | Welcome Bonus 100% | FIRST_DEPOSIT | 100.00 | 10000.0000 | 75.00 | 3.00 | 200.0000 | True | 2026-04-03 01:21:35.400378+00:00 | 2026-04-03 01:21:35.400378+00:00
+
+  [TABLE] public.carousels — 0 linhas
+  Colunas (6):
+    id                                       uuid                      NOT NULL
+    name                                     character varying(255)    NOT NULL
+    data                                     jsonb                     NOT NULL DEFAULT '[]'::jsonb
+    active                                   boolean                   NOT NULL DEFAULT true
+    created_at                               timestamp with time zone  NOT NULL DEFAULT now()
+    updated_at                               timestamp with time zone  NOT NULL DEFAULT now()
+
+  [TABLE] public.casino_game_categories — 7 linhas
+  Colunas (7):
+    id                                       uuid                      NOT NULL
+    slug                                     character varying         NOT NULL
+    name                                     character varying         NOT NULL
+    created_at                               timestamp without time zone NOT NULL
+    updated_at                               timestamp without time zone NOT NULL
+    image                                    character varying(500)   
+    icon                                     character varying(500)   
+  Sample (top 3):
+    id | slug | name | created_at | updated_at | image | icon
+    031fb531-32db-4920-9257-21f7845717d5 | slots | Slots | 2026-03-11 13:52:58.437000 | 2026-03-11 13:52:58.437000 | NULL | NULL
+    ceec88d4-5314-4218-a64d-47df62bedcf3 | crypto | Crypto | 2026-03-11 13:52:58.458000 | 2026-03-11 13:52:58.458000 | NULL | NULL
+    42b5f084-8cca-401f-bd87-2dae4fe62570 | multiplayer | Multiplayer | 2026-03-11 13:52:58.469000 | 2026-03-11 13:52:58.469000 | NULL | NULL
+
+  [TABLE] public.casino_game_categories_map — 182 linhas
+  Colunas (3):
+    id                                       uuid                      NOT NULL DEFAULT gen_random_uuid()
+    game_id                                  uuid                      NOT NULL
+    category_id                              uuid                      NOT NULL
+  Sample (top 3):
+    id | game_id | category_id
+    019d2197-8d3a-7778-b2c4-a7a20f5bffe8 | 7e07ac82-eb8f-44ef-b36f-bb170a0c3083 | 42b5f084-8cca-401f-bd87-2dae4fe62570
+    019d2197-8d3a-7778-b2c4-ab8a18b611aa | 7e07ac82-eb8f-44ef-b36f-bb170a0c3083 | 019d2170-99b5-7227-9c6b-e76bf275033a
+    4cc2b62c-b437-4a19-9592-3b65b594c5db | aea912a6-9bb1-4153-a189-71b23473db23 | 031fb531-32db-4920-9257-21f7845717d5
+
+  [TABLE] public.casino_game_metrics — 632 linhas
+  Colunas (12):
+    id                                       uuid                      NOT NULL DEFAULT uuid_generate_v4()
+    game_id                                  uuid                      NOT NULL
+    currency_id                              uuid                      NOT NULL
+    game_clicks                              integer                   NOT NULL
+    created_sessions                         integer                   NOT NULL
+    played_sessions                          integer                   NOT NULL
+    played_rounds                            integer                   NOT NULL
+    total_bet_amount                         numeric(18,4)             NOT NULL
+    total_win_amount                         numeric(18,4)             NOT NULL
+    net_revenue                              numeric(18,4)             NOT NULL
+    date                                     date                      NOT NULL
+    updated_at                               timestamp without time zone NOT NULL
+  Sample (top 3):
+    id | game_id | currency_id | game_clicks | created_sessions | played_sessions | played_rounds | total_bet_amount | total_win_amount | net_revenue | date | updated_at
+    019d3edf-59b2-77ff-9516-ab8698e1813e | 87d5042d-1ffe-40a1-a601-57fa8b548d3e | 019cdd15-5c7d-74df-a586-bdf7026b5df5 | 0 | 0 | 101 | 101 | 1067.5000 | 372.4000 | 695.1000 | 2026-03-30 | 2026-03-30 18:49:13.972859
+    019d3d58-1132-70fe-b389-42d31d94cf95 | d653fa39-0f5b-439b-aec8-ebbb32a72e44 | 019cdd15-5c7d-74df-a586-bdf7026b5df5 | 0 | 0 | 57 | 57 | 128.2500 | 342.4500 | -214.2000 | 2026-03-30 | 2026-03-30 14:45:01.555694
+    019d3d2c-d3db-72af-b7bf-983a65bec961 | 5203fcdc-8669-4b10-b4ac-b2e3bec4ac2a | 019cdd15-5c7d-74df-a586-bdf7026b5df5 | 0 | 0 | 48 | 48 | 480.0000 | 92.5000 | 387.5000 | 2026-03-30 | 2026-03-30 14:45:01.555694
+
+  [TABLE] public.casino_game_metrics_2026_03 — 255 linhas
+  Colunas (12):
+    id                                       uuid                      NOT NULL DEFAULT uuid_generate_v4()
+    game_id                                  uuid                      NOT NULL
+    currency_id                              uuid                      NOT NULL
+    game_clicks                              integer                   NOT NULL
+    created_sessions                         integer                   NOT NULL
+    played_sessions                          integer                   NOT NULL
+    played_rounds                            integer                   NOT NULL
+    total_bet_amount                         numeric(18,4)             NOT NULL
+    total_win_amount                         numeric(18,4)             NOT NULL
+    net_revenue                              numeric(18,4)             NOT NULL
+    date                                     date                      NOT NULL
+    updated_at                               timestamp without time zone NOT NULL
+  Sample (top 3):
+    id | game_id | currency_id | game_clicks | created_sessions | played_sessions | played_rounds | total_bet_amount | total_win_amount | net_revenue | date | updated_at
+    019d3edf-59b2-77ff-9516-ab8698e1813e | 87d5042d-1ffe-40a1-a601-57fa8b548d3e | 019cdd15-5c7d-74df-a586-bdf7026b5df5 | 0 | 0 | 101 | 101 | 1067.5000 | 372.4000 | 695.1000 | 2026-03-30 | 2026-03-30 18:49:13.972859
+    019d3d58-1132-70fe-b389-42d31d94cf95 | d653fa39-0f5b-439b-aec8-ebbb32a72e44 | 019cdd15-5c7d-74df-a586-bdf7026b5df5 | 0 | 0 | 57 | 57 | 128.2500 | 342.4500 | -214.2000 | 2026-03-30 | 2026-03-30 14:45:01.555694
+    019d3d2c-d3db-72af-b7bf-983a65bec961 | 5203fcdc-8669-4b10-b4ac-b2e3bec4ac2a | 019cdd15-5c7d-74df-a586-bdf7026b5df5 | 0 | 0 | 48 | 48 | 480.0000 | 92.5000 | 387.5000 | 2026-03-30 | 2026-03-30 14:45:01.555694
+
+  [TABLE] public.casino_game_metrics_2026_04 — 377 linhas
+  Colunas (12):
+    id                                       uuid                      NOT NULL DEFAULT uuid_generate_v4()
+    game_id                                  uuid                      NOT NULL
+    currency_id                              uuid                      NOT NULL
+    game_clicks                              integer                   NOT NULL
+    created_sessions                         integer                   NOT NULL
+    played_sessions                          integer                   NOT NULL
+    played_rounds                            integer                   NOT NULL
+    total_bet_amount                         numeric(18,4)             NOT NULL
+    total_win_amount                         numeric(18,4)             NOT NULL
+    net_revenue                              numeric(18,4)             NOT NULL
+    date                                     date                      NOT NULL
+    updated_at                               timestamp without time zone NOT NULL
+  Sample (top 3):
+    id | game_id | currency_id | game_clicks | created_sessions | played_sessions | played_rounds | total_bet_amount | total_win_amount | net_revenue | date | updated_at
+    019d4b6c-ca6c-719b-aed5-5bdcdc435f30 | 433dbf20-a0e3-40f4-bf23-fbc8023513f5 | 019cdd15-5c7d-74df-a586-bdf7026b5df5 | 0 | 0 | 53 | 53 | 846.0000 | 875.2000 | -29.2000 | 2026-04-01 | 2026-04-01 23:46:38.946582
+    019d4e9d-39db-705c-9d72-4a9a207c7985 | a21d5d14-9b42-496b-9184-bcedddfbbd70 | 019cdd15-5c7d-74df-a586-bdf7026b5df5 | 0 | 0 | 4 | 4 | 300.0000 | 44.8000 | 255.2000 | 2026-04-02 | 2026-04-02 15:22:23.263559
+    019d4e8a-b3d3-70fb-9494-27d81590250d | 54c60cec-7c29-43d0-aa02-efdafdc96127 | 019cdd15-5c7d-74df-a586-bdf7026b5df5 | 0 | 0 | 115 | 115 | 400.4000 | 535.2800 | -134.8800 | 2026-04-02 | 2026-04-02 19:57:38.836599
+
+  [TABLE] public.casino_game_metrics_2026_05 — 0 linhas
+  Colunas (12):
+    id                                       uuid                      NOT NULL DEFAULT uuid_generate_v4()
+    game_id                                  uuid                      NOT NULL
+    currency_id                              uuid                      NOT NULL
+    game_clicks                              integer                   NOT NULL
+    created_sessions                         integer                   NOT NULL
+    played_sessions                          integer                   NOT NULL
+    played_rounds                            integer                   NOT NULL
+    total_bet_amount                         numeric(18,4)             NOT NULL
+    total_win_amount                         numeric(18,4)             NOT NULL
+    net_revenue                              numeric(18,4)             NOT NULL
+    date                                     date                      NOT NULL
+    updated_at                               timestamp without time zone NOT NULL
+
+  [TABLE] public.casino_game_metrics_default — 0 linhas
+  Colunas (12):
+    id                                       uuid                      NOT NULL DEFAULT uuid_generate_v4()
+    game_id                                  uuid                      NOT NULL
+    currency_id                              uuid                      NOT NULL
+    game_clicks                              integer                   NOT NULL
+    created_sessions                         integer                   NOT NULL
+    played_sessions                          integer                   NOT NULL
+    played_rounds                            integer                   NOT NULL
+    total_bet_amount                         numeric(18,4)             NOT NULL
+    total_win_amount                         numeric(18,4)             NOT NULL
+    net_revenue                              numeric(18,4)             NOT NULL
+    date                                     date                      NOT NULL
+    updated_at                               timestamp without time zone NOT NULL
+
+  [TABLE] public.casino_game_types — 0 linhas
+  Colunas (4):
+    id                                       uuid                      NOT NULL
+    name                                     character varying         NOT NULL
+    created_at                               timestamp without time zone NOT NULL
+    updated_at                               timestamp without time zone NOT NULL
+
+  [TABLE] public.casino_games — 136 linhas
+  Colunas (16):
+    id                                       uuid                      NOT NULL
+    external_id                              character varying         NOT NULL
+    provider_id                              uuid                      NOT NULL
+    name                                     character varying         NOT NULL
+    slug                                     character varying         NOT NULL
+    image_url                                character varying        
+    vertical_image_url                       character varying        
+    demo                                     boolean                   NOT NULL DEFAULT false
+    min_bet                                  numeric(18,4)            
+    max_bet                                  numeric(18,4)            
+    type_id                                  uuid                     
+    created_at                               timestamp without time zone NOT NULL
+    updated_at                               timestamp without time zone NOT NULL
+    rtp                                      numeric(8,2)              NOT NULL DEFAULT 0
+    pot                                      numeric(8,2)              NOT NULL DEFAULT 0
+    active                                   boolean                   NOT NULL DEFAULT true
+  Sample (top 3):
+    id | external_id | provider_id | name | slug | image_url | vertical_image_url | demo | min_bet | max_bet | type_id | created_at | updated_at | rtp | pot | active
+    70d435f7-c3f8-4c36-a2a6-c29c2331b509 | 4001 | 6548d153-5e96-428d-9372-bb8fb38a625d | FISHDOM | fishdom | https://img.et606.com/admin_official2J_2025_4_21_6 | https://img.et606.com/admin_official2J_2025_11_19_ | False | NULL | NULL | NULL | 2026-03-11 13:52:58.534000 | 2026-04-09 10:44:20.372588 | 78.30 | 21.70 | True
+    9617c522-af3b-4438-8a0c-4c6dec3db9b0 | 1023 | 6548d153-5e96-428d-9372-bb8fb38a625d | RISING FORTUNES | rising-fortunes | https://img.et606.com/admin_official2J_2025_4_21_6 | https://img.et606.com/admin_official2J_2025_11_19_ | False | NULL | NULL | NULL | 2026-03-11 13:52:58.451000 | 2026-04-08 21:56:59.509510 | 98.22 | 1.78 | True
+    c671908a-0ab5-4241-9525-01b57d163e5e | 2004 | 6548d153-5e96-428d-9372-bb8fb38a625d | CRASH | crash | https://img.et606.com/admin_official2J_2025_4_21_6 | https://img.et606.com/admin_official2J_2025_11_19_ | False | NULL | NULL | NULL | 2026-03-11 13:52:58.464000 | 2026-04-09 10:45:08.164416 | 99.69 | 0.31 | True
+
+  [TABLE] public.casino_provider_configs — 2 linhas
+  Colunas (12):
+    id                                       uuid                      NOT NULL
+    slug                                     character varying         NOT NULL
+    name                                     character varying         NOT NULL
+    enabled                                  boolean                   NOT NULL DEFAULT true
+    api_url                                  character varying        
+    auth_token                               character varying        
+    secret_key                               character varying        
+    api_key                                  character varying        
+    merchant_id                              character varying        
+    metadata                                 jsonb                    
+    created_at                               timestamp without time zone NOT NULL
+    updated_at                               timestamp without time zone NOT NULL
+  Sample (top 3):
+    id | slug | name | enabled | api_url | auth_token | secret_key | api_key | merchant_id | metadata | created_at | updated_at
+    019cdd15-5d1c-7519-9fa5-364e5789a0d1 | alea | Alea | False | https://customer-api.aleaplay.com/api/graphql | NULL | NULL | NULL | NULL | {'play_url': 'https://play.aleaplay.com/api/v1/gam | 2026-03-11 13:28:10.780000 | 2026-03-11 13:28:10.780000
+    019cdd15-5d1d-70fc-b3af-099fab27f83e | 2j | 2J Games | True | https://op-game-api.et606.com | NULL | NULL | iszyxPeYl7KaF_9c6HTUi | 3948 | {'rtp_value': '93', 'rtp_target': '93', 'allowed_i | 2026-03-11 13:28:10.780000 | 2026-03-27 21:25:49.055000
+
+  [TABLE] public.casino_providers — 1 linhas
+  Colunas (7):
+    id                                       uuid                      NOT NULL
+    external_id                              character varying         NOT NULL
+    name                                     character varying         NOT NULL
+    slug                                     character varying         NOT NULL
+    created_at                               timestamp without time zone NOT NULL
+    updated_at                               timestamp without time zone NOT NULL
+    active                                   boolean                   NOT NULL DEFAULT true
+  Sample (top 3):
+    id | external_id | name | slug | created_at | updated_at | active
+    6548d153-5e96-428d-9372-bb8fb38a625d | 2j | 2J Game | 2j | 2026-03-11 13:52:58.429000 | 2026-03-11 13:52:58.429000 | True
+
+  [TABLE] public.casino_user_game_metrics — 1224 linhas
+  Colunas (13):
+    id                                       uuid                      NOT NULL DEFAULT uuid_generate_v4()
+    game_id                                  uuid                      NOT NULL
+    user_id                                  uuid                      NOT NULL
+    currency_id                              uuid                      NOT NULL
+    game_clicks                              integer                   NOT NULL
+    created_sessions                         integer                   NOT NULL
+    played_sessions                          integer                   NOT NULL
+    played_rounds                            integer                   NOT NULL
+    total_bet_amount                         numeric(18,4)             NOT NULL
+    total_win_amount                         numeric(18,4)             NOT NULL
+    net_revenue                              numeric(18,4)             NOT NULL
+    date                                     date                      NOT NULL
+    updated_at                               timestamp without time zone NOT NULL
+  Sample (top 3):
+    id | game_id | user_id | currency_id | game_clicks | created_sessions | played_sessions | played_rounds | total_bet_amount | total_win_amount | net_revenue | date | updated_at
+    019d3d41-2e6b-7610-b9de-ee70de39dbd9 | d8c338d6-593f-4ae8-8842-a392e3a57d8b | 019d2dd8-11b2-7283-94bd-edfb85c07915 | 019cdd15-5c7d-74df-a586-bdf7026b5df5 | 0 | 0 | 16 | 16 | 240.0000 | 7.5000 | 232.5000 | 2026-03-30 | 2026-03-30 14:45:15.415870
+    019d3d58-1136-76c4-a102-db77b05d540e | d653fa39-0f5b-439b-aec8-ebbb32a72e44 | 019d3d3a-0785-763e-bbd2-dbd014d0e33f | 019cdd15-5c7d-74df-a586-bdf7026b5df5 | 0 | 0 | 57 | 57 | 128.2500 | 342.4500 | -214.2000 | 2026-03-30 | 2026-03-30 14:45:15.415870
+    019d3eb2-b9cb-77d3-8968-6b2bcd05abf3 | e5f067b1-b344-4703-8411-d48909d58f60 | 019d3dc1-c339-7521-84f6-4f0b0465cf06 | 019cdd15-5c7d-74df-a586-bdf7026b5df5 | 0 | 0 | 167 | 167 | 6602.0000 | 7222.0000 | -620.0000 | 2026-03-30 | 2026-03-30 14:45:15.415870
+
+  [TABLE] public.casino_user_game_metrics_2026_03 — 474 linhas
+  Colunas (13):
+    id                                       uuid                      NOT NULL DEFAULT uuid_generate_v4()
+    game_id                                  uuid                      NOT NULL
+    user_id                                  uuid                      NOT NULL
+    currency_id                              uuid                      NOT NULL
+    game_clicks                              integer                   NOT NULL
+    created_sessions                         integer                   NOT NULL
+    played_sessions                          integer                   NOT NULL
+    played_rounds                            integer                   NOT NULL
+    total_bet_amount                         numeric(18,4)             NOT NULL
+    total_win_amount                         numeric(18,4)             NOT NULL
+    net_revenue                              numeric(18,4)             NOT NULL
+    date                                     date                      NOT NULL
+    updated_at                               timestamp without time zone NOT NULL
+  Sample (top 3):
+    id | game_id | user_id | currency_id | game_clicks | created_sessions | played_sessions | played_rounds | total_bet_amount | total_win_amount | net_revenue | date | updated_at
+    019d3d41-2e6b-7610-b9de-ee70de39dbd9 | d8c338d6-593f-4ae8-8842-a392e3a57d8b | 019d2dd8-11b2-7283-94bd-edfb85c07915 | 019cdd15-5c7d-74df-a586-bdf7026b5df5 | 0 | 0 | 16 | 16 | 240.0000 | 7.5000 | 232.5000 | 2026-03-30 | 2026-03-30 14:45:15.415870
+    019d3d58-1136-76c4-a102-db77b05d540e | d653fa39-0f5b-439b-aec8-ebbb32a72e44 | 019d3d3a-0785-763e-bbd2-dbd014d0e33f | 019cdd15-5c7d-74df-a586-bdf7026b5df5 | 0 | 0 | 57 | 57 | 128.2500 | 342.4500 | -214.2000 | 2026-03-30 | 2026-03-30 14:45:15.415870
+    019d3eb2-b9cb-77d3-8968-6b2bcd05abf3 | e5f067b1-b344-4703-8411-d48909d58f60 | 019d3dc1-c339-7521-84f6-4f0b0465cf06 | 019cdd15-5c7d-74df-a586-bdf7026b5df5 | 0 | 0 | 167 | 167 | 6602.0000 | 7222.0000 | -620.0000 | 2026-03-30 | 2026-03-30 14:45:15.415870
+
+  [TABLE] public.casino_user_game_metrics_2026_04 — 750 linhas
+  Colunas (13):
+    id                                       uuid                      NOT NULL DEFAULT uuid_generate_v4()
+    game_id                                  uuid                      NOT NULL
+    user_id                                  uuid                      NOT NULL
+    currency_id                              uuid                      NOT NULL
+    game_clicks                              integer                   NOT NULL
+    created_sessions                         integer                   NOT NULL
+    played_sessions                          integer                   NOT NULL
+    played_rounds                            integer                   NOT NULL
+    total_bet_amount                         numeric(18,4)             NOT NULL
+    total_win_amount                         numeric(18,4)             NOT NULL
+    net_revenue                              numeric(18,4)             NOT NULL
+    date                                     date                      NOT NULL
+    updated_at                               timestamp without time zone NOT NULL
+  Sample (top 3):
+    id | game_id | user_id | currency_id | game_clicks | created_sessions | played_sessions | played_rounds | total_bet_amount | total_win_amount | net_revenue | date | updated_at
+    019d4a52-a06e-71dd-bf31-7616cfa7a2cb | 1bf85fa9-398d-46f0-8881-e30562e88d3a | 019d3ea8-39f6-74ee-ab16-2a63baf5ed88 | 019cdd15-5c7d-74df-a586-bdf7026b5df5 | 0 | 0 | 103 | 103 | 1545.0000 | 1135.5000 | 409.5000 | 2026-04-01 | 2026-04-01 18:46:20.846781
+    019d471f-392e-749a-96a9-49d3a898fa69 | 243b2259-912b-41d5-88b3-f5a708546d4d | 019d4320-dee1-7119-855b-807c7cb7d49f | 019cdd15-5c7d-74df-a586-bdf7026b5df5 | 0 | 0 | 17 | 17 | 122.4000 | 140.8000 | -18.4000 | 2026-04-01 | 2026-04-01 03:40:17.515993
+    019d4672-4e45-7241-9572-f226e68c4355 | 8b1a811b-7e1b-4d0e-96cb-7dec68811797 | 019d466d-f358-727d-8bdd-a3d8f8605379 | 019cdd15-5c7d-74df-a586-bdf7026b5df5 | 0 | 0 | 237 | 237 | 737.2500 | 539.2000 | 198.0500 | 2026-04-01 | 2026-04-01 00:44:08.223650
+
+  [TABLE] public.casino_user_game_metrics_2026_05 — 0 linhas
+  Colunas (13):
+    id                                       uuid                      NOT NULL DEFAULT uuid_generate_v4()
+    game_id                                  uuid                      NOT NULL
+    user_id                                  uuid                      NOT NULL
+    currency_id                              uuid                      NOT NULL
+    game_clicks                              integer                   NOT NULL
+    created_sessions                         integer                   NOT NULL
+    played_sessions                          integer                   NOT NULL
+    played_rounds                            integer                   NOT NULL
+    total_bet_amount                         numeric(18,4)             NOT NULL
+    total_win_amount                         numeric(18,4)             NOT NULL
+    net_revenue                              numeric(18,4)             NOT NULL
+    date                                     date                      NOT NULL
+    updated_at                               timestamp without time zone NOT NULL
+
+  [TABLE] public.casino_user_game_metrics_default — 0 linhas
+  Colunas (13):
+    id                                       uuid                      NOT NULL DEFAULT uuid_generate_v4()
+    game_id                                  uuid                      NOT NULL
+    user_id                                  uuid                      NOT NULL
+    currency_id                              uuid                      NOT NULL
+    game_clicks                              integer                   NOT NULL
+    created_sessions                         integer                   NOT NULL
+    played_sessions                          integer                   NOT NULL
+    played_rounds                            integer                   NOT NULL
+    total_bet_amount                         numeric(18,4)             NOT NULL
+    total_win_amount                         numeric(18,4)             NOT NULL
+    net_revenue                              numeric(18,4)             NOT NULL
+    date                                     date                      NOT NULL
+    updated_at                               timestamp without time zone NOT NULL
+
+  [TABLE] public.currencies — 2 linhas
+  Colunas (12):
+    id                                       uuid                      NOT NULL
+    code                                     character varying(10)     NOT NULL
+    type                                     character varying         NOT NULL
+    name                                     character varying(50)     NOT NULL
+    symbol                                   character varying(5)     
+    decimals                                 integer                   NOT NULL DEFAULT 2
+    active                                   boolean                   NOT NULL DEFAULT true
+    created_at                               timestamp without time zone NOT NULL DEFAULT now()
+    updated_at                               timestamp without time zone NOT NULL DEFAULT now()
+    suggested_deposit_amounts                jsonb                     DEFAULT '[]'::jsonb
+    suggested_withdrawal_amounts             jsonb                     DEFAULT '[]'::jsonb
+    deposit_hot_badges                       jsonb                     DEFAULT '[]'::jsonb
+  Sample (top 3):
+    id | code | type | name | symbol | decimals | active | created_at | updated_at | suggested_deposit_amounts | suggested_withdrawal_amounts | deposit_hot_badges
+    019ce22d-0869-7424-a078-fc6b8fe27bca | BRL | FIAT | Brazilian Real | R$ | 2 | True | 2026-03-12 13:12:08.043942 | 2026-03-12 13:12:08.043942 | [] | [] | []
+  Sample erro: 'charmap' codec can't encode character '\u20a8' in position 74: character maps to <undefined>
+
+  [TABLE] public.gateways — 1 linhas
+  Colunas (11):
+    id                                       uuid                      NOT NULL
+    code                                     character varying(50)     NOT NULL
+    name                                     character varying(100)    NOT NULL
+    type                                     character varying         NOT NULL
+    supported_currencies                     ARRAY                     NOT NULL
+    api_host                                 character varying(500)    NOT NULL
+    credentials                              jsonb                     NOT NULL
+    active                                   boolean                   NOT NULL DEFAULT true
+    created_at                               timestamp without time zone NOT NULL DEFAULT now()
+    updated_at                               timestamp without time zone NOT NULL DEFAULT now()
+    image                                    character varying(500)   
+  Sample (top 3):
+    id | code | name | type | supported_currencies | api_host | credentials | active | created_at | updated_at | image
+    019cdd15-5c8c-74d7-b2f0-e4f57051b10a | pk | PK Gateway | BOTH | ['PKR'] | https://mch-api.bctyso.com | {'mchId': 43, 'payinSecret': '666655f7-f66e-44eb-8 | True | 2026-03-11 13:28:10.637071 | 2026-03-12 02:31:48.286486 | NULL
+
+  [TABLE] public.legal_documents — 2 linhas
+  Colunas (8):
+    id                                       uuid                      NOT NULL
+    type                                     USER-DEFINED              NOT NULL
+    title                                    character varying(255)    NOT NULL
+    content                                  text                      NOT NULL
+    active                                   boolean                   NOT NULL DEFAULT true
+    created_at                               timestamp with time zone  NOT NULL DEFAULT now()
+    updated_at                               timestamp with time zone  NOT NULL DEFAULT now()
+    version                                  integer                   NOT NULL DEFAULT 1
+  Sample (top 3):
+    id | type | title | content | active | created_at | updated_at | version
+    019cfc39-129e-73cc-bc68-a9beccb99609 | terms_of_use | Termos de uso | sim | True | 2026-03-17 14:35:24.705712+00:00 | 2026-03-17 14:35:24.705712+00:00 | 1
+    019cfc39-38ab-73d4-bc66-fae9fab9a725 | privacy_policy | Politica | não | True | 2026-03-17 14:35:34.446659+00:00 | 2026-03-17 14:35:34.446659+00:00 | 1
+
+  [TABLE] public.location_service_config — 2 linhas
+  Colunas (6):
+    id                                       uuid                      NOT NULL
+    key                                      character varying(100)    NOT NULL
+    value                                    jsonb                     NOT NULL DEFAULT '{}'::jsonb
+    enabled                                  boolean                   NOT NULL DEFAULT true
+    created_at                               timestamp with time zone  NOT NULL DEFAULT now()
+    updated_at                               timestamp with time zone  NOT NULL DEFAULT now()
+  Sample (top 3):
+    id | key | value | enabled | created_at | updated_at
+    019ce8e1-6e17-71b9-a086-5a0d2724ae6e | impossible_travel | {'maxSpeedKmh': 900, 'minDistanceKm': 100, 'thrott | True | 2026-03-13 20:26:53.854189+00:00 | 2026-03-13 20:26:53.854189+00:00
+    019ce8e1-6e26-76f8-a5a2-4ffa2ca24ee7 | geoip | {'dbPath': '/app/data/GeoLite2-City.mmdb'} | True | 2026-03-13 20:26:53.865579+00:00 | 2026-03-13 20:26:53.865579+00:00
+
+  [TABLE] public.migrations — 53 linhas
+  Colunas (3):
+    id                                       integer                   NOT NULL DEFAULT nextval('migrations_id_seq'::regclass)
+    timestamp                                bigint                    NOT NULL
+    name                                     character varying         NOT NULL
+  Sample (top 3):
+    id | timestamp | name
+    1 | 1741500000000 | InitialSchema1741500000000
+    2 | 1741600000000 | CreateThemes1741600000000
+    3 | 1741700000000 | AddWinAmountToBets1741700000000
+
+  [TABLE] public.payment_methods — 5 linhas
+  Colunas (18):
+    id                                       uuid                      NOT NULL
+    code                                     character varying(100)    NOT NULL
+    name                                     character varying(100)    NOT NULL
+    operation_type                           character varying         NOT NULL
+    min_amount                               numeric(36,18)            NOT NULL DEFAULT 0.000000000000000000
+    max_amount                               numeric(36,18)            NOT NULL DEFAULT 0.000000000000000000
+    amount_ranges                            jsonb                     NOT NULL DEFAULT '[]'::jsonb
+    quota                                    jsonb                     NOT NULL DEFAULT '[]'::jsonb
+    suggested_amounts                        jsonb                     NOT NULL DEFAULT '[]'::jsonb
+    active                                   boolean                   NOT NULL DEFAULT true
+    last_synced_at                           timestamp without time zone
+    currency_id                              uuid                      NOT NULL
+    gateway_id                               uuid                      NOT NULL
+    created_at                               timestamp without time zone NOT NULL DEFAULT now()
+    updated_at                               timestamp without time zone NOT NULL DEFAULT now()
+    gateway_min_amount                       numeric                  
+    gateway_max_amount                       numeric                  
+    image                                    character varying(500)   
+  Sample (top 3):
+    id | code | name | operation_type | min_amount | max_amount | amount_ranges | quota | suggested_amounts | active | last_synced_at | currency_id | gateway_id | created_at | updated_at | gateway_min_amount | gateway_max_amount | image
+    019d6fb7-d7ae-778e-8475-61851ae6a30f | pka_easypaisa_payin | Easypaisa Pay In  | PAYIN | 300.000000000000000000 | 0E-18 | [] | [] | [] | False | NULL | 019cdd15-5c7d-74df-a586-bdf7026b5df5 | 019cdd15-5c8c-74d7-b2f0-e4f57051b10a | 2026-04-09 00:50:12.527795 | 2026-04-09 01:35:30.671748 | NULL | NULL | NULL
+    019cdfe5-782d-77ae-a585-4a9a036cc970 | pk_payin_jazzcash | Jazzcash | PAYIN | 100.000000000000000000 | 50000.000000000000000000 | [{'max': '50000', 'min': '100'}] | [] | [] | True | 2026-04-09 01:51:23.826000 | 019cdd15-5c7d-74df-a586-bdf7026b5df5 | 019cdd15-5c8c-74d7-b2f0-e4f57051b10a | 2026-03-12 02:34:43.631759 | 2026-04-09 01:51:23.831210 | 100.000000000000000000 | 50000 | NULL
+    019cdfe5-783a-776a-a000-20370c434cb5 | pk_payin_easypaisa | Easypaisa | PAYIN | 200.000000000000000000 | 50000.000000000000000000 | [{'max': '50000', 'min': '100'}] | [] | [] | True | 2026-04-09 01:51:23.834000 | 019cdd15-5c7d-74df-a586-bdf7026b5df5 | 019cdd15-5c8c-74d7-b2f0-e4f57051b10a | 2026-03-12 02:34:43.643007 | 2026-04-09 01:51:23.838457 | 100 | 50000 | NULL
+
+  [TABLE] public.referral_config — 0 linhas
+  Colunas (9):
+    id                                       uuid                      NOT NULL
+    min_deposit_amount                       numeric(18,4)             NOT NULL DEFAULT 200
+    wagering_multiplier                      numeric(5,2)              NOT NULL DEFAULT 3
+    reward_amount                            numeric(18,4)             NOT NULL DEFAULT 100
+    reward_type                              character varying(10)     NOT NULL DEFAULT 'BONUS'::character varying
+    expiration_days                          integer                   NOT NULL DEFAULT 30
+    active                                   boolean                   NOT NULL DEFAULT true
+    created_at                               timestamp with time zone  NOT NULL DEFAULT now()
+    updated_at                               timestamp with time zone  NOT NULL DEFAULT now()
+
+  [TABLE] public.referrals — 0 linhas
+  Colunas (14):
+    id                                       uuid                      NOT NULL
+    referrer_id                              uuid                      NOT NULL
+    referred_id                              uuid                      NOT NULL
+    status                                   character varying(20)     NOT NULL DEFAULT 'PENDING'::character varying
+    deposit_amount                           numeric(18,4)            
+    wagering_target                          numeric(18,4)            
+    wagering_progress                        numeric(18,4)             DEFAULT 0
+    reward_amount                            numeric(18,4)             NOT NULL
+    reward_type                              character varying(10)     NOT NULL
+    reward_transaction_id                    uuid                     
+    expires_at                               timestamp with time zone  NOT NULL
+    completed_at                             timestamp with time zone 
+    created_at                               timestamp with time zone  NOT NULL DEFAULT now()
+    updated_at                               timestamp with time zone  NOT NULL DEFAULT now()
+
+  [TABLE] public.responsible_gaming_limits — 0 linhas
+  Colunas (12):
+    id                                       uuid                      NOT NULL
+    user_id                                  uuid                      NOT NULL
+    type                                     character varying         NOT NULL
+    period                                   character varying         NOT NULL
+    amount                                   numeric(18,4)             NOT NULL
+    currency                                 character varying         NOT NULL DEFAULT 'BRL'::character varying
+    status                                   character varying         NOT NULL DEFAULT 'ACTIVE'::character varying
+    requested_at                             timestamp without time zone
+    effective_at                             timestamp without time zone
+    created_by                               character varying         NOT NULL DEFAULT 'USER'::character varying
+    created_at                               timestamp without time zone NOT NULL
+    updated_at                               timestamp without time zone NOT NULL
+
+  [TABLE] public.responsible_gaming_self_exclusions — 0 linhas
+  Colunas (10):
+    id                                       uuid                      NOT NULL
+    user_id                                  uuid                      NOT NULL
+    status                                   character varying         NOT NULL
+    start_at                                 timestamp without time zone
+    effective_at                             timestamp without time zone
+    end_at                                   timestamp without time zone
+    reason                                   character varying        
+    created_by                               character varying         NOT NULL DEFAULT 'USER'::character varying
+    created_at                               timestamp without time zone NOT NULL
+    updated_at                               timestamp without time zone NOT NULL
+
+  [TABLE] public.role_permissions — 258 linhas
+  Colunas (3):
+    id                                       uuid                      NOT NULL
+    role_id                                  uuid                      NOT NULL
+    permission                               character varying(100)    NOT NULL
+  Sample (top 3):
+    id | role_id | permission
+    bac06b7a-a085-409a-b47c-7614f81c1dd8 | b4c4bdd2-d391-42f2-9fe1-7f86806331ca | transactions:read
+    84d28432-4ae9-442e-940a-d608e200d06b | b4c4bdd2-d391-42f2-9fe1-7f86806331ca | transactions:approve
+    869b2bdf-59b3-43cb-998f-b2a5df688a9d | b4c4bdd2-d391-42f2-9fe1-7f86806331ca | transactions:reject
+
+  [TABLE] public.roles — 9 linhas
+  Colunas (7):
+    id                                       uuid                      NOT NULL
+    name                                     character varying(100)    NOT NULL
+    description                              character varying(255)   
+    type                                     character varying(20)     NOT NULL
+    active                                   boolean                   NOT NULL DEFAULT true
+    created_at                               timestamp with time zone  NOT NULL DEFAULT now()
+    updated_at                               timestamp with time zone  NOT NULL DEFAULT now()
+  Sample (top 3):
+    id | name | description | type | active | created_at | updated_at
+    b4c4bdd2-d391-42f2-9fe1-7f86806331ca | SUPER_ADMIN | Full system access | INTERNAL | True | 2026-04-06 16:48:54.397917+00:00 | 2026-04-06 16:48:54.397917+00:00
+    ce0e3971-eade-4790-8d42-f27ecf0b3a3d | ADMIN | General administrator | INTERNAL | True | 2026-04-06 16:48:54.397917+00:00 | 2026-04-06 16:48:54.397917+00:00
+    3ee360e3-bb21-4569-8b52-93743a562c73 | MAINTAINER | System maintainer | INTERNAL | True | 2026-04-06 16:48:54.397917+00:00 | 2026-04-06 16:48:54.397917+00:00
+
+  [TABLE] public.site_assets — 12 linhas
+  Colunas (10):
+    id                                       uuid                      NOT NULL
+    name                                     character varying(255)    NOT NULL
+    type                                     USER-DEFINED              NOT NULL
+    image                                    character varying(500)   
+    alt                                      character varying(255)   
+    created_at                               timestamp with time zone  NOT NULL DEFAULT now()
+    updated_at                               timestamp with time zone  NOT NULL DEFAULT now()
+    storage_key                              character varying(500)    DEFAULT NULL::character varying
+    mobile_image                             character varying(500)   
+    mobile_storage_key                       character varying(500)   
+  Sample (top 3):
+    id | name | type | image | alt | created_at | updated_at | storage_key | mobile_image | mobile_storage_key
+    019d2177-3ad1-71a9-b330-ffd5967edaff | Favicon | favicon | https://dsrxqpoox1332.cloudfront.net/site-assets/f | NULL | 2026-03-24 20:09:15.217517+00:00 | 2026-03-24 20:09:15.217517+00:00 | public/site-assets/favicon-wgobx5tw5u3t7rkrynt997h | NULL | NULL
+    019cfcf8-4a96-752b-940d-27654d77f544 | Login Background | login_background | https://dsrxqpoox1332.cloudfront.net/site-assets/l | NULL | 2026-03-17 18:04:16.411301+00:00 | 2026-03-24 20:09:53.626365+00:00 | public/site-assets/login-background-une77dbbgke47e | NULL | NULL
+    019d6364-9cbf-77df-90e6-07b0902167c0 | Main Banner 03 | background_image | https://dsrxqpoox1332.cloudfront.net/site-assets/m | NULL | 2026-04-06 15:23:51.362837+00:00 | 2026-04-06 15:25:48.371332+00:00 | public/site-assets/main-banner-03-peykru7kwch5ewyu | https://dsrxqpoox1332.cloudfront.net/site-assets/m | public/site-assets/main-banner-03-pnq89p4h2oiiceyh
+
+  [TABLE] public.site_settings — 1 linhas
+  Colunas (21):
+    id                                       uuid                      NOT NULL
+    name                                     character varying(255)    NOT NULL
+    description                              text                     
+    created_at                               timestamp with time zone  NOT NULL DEFAULT now()
+    updated_at                               timestamp with time zone  NOT NULL DEFAULT now()
+    favicon                                  character varying(500)   
+    terms_of_use_id                          uuid                     
+    privacy_policy_id                        uuid                     
+    links                                    jsonb                     NOT NULL DEFAULT '{"twitter": null, "youtube": null, "facebook": null, "linkedin": null, "telegram": null, "whatsapp": null, "instagram": null}'::jsonb
+    tracking                                 jsonb                     NOT NULL DEFAULT '{"gtmEnabled": false, "gtmContainerId": null, "facebookPixelId": null, "googleAnalyticsId": null, "facebookPixelEnabled": false, "googleAnalyticsEnabled": false}'::jsonb
+    regulatory                               jsonb                     NOT NULL DEFAULT '{"contactEmail": null, "contactPhone": null, "contactDescription": null}'::jsonb
+    default_currency_code                    character varying(10)     NOT NULL DEFAULT 'BRL'::character varying
+    withdrawal_limits                        jsonb                     NOT NULL DEFAULT '{"maxAutoWithdrawalAmount": 0, "maxApprovedWithdrawalsPerIp": 0, "maxPendingWithdrawalsPerDay": 0, "maxApprovedWithdrawalsPerDay": 0}'::jsonb
+    turnover_multiplier                      numeric(10,2)             NOT NULL DEFAULT 1
+    login_background                         character varying(500)    DEFAULT NULL::character varying
+    register_background                      character varying(500)    DEFAULT NULL::character varying
+    logo                                     character varying(500)    DEFAULT NULL::character varying
+    logotype                                 character varying(500)    DEFAULT NULL::character varying
+    logo_visual_signature                    character varying(500)    DEFAULT NULL::character varying
+    deposit_background                       character varying(500)   
+    turnstile                                jsonb                     NOT NULL DEFAULT '{"enabled": false, "siteKey": null, "secretKey": null}'::jsonb
+  Sample (top 3):
+    id | name | description | created_at | updated_at | favicon | terms_of_use_id | privacy_policy_id | links | tracking | regulatory | default_currency_code | withdrawal_limits | turnover_multiplier | login_background | register_background | logo | logotype | logo_visual_signature | deposit_background | turnstile
+    019cfc38-275f-757c-807b-5c8cfaeed74b | Play4Tune | Play the best online slots and casino games at Pla | 2026-03-17 14:34:24.480972+00:00 | 2026-04-09 12:20:01.583135+00:00 | site-assets://019d2177-3ad1-71a9-b330-ffd5967edaff | 019cfc39-129e-73cc-bc68-a9beccb99609 | 019cfc39-38ab-73d4-bc66-fae9fab9a725 | {'twitter': None, 'youtube': None, 'facebook': Non | {'gtmContainer': [], 'facebookPixel': [{'id': '161 | {'contactEmail': None, 'contactPhone': None, 'cont | PKR | {'maxAutoWithdrawalAmount': 5000, 'maxApprovedWith | 1.00 | site-assets://019cfcf8-4a96-752b-940d-27654d77f544 | site-assets://019cfcf8-4aa4-75f8-b5c9-a163a351b0b1 | site-assets://019d214e-de54-7380-9871-5a5540f0aafd | site-assets://019d214e-de60-71d9-a66c-56fe6f9f39b3 | site-assets://019d214e-de66-70cf-a096-fdaeebd477b7 | site-assets://019d2178-c30f-7486-bb7a-073e1e090402 | {'enabled': False, 'siteKey': '0x4AAAAAACzrMJGyXYj
+
+  [TABLE] public.storage_config — 1 linhas
+  Colunas (14):
+    id                                       uuid                      NOT NULL
+    region                                   character varying(50)     NOT NULL DEFAULT 'us-east-1'::character varying
+    bucket_name                              character varying(255)    NOT NULL
+    access_key_id                            text                      NOT NULL
+    secret_access_key                        text                      NOT NULL
+    use_signed_url                           boolean                   NOT NULL DEFAULT false
+    signed_url_expires_in                    integer                   NOT NULL DEFAULT 604800
+    use_cloudfront                           boolean                   NOT NULL DEFAULT false
+    cloudfront_domain                        character varying(255)   
+    cloudfront_key_pair_id                   character varying(255)   
+    cloudfront_private_key                   text                     
+    created_at                               timestamp with time zone  NOT NULL DEFAULT now()
+    updated_at                               timestamp with time zone  NOT NULL DEFAULT now()
+    base_path                                character varying(255)    DEFAULT NULL::character varying
+  Sample (top 3):
+    id | region | bucket_name | access_key_id | secret_access_key | use_signed_url | signed_url_expires_in | use_cloudfront | cloudfront_domain | cloudfront_key_pair_id | cloudfront_private_key | created_at | updated_at | base_path
+    019d2157-96ce-737a-b1a2-b36e2728b79b | us-east-1 | play4tune-assets | <REDACTED_AWS_KEY_ID> | <REDACTED_AWS_SECRET> | False | 604800 | True | dsrxqpoox1332.cloudfront.net | NULL | NULL | 2026-03-24 19:34:41.615649+00:00 | 2026-03-24 19:34:41.615649+00:00 | public
+
+  [TABLE] public.themes — 4 linhas
+  Colunas (7):
+    id                                       uuid                      NOT NULL
+    name                                     character varying(255)    NOT NULL
+    active                                   boolean                   NOT NULL DEFAULT false
+    allowed_users                            jsonb                     NOT NULL DEFAULT '[]'::jsonb
+    value                                    jsonb                     NOT NULL
+    created_at                               timestamp without time zone NOT NULL DEFAULT now()
+    updated_at                               timestamp without time zone NOT NULL DEFAULT now()
+  Sample (top 3):
+    id | name | active | allowed_users | value | created_at | updated_at
+    019ce2a7-2921-754d-89d3-f1e5add7e2d3 | Multibet | False | [] | {'Colors': {'Red': {'100': {'hex': '#FEF2F2'}, '30 | 2026-03-12 15:25:31.811666 | 2026-04-02 15:07:03.683336
+    019ce293-2bcf-74d2-832d-84becd25aa9c | Supernova | False | [] | {'Colors': {'Red': {'100': {'hex': '#FEF2F2'}, '30 | 2026-03-12 15:03:41.776536 | 2026-04-02 15:07:03.683336
+    019ce351-0e37-71e0-8bb1-d106bd03a954 | Zona de Jogo | False | [] | {'Colors': {'Red': {'100': {'hex': '#FEF2F2'}, '30 | 2026-03-12 18:31:06.042413 | 2026-04-02 15:07:03.683336
+
+  [TABLE] public.timezone_migration_log — 0 linhas
+  Colunas (6):
+    id                                       integer                   NOT NULL DEFAULT nextval('timezone_migration_log_id_seq'::regclass)
+    table_name                               character varying(100)   
+    column_name                              character varying(100)   
+    action                                   character varying(50)    
+    executed_at                              timestamp with time zone  DEFAULT now()
+    notes                                    text                     
+
+  [TABLE] public.transactions — ~112399 linhas
+  Colunas (38):
+    id                                       uuid                      NOT NULL
+    idempotency_key                          character varying         NOT NULL
+    status                                   character varying         NOT NULL
+    type                                     character varying         NOT NULL
+    amount                                   numeric(36,18)            NOT NULL DEFAULT 0.000000000000000000
+    real_amount                              numeric(36,18)            DEFAULT 0.000000000000000000
+    balance_before                           numeric(36,18)            DEFAULT 0.000000000000000000
+    balance_after                            numeric(36,18)            DEFAULT 0.000000000000000000
+    locked_amount                            numeric(36,18)           
+    locked_amount_before                     numeric(36,18)           
+    locked_amount_after                      numeric(36,18)           
+    fee_amount                               numeric(36,18)           
+    metadata                                 jsonb                     NOT NULL
+    external_id                              character varying        
+    gateway_order_no                         character varying        
+    reference_type                           character varying        
+    reference_id                             character varying        
+    reversed_transaction_id                  uuid                     
+    processed_at                             timestamp without time zone
+    expires_at                               timestamp without time zone
+    ip_address                               character varying        
+    user_agent                               character varying        
+    flagged_for_review                       boolean                   NOT NULL DEFAULT false
+    gateway_flagged                          boolean                   NOT NULL DEFAULT false
+    reviewed_by                              character varying        
+    reviewed_at                              timestamp without time zone
+    rejection_reason                         character varying        
+    user_id                                  uuid                      NOT NULL
+    currency_id                              uuid                      NOT NULL
+    wallet_id                                uuid                      NOT NULL
+    payment_method_id                        uuid                     
+    created_at                               timestamp without time zone NOT NULL DEFAULT now()
+    updated_at                               timestamp without time zone NOT NULL DEFAULT now()
+    turnover_met                             boolean                   NOT NULL DEFAULT false
+    notified                                 boolean                   NOT NULL DEFAULT false
+    error_reason                             character varying(1000)  
+    failure_source                           character varying(50)    
+    review_note                              text                     
+  Sample (top 3):
+    id | idempotency_key | status | type | amount | real_amount | balance_before | balance_after | locked_amount | locked_amount_before | locked_amount_after | fee_amount | metadata | external_id | gateway_order_no | reference_type | reference_id | reversed_transaction_id | processed_at | expires_at | ip_address | user_agent | flagged_for_review | gateway_flagged | reviewed_by | reviewed_at | rejection_reason | user_id | currency_id | wallet_id | payment_method_id | created_at | updated_at | turnover_met | notified | error_reason | failure_source | review_note
+    019d27e5-78cb-714f-9afb-1477fa43bdaa | 87011482-c2d1-4ace-9f47-27b44acfa76a | COMPLETED | DEPOSIT | 200.000000000000000000 | 0E-18 | 0E-18 | 200.000000000000000000 | NULL | NULL | NULL | NULL | {'url': 'https://cashier.npaypk.com/?token=eyJhbGc | 2603260707233219 | 2603260707233219 | NULL | NULL | NULL | 2026-03-26 02:07:38.845000 | NULL | 100.53.65.9 | NULL | False | False | 019cdd15-5d16-76fd-a3bc-6f652970b76a | 2026-03-26 02:07:38.845000 | NULL | 019d27e5-68ca-7009-b306-6e11ba56091c | 019cdd15-5c7d-74df-a586-bdf7026b5df5 | 019d27e5-68d4-721f-97e3-6b57c9a25048 | 019cdfe5-782d-77ae-a585-4a9a036cc970 | 2026-03-26 02:07:23.341827 | 2026-03-26 02:07:38.846800 | False | False | NULL | NULL | NULL
+    019d27ea-76e4-7219-9e30-97ffd8f89585 | 7e6ffae4-027a-4c72-97cd-94d55ea1dce0 | COMPLETED | DEPOSIT | 200.000000000000000000 | 0E-18 | 0E-18 | 200.000000000000000000 | NULL | NULL | NULL | NULL | {'url': 'https://gateway.vpay.top/api/checkout?ord | 2603260712504244 | 2603260712504244 | NULL | NULL | NULL | 2026-03-26 02:13:07.864000 | NULL | 44.222.72.83 | NULL | False | False | 019cdd15-5d16-76fd-a3bc-6f652970b76a | 2026-03-26 02:13:07.864000 | NULL | 019d27ea-37da-75ce-9eb9-ff4f620b3f87 | 019cdd15-5c7d-74df-a586-bdf7026b5df5 | 019d27ea-37e5-7309-8dc1-cba310b33310 | 019cdfe5-782d-77ae-a585-4a9a036cc970 | 2026-03-26 02:12:50.535013 | 2026-03-26 02:13:07.865288 | False | False | NULL | NULL | NULL
+    019d2976-1b39-70df-be00-faa26f3483b6 | 9b1c515e-8135-4c30-884c-ff90535e4ff5 | FAILED | DEPOSIT | 1000.000000000000000000 | 0E-18 | 0E-18 | 0E-18 | NULL | NULL | NULL | NULL | {'sessionId': '019d2974-e26d-7456-9257-2a61c8f74e8 | NULL | NULL | NULL | NULL | NULL | NULL | NULL | 32.192.52.121 | NULL | False | False | NULL | NULL | NULL | 019d2974-e256-7540-8b45-b94e1296863a | 019cdd15-5c7d-74df-a586-bdf7026b5df5 | 019d2974-e25d-71fd-84d9-0b95194953fd | 019cdfe5-782d-77ae-a585-4a9a036cc970 | 2026-03-26 09:24:59.325764 | 2026-03-26 09:24:59.732024 | False | False | NULL | NULL | NULL
+
+  [TABLE] public.user_addresses — 0 linhas
+  Colunas (14):
+    id                                       uuid                      NOT NULL
+    user_id                                  uuid                      NOT NULL
+    label                                    character varying(50)    
+    street                                   character varying(255)    NOT NULL
+    number                                   character varying(20)     NOT NULL
+    complement                               character varying(255)   
+    neighborhood                             character varying(100)    NOT NULL
+    city                                     character varying(100)    NOT NULL
+    state                                    character varying(100)    NOT NULL
+    country                                  character varying(100)    NOT NULL
+    zip_code                                 character varying(20)     NOT NULL
+    is_default                               boolean                   NOT NULL DEFAULT false
+    created_at                               timestamp with time zone  NOT NULL DEFAULT now()
+    updated_at                               timestamp with time zone  NOT NULL DEFAULT now()
+
+  [TABLE] public.user_favorite_games — 124 linhas
+  Colunas (4):
+    id                                       uuid                      NOT NULL DEFAULT uuid_generate_v4()
+    user_id                                  uuid                      NOT NULL
+    game_id                                  uuid                      NOT NULL
+    created_at                               timestamp with time zone  NOT NULL DEFAULT now()
+  Sample (top 3):
+    id | user_id | game_id | created_at
+    019d01f2-5c95-74d5-917f-05699b7fca70 | 019ce3e4-e1d7-768f-b4cc-b35cce1188aa | e749a390-b2d7-4347-bb40-fecaefe3fd15 | 2026-03-18 17:15:53.878546+00:00
+    019d256d-e6d5-7205-8cae-c54a8a6b1ed0 | 019d2568-bc72-76ce-bc4e-0970a0ce872f | 87d5042d-1ffe-40a1-a601-57fa8b548d3e | 2026-03-25 14:37:32.757869+00:00
+    019d256d-ef88-7598-87fe-3ee193de17aa | 019d2568-bc72-76ce-bc4e-0970a0ce872f | e749a390-b2d7-4347-bb40-fecaefe3fd15 | 2026-03-25 14:37:34.984638+00:00
+
+  [TABLE] public.user_marketing_events — 1965 linhas
+  Colunas (14):
+    id                                       uuid                      NOT NULL DEFAULT uuid_generate_v4()
+    user_id                                  uuid                      NOT NULL
+    event_type                               character varying(50)     NOT NULL
+    amount                                   numeric                  
+    currency                                 character varying(10)    
+    page                                     text                     
+    utm_source                               character varying(100)   
+    utm_medium                               character varying(100)   
+    utm_campaign                             character varying(150)   
+    utm_term                                 character varying(150)   
+    utm_content                              character varying(150)   
+    referrer_url                             text                     
+    created_at                               timestamp without time zone NOT NULL DEFAULT now()
+    fbclid                                   character varying(255)   
+  Sample (top 3):
+    id | user_id | event_type | amount | currency | page | utm_source | utm_medium | utm_campaign | utm_term | utm_content | referrer_url | created_at | fbclid
+    37d10074-f12e-4c3f-8ab4-439acfc33a52 | 019d5e52-adf8-753e-a15c-4ff6645e9fb5 | Deposit | 2000 | PKR | NULL | fb | paid | 120241074186300141 | 120241074186280141 | 120241074334430141 | NULL | 2026-04-05 16:13:44.873582 | IwZXh0bgNhZW0BMABhZGlkAasuns4mWK1zcnRjBmFwcF9pZAwz
+    ff44e0ac-2a93-475f-9d26-f986f15b75ee | 019d2c4d-afd4-77b8-9a8b-851a38ad6a1c | Deposit | 200 | PKR | NULL | NULL | NULL | direct-march | NULL | 3d804qo.15.26ba | NULL | 2026-04-05 20:43:08.328329 | {fbclid}
+    cdf47e30-becf-43e6-9dc1-152e03eb9dae | 019d2c4d-afd4-77b8-9a8b-851a38ad6a1c | FTD | 200 | PKR | NULL | NULL | NULL | direct-march | NULL | 3d804qo.15.26ba | NULL | 2026-04-05 20:43:08.337106 | {fbclid}
+
+  [TABLE] public.user_payment_accounts — 202 linhas
+  Colunas (12):
+    id                                       uuid                      NOT NULL
+    user_id                                  uuid                      NOT NULL
+    type                                     character varying(50)     NOT NULL
+    label                                    character varying(100)   
+    account_name                             character varying(255)    NOT NULL
+    account_number                           character varying(255)    NOT NULL
+    bank_code                                character varying(50)    
+    metadata                                 jsonb                     NOT NULL DEFAULT '{}'::jsonb
+    is_default                               boolean                   NOT NULL DEFAULT false
+    active                                   boolean                   NOT NULL DEFAULT true
+    created_at                               timestamp with time zone  NOT NULL DEFAULT now()
+    updated_at                               timestamp with time zone  NOT NULL DEFAULT now()
+  Sample (top 3):
+    id | user_id | type | label | account_name | account_number | bank_code | metadata | is_default | active | created_at | updated_at
+    019d03f3-e25f-723e-a831-3a553004d9aa | 019ce3e4-e1d7-768f-b4cc-b35cce1188aa | bank_account | NULL | Muhamed 2 | +123456789012 | HBL | {} | True | True | 2026-03-19 02:36:48.096712+00:00 | 2026-03-19 02:37:23.491307+00:00
+    019d25a5-3261-764c-936e-872e3ffba333 | 019d25a4-a727-7509-a83c-bfb7f6567254 | bank_account | NULL | Muhammad Cheema | 03142580969 | EASYPAISA | {} | True | True | 2026-03-25 15:37:56.578244+00:00 | 2026-03-25 15:37:56.578244+00:00
+    019d2892-e395-7328-9533-01a5464f40fd | 019d2891-5eae-720c-ab5f-f6c4e3b6f7a5 | bank_account | NULL | Danish Awan | 03485416081 | EASYPESA | {} | True | True | 2026-03-26 05:16:48.406920+00:00 | 2026-03-26 05:16:48.406920+00:00
+
+  [TABLE] public.user_sessions — 2741 linhas
+  Colunas (11):
+    id                                       uuid                      NOT NULL
+    user_id                                  uuid                      NOT NULL
+    token                                    character varying(255)    NOT NULL
+    revoked                                  boolean                   NOT NULL DEFAULT false
+    coords                                   jsonb                     NOT NULL DEFAULT '{}'::jsonb
+    metadata                                 jsonb                     NOT NULL DEFAULT '{}'::jsonb
+    utm                                      jsonb                     NOT NULL DEFAULT '{}'::jsonb
+    expires_at                               timestamp without time zone NOT NULL
+    expired                                  boolean                   NOT NULL DEFAULT false
+    created_at                               timestamp without time zone NOT NULL DEFAULT now()
+    updated_at                               timestamp without time zone NOT NULL DEFAULT now()
+  Sample (top 3):
+    id | user_id | token | revoked | coords | metadata | utm | expires_at | expired | created_at | updated_at
+    019d2869-1af7-741f-bed4-ce1f3f4cdc36 | 019d2869-1ada-744e-8f1d-403c6c652aa3 | eyJ1c2VySWQiOiIwMTlkMjg2OS0xYWRhLTc0NGUtOGYxZC00MD | False | {} | {'ip': '100.55.90.111'} | {'content': '10lsjo3.15.1n2r', 'campaign': 'direct | 2026-03-26 05:31:10.071000 | False | 2026-03-26 04:31:10.073672 | 2026-03-26 04:31:10.073672
+    019d2893-81fb-7758-b8d1-e25d1d978853 | 019d2891-5eae-720c-ab5f-f6c4e3b6f7a5 | eyJ1c2VySWQiOiIwMTlkMjg5MS01ZWFlLTcyMGMtYWI1Zi1mNm | False | {} | {'ip': '100.53.240.240'} | {} | 2026-03-26 06:17:28.955000 | False | 2026-03-26 05:17:28.956718 | 2026-03-26 05:17:28.956718
+    019d2b97-8891-701d-a9ac-19457e676227 | 019d2b97-8871-7665-a098-dab1cd57fa2a | eyJ1c2VySWQiOiIwMTlkMmI5Ny04ODcxLTc2NjUtYTA5OC1kYW | False | {} | {'ip': '32.193.245.226'} | {'fbclid': '{fbclid}', 'content': '9iqjch.15.25bs' | 2026-03-26 20:20:44.433000 | False | 2026-03-26 19:20:44.433811 | 2026-03-26 19:20:44.433811
+
+  [TABLE] public.users — 1451 linhas
+  Colunas (18):
+    id                                       uuid                      NOT NULL
+    name                                     character varying(255)   
+    email                                    character varying(255)   
+    phone                                    character varying(20)    
+    password                                 character varying         NOT NULL
+    role                                     character varying(100)    NOT NULL
+    active                                   boolean                   NOT NULL DEFAULT true
+    blocked                                  boolean                   NOT NULL DEFAULT false
+    email_verified_at                        timestamp with time zone 
+    created_at                               timestamp without time zone NOT NULL DEFAULT now()
+    updated_at                               timestamp without time zone NOT NULL DEFAULT now()
+    is_affiliate                             boolean                   NOT NULL DEFAULT false
+    affiliate_code                           character varying(50)    
+    affiliate_at                             timestamp with time zone 
+    affiliate_id                             uuid                     
+    username                                 character varying(50)     NOT NULL
+    public_id                                character varying(9)      NOT NULL
+    referred_by                              uuid                     
+  Sample (top 3):
+    id | name | email | phone | password | role | active | blocked | email_verified_at | created_at | updated_at | is_affiliate | affiliate_code | affiliate_at | affiliate_id | username | public_id | referred_by
+    019d6e2b-fcd0-763e-9e53-ed446acd5bb2 | NULL | NULL | +923075941703 | $argon2id$v=19$m=65536,t=3,p=4$ozMFmOH1qSrS8vKtSPI | USER | True | False | NULL | 2026-04-08 17:37:49.777855 | 2026-04-08 17:37:49.777855 | False | NULL | NULL | NULL | Muhamma19 | ZIiCKQDKi | NULL
+    019d6e2b-9b06-7753-bf00-05780089fdad | NULL | wa80181@gmail.com | +923023638705 | $argon2id$v=19$m=65536,t=3,p=4$vMuOYD0LXa3folu+E4Y | USER | True | False | 2026-04-08 17:40:42.130000+00:00 | 2026-04-08 17:37:24.743614 | 2026-04-08 17:40:42.129899 | False | NULL | NULL | NULL | waheed705 | HlVvWE48c | NULL
+    019d70b2-bbea-70e9-9ddc-5d12460aaeab | NULL | NULL | +923264974643 | $argon2id$v=19$m=65536,t=3,p=4$le+HYSaMZNyJceH73m+ | USER | True | False | NULL | 2026-04-09 05:24:14.956457 | 2026-04-09 05:24:14.956457 | False | NULL | NULL | NULL | rehanalshaq57 | QJq3K05O2 | NULL
+
+  [TABLE] public.wallets — 2900 linhas
+  Colunas (12):
+    id                                       uuid                      NOT NULL
+    type                                     character varying         NOT NULL
+    balance                                  numeric(36,18)            NOT NULL DEFAULT 0.000000000000000000
+    locked_balance                           numeric(36,18)            NOT NULL DEFAULT 0.000000000000000000
+    version                                  integer                   NOT NULL DEFAULT 0
+    active                                   boolean                   NOT NULL DEFAULT true
+    blocked                                  boolean                   NOT NULL DEFAULT false
+    blocked_reason                           character varying        
+    user_id                                  uuid                      NOT NULL
+    currency_id                              uuid                      NOT NULL
+    created_at                               timestamp without time zone NOT NULL DEFAULT now()
+    updated_at                               timestamp without time zone NOT NULL DEFAULT now()
+  Sample (top 3):
+    id | type | balance | locked_balance | version | active | blocked | blocked_reason | user_id | currency_id | created_at | updated_at
+    019ce3e4-e1de-72e8-ab1c-4cf06d0c173f | REAL | 0E-18 | 0E-18 | 0 | True | False | NULL | 019ce3e4-e1d7-768f-b4cc-b35cce1188aa | 019cdd15-5c7d-74df-a586-bdf7026b5df5 | 2026-03-12 21:12:34.016918 | 2026-03-19 02:49:38.035429
+    019d2568-bc79-70f8-9366-90ccd093e28a | BONUS | 0E-18 | 0E-18 | 0 | True | False | NULL | 019d2568-bc72-76ce-bc4e-0970a0ce872f | 019cdd15-5c7d-74df-a586-bdf7026b5df5 | 2026-03-25 14:31:54.235069 | 2026-03-25 14:31:54.235069
+    019d41bf-cd51-7388-917f-338a009a8e09 | REAL | 0E-18 | 0E-18 | 0 | True | False | NULL | 019d41bf-cd46-776a-afa4-f2bf04dc1678 | 019cdd15-5c7d-74df-a586-bdf7026b5df5 | 2026-03-31 02:36:22.227829 | 2026-03-31 02:36:22.227829
+
+  [TABLE] public.webhook_deliveries — 5610 linhas
+  Colunas (11):
+    id                                       uuid                      NOT NULL DEFAULT uuid_generate_v4()
+    webhook_endpoint_id                      uuid                      NOT NULL
+    event_type                               character varying(100)    NOT NULL
+    payload                                  jsonb                     NOT NULL DEFAULT '{}'::jsonb
+    status                                   character varying(20)     NOT NULL DEFAULT 'PENDING'::character varying
+    http_status                              integer                  
+    response_body                            text                     
+    error_message                            text                     
+    attempts                                 integer                   NOT NULL DEFAULT 0
+    created_at                               timestamp without time zone NOT NULL DEFAULT now()
+    updated_at                               timestamp without time zone NOT NULL DEFAULT now()
+  Sample (top 3):
+    id | webhook_endpoint_id | event_type | payload | status | http_status | response_body | error_message | attempts | created_at | updated_at
+    019d25a7-a8f0-715e-9bec-f4e484b60c43 | 019d2572-51bc-71dc-9c29-b4c77f3bd1fc | Login | {'data': {'userId': '019cdd15-5d16-76fd-a3bc-6f652 | SUCCESS | 200 | {"success":true,"message":"Webhook recebido e redi | NULL | 1 | 2026-03-25 15:40:38.007711 | 2026-03-25 15:40:38.658969
+    019d257d-c8f0-746c-94fe-5fc7897ddc8b | 019d2572-51bc-71dc-9c29-b4c77f3bd1fc | Register | {'data': {'userId': '019d257d-c8d7-7061-b03b-bd453 | SUCCESS | 200 | {"success":true,"message":"Webhook recebido e redi | NULL | 1 | 2026-03-25 14:54:53.680761 | 2026-03-25 14:54:54.460206
+    019d2588-5c5f-77f7-a686-fbffee900ea5 | 019d2572-51bc-71dc-9c29-b4c77f3bd1fc | Login | {'data': {'userId': '019d257d-c8d7-7061-b03b-bd453 | SUCCESS | 200 | {"success":true,"message":"Webhook recebido e redi | NULL | 1 | 2026-03-25 15:06:26.783958 | 2026-03-25 15:06:29.025659
+
+  [TABLE] public.webhook_endpoints — 2 linhas
+  Colunas (13):
+    id                                       uuid                      NOT NULL
+    url                                      character varying(500)   
+    secret                                   character varying(255)    NOT NULL
+    events                                   jsonb                     NOT NULL DEFAULT '[]'::jsonb
+    active                                   boolean                   NOT NULL DEFAULT true
+    description                              character varying(255)   
+    created_at                               timestamp without time zone NOT NULL DEFAULT now()
+    updated_at                               timestamp without time zone NOT NULL DEFAULT now()
+    type                                     USER-DEFINED              NOT NULL DEFAULT 'standard'::webhook_endpoints_type_enum
+    url_script                               text                     
+    body_script                              text                     
+    headers_script                           text                     
+    method                                   USER-DEFINED              NOT NULL DEFAULT 'POST'::webhook_method_enum
+  Sample (top 3):
+    id | url | secret | events | active | description | created_at | updated_at | type | url_script | body_script | headers_script | method
+    019d2572-51bc-71dc-9c29-b4c77f3bd1fc | https://api.play4tune.sunsetai.com.br/api/v1/webho | @5UPERNOVA_SECR3T! | ['Register', 'Login', 'DepositCreation', 'Deposit' | True | Nubo integration | 2026-03-25 14:42:22.269407 | 2026-03-25 14:42:22.269407 | standard | NULL | NULL | NULL | POST
+    019d2745-8760-7469-963e-d8af07c031d9 |  | SECRET | ['Register', 'Deposit', 'FTD'] | True | Keitaro | 2026-03-25 23:12:41.313287 | 2026-03-28 18:23:16.908955 | composed | const utmContent = ctx.utmContent;
+
+let status = ' |  | NULL | GET
+
+  [VIEW] public.heatmap_hour — ~? linhas
+  Colunas (9):
+    data                                     date                     
+    data_nome                                text                     
+    hour                                     integer                  
+    dep_amount                               double precision         
+    withdrawal_amount                        double precision         
+    net_deposit                              double precision         
+    ggr_cassino                              double precision         
+    ggr_sport                                double precision         
+    ngr                                      double precision         
+  Sample (top 3):
+    data | data_nome | hour | dep_amount | withdrawal_amount | net_deposit | ggr_cassino | ggr_sport | ngr
+    2026-04-09 | Thu | 0 | 1500.0 | 1500.0 | 0.0 | 951.24 | 0.0 | 951.24
+    2026-04-09 | Thu | 1 | 900.0 | 0.0 | 900.0 | 111.0 | 0.0 | 111.0
+    2026-04-09 | Thu | 2 | 1200.0 | 1700.0 | -500.0 | -4561.82 | 0.0 | -4561.82
+
+  [VIEW] public.matriz_aquisicao — ~? linhas
+  Colunas (14):
+    data_registro                            date                     
+    nome                                     character varying        
+    users                                    bigint                   
+    ftd                                      bigint                   
+    ftd_amount                               numeric                  
+    std                                      bigint                   
+    std_amount                               numeric                  
+    ttd                                      bigint                   
+    ttd_amount                               numeric                  
+    qtd                                      bigint                   
+    qtd_amount                               numeric                  
+    dep_amount                               numeric                  
+    withdrawal_amount                        numeric                  
+    net_deposit                              numeric                  
+  Sample (top 3):
+    data_registro | nome | users | ftd | ftd_amount | std | std_amount | ttd | ttd_amount | qtd | qtd_amount | dep_amount | withdrawal_amount | net_deposit
+    2026-04-09 | Facebook | 49 | 2 | 200.000000000000000000 | NULL | NULL | NULL | NULL | NULL | NULL | 200.000000000000000000 | 0 | 200.000000000000000000
+    2026-04-09 | Organico | 12 | 2 | 1400.000000000000000000 | 1 | 700.000000000000000000 | NULL | NULL | NULL | NULL | 2100.000000000000000000 | 700.000000000000000000 | 1400.000000000000000000
+    2026-04-09 | Instagram | 4 | NULL | NULL | NULL | NULL | NULL | NULL | NULL | NULL | 0 | 0 | 0
+
+  [VIEW] public.matriz_financeiro — ~? linhas
+  Colunas (26):
+    data                                     date                     
+    deposit                                  double precision         
+    adpu                                     double precision         
+    avg_dep                                  double precision         
+    withdrawal                               double precision         
+    net_deposit                              double precision         
+    users                                    integer                  
+    ftd                                      integer                  
+    conversion                               double precision         
+    ftd_amount                               double precision         
+    avg_ftd_amount                           double precision         
+    turnover_cassino                         double precision         
+    win_cassino                              double precision         
+    ggr_cassino                              double precision         
+    turnover_sports                          double precision         
+    win_sports                               double precision         
+    ggr_sport                                double precision         
+    ggr_total                                double precision         
+    ngr                                      double precision         
+    retencao                                 integer                  
+    arpu                                     numeric                  
+    ativos                                   integer                  
+    hold_cassino                             numeric                  
+    hold_sport                               numeric                  
+    btr_ggr                                  numeric                  
+    hold_total                               numeric                  
+  Sample (top 3):
+    data | deposit | adpu | avg_dep | withdrawal | net_deposit | users | ftd | conversion | ftd_amount | avg_ftd_amount | turnover_cassino | win_cassino | ggr_cassino | turnover_sports | win_sports | ggr_sport | ggr_total | ngr | retencao | arpu | ativos | hold_cassino | hold_sport | btr_ggr | hold_total
+    2026-04-09 | 6000.0 | 500.0 | 2000.0 | 12200.0 | -6200.0 | 3 | 6 | 0.09 | 2600.0 | 433.33 | 122072.0 | 128955.948 | -6883.948 | 0.0 | 0.0 | 0.0 | -6883.948 | -8443.948 | 0 | -573.66 | 12 | -0.06 | 0 | 0.00 | -0.06
+    2026-04-08 | 29000.0 | 690.48 | 9666.67 | 19300.0 | 9700.0 | 3 | 27 | 0.16 | 14000.0 | 518.52 | 943105.58 | 956003.487 | -12897.907 | 0.0 | 0.0 | 0.0 | -12897.907 | -13797.907 | 900 | -307.09 | 42 | -0.01 | 0 | 0.03 | -0.01
+    2026-04-07 | 46600.0 | 1059.09 | 15533.33 | 11900.0 | 34700.0 | 3 | 42 | 0.22 | 39200.0 | 933.33 | 558131.3 | 522872.419 | 35258.881 | 0.0 | 0.0 | 0.0 | 35258.881 | 34213.631 | 1045 | 801.34 | 44 | 0.06 | 0 | 0.02 | 0.06
+
+  [VIEW] public.matriz_financeiro_hora — ~? linhas
+  Colunas (22):
+    data                                     date                     
+    hour                                     integer                  
+    deposit                                  double precision         
+    adpu                                     double precision         
+    avg_dep                                  double precision         
+    withdrawal                               double precision         
+    net_deposit                              double precision         
+    users                                    integer                  
+    ftd                                      integer                  
+    conversion                               double precision         
+    ftd_amount                               double precision         
+    avg_ftd_amount                           double precision         
+    turnover_cassino                         double precision         
+    win_cassino                              double precision         
+    ggr_cassino                              double precision         
+    turnover_sports                          double precision         
+    win_sports                               double precision         
+    ggr_sports                               double precision         
+    ggr_total                                double precision         
+    ngr                                      double precision         
+    arpu                                     numeric                  
+    ativos                                   integer                  
+  Sample (top 3):
+    data | hour | deposit | adpu | avg_dep | withdrawal | net_deposit | users | ftd | conversion | ftd_amount | avg_ftd_amount | turnover_cassino | win_cassino | ggr_cassino | turnover_sports | win_sports | ggr_sports | ggr_total | ngr | arpu | ativos
+    2026-04-09 | 9 | 900.0 | 450.0 | 900.0 | 500.0 | 400.0 | 1 | 0 | 0.0 | 0.0 | 0.0 | 2310.0 | 3635.558 | -1325.558 | 0.0 | 0.0 | 0.0 | -1325.558 | -1325.558 | -662.78 | 2
+    2026-04-09 | 8 | 100.0 | 100.0 | 100.0 | 0.0 | 100.0 | 1 | 1 | 1.0 | 100.0 | 100.0 | 2655.0 | 2712.16 | -57.16 | 0.0 | 0.0 | 0.0 | -57.16 | -57.16 | -57.16 | 1
+    2026-04-09 | 7 | 1100.0 | 366.67 | 550.0 | 3500.0 | -2400.0 | 2 | 1 | 0.5 | 100.0 | 100.0 | 6520.5 | 7448.36 | -927.86 | 0.0 | 0.0 | 0.0 | -927.86 | -927.86 | -309.29 | 3
+
+  [VIEW] public.mv_aquisicao — ~? linhas
+  Colunas (14):
+    data_registro                            date                     
+    nome                                     character varying        
+    users                                    bigint                   
+    ftd                                      bigint                   
+    ftd_amount                               numeric                  
+    std                                      bigint                   
+    std_amount                               numeric                  
+    ttd                                      bigint                   
+    ttd_amount                               numeric                  
+    qtd                                      bigint                   
+    qtd_amount                               numeric                  
+    dep_amount                               numeric                  
+    withdrawal_amount                        numeric                  
+    net_deposit                              numeric                  
+  Sample (top 3):
+    data_registro | nome | users | ftd | ftd_amount | std | std_amount | ttd | ttd_amount | qtd | qtd_amount | dep_amount | withdrawal_amount | net_deposit
+    2026-04-09 | Facebook | 49 | 2 | 200.000000000000000000 | NULL | NULL | NULL | NULL | NULL | NULL | 200.000000000000000000 | 0 | 200.000000000000000000
+    2026-04-09 | Organico | 12 | 2 | 1400.000000000000000000 | 1 | 700.000000000000000000 | NULL | NULL | NULL | NULL | 2100.000000000000000000 | 700.000000000000000000 | 1400.000000000000000000
+    2026-04-09 | Instagram | 4 | NULL | NULL | NULL | NULL | NULL | NULL | NULL | NULL | 0 | 0 | 0
+
+  [VIEW] public.mv_cohort_aquisicao — ~? linhas
+  Colunas (6):
+    data_registro                            date                     
+    nome                                     character varying        
+    data_dif                                 integer                  
+    qtd_depositantes                         numeric                  
+    qtd_jogadores                            numeric                  
+    total_users                              integer                  
+  Sample (top 3):
+    data_registro | nome | data_dif | qtd_depositantes | qtd_jogadores | total_users
+    2026-03-11 | Organico | 0 | 0 | 0 | 1
+    2026-03-12 | Organico | 0 | 0 | 0 | 1
+    2026-03-25 | Afiliados | 0 | 6 | 0 | 8
+
+  [VIEW] public.tab_cassino — ~? linhas
+  Colunas (2):
+    data                                     date                     
+    casino_bonus_bet_amount_inhouse          double precision         
+  Sample (top 3):
+    data | casino_bonus_bet_amount_inhouse
+    2026-03-27 | 100.0
+    2026-03-28 | 0.0
+    2026-03-29 | 0.0
+
+  [VIEW] public.tab_sports — ~? linhas
+  Colunas (2):
+    data                                     date                     
+    sportsbook_bonus_bet                     double precision         
+  Sample (top 3):
+    data | sportsbook_bonus_bet
+    2026-04-03 | 0.0
+    2026-04-05 | 0.0
+    2026-03-31 | 0.0
+
+  [VIEW] public.vw_active_player_retention_weekly — ~? linhas
+  Colunas (8):
+    semana                                   date                     
+    semana_label                             character varying        
+    depositantes_semana_atual                integer                  
+    depositantes_semana_anterior             integer                  
+    retidos_da_semana_anterior               integer                  
+    repeat_depositors                        integer                  
+    retention_pct                            numeric                  
+    repeat_depositor_pct                     numeric                  
+  Sample (top 3):
+    semana | semana_label | depositantes_semana_atual | depositantes_semana_anterior | retidos_da_semana_anterior | repeat_depositors | retention_pct | repeat_depositor_pct
+    2026-03-23 | Semana 23/03 | 92 | 0 | 0 | 18 | 0 | 19.6
+    2026-03-30 | Semana 30/03 | 60 | 5 | 5 | 10 | 100.0 | 16.7
+    2026-04-06 | Semana 06/04 | 91 | 1 | 1 | 15 | 100.0 | 16.5
+
+  [VIEW] public.vw_ativos — ~? linhas
+  Colunas (2):
+    date                                     date                     
+    ativos_cassino                           bigint                   
+  Sample (top 3):
+    date | ativos_cassino
+    2026-03-27 | 26
+    2026-03-28 | 21
+    2026-03-29 | 20
+
+  [VIEW] public.vw_cadastros_ftd — ~? linhas
+  Colunas (7):
+    date                                     date                     
+    novos_usuarios                           bigint                   
+    ftd                                      bigint                   
+    conversao_ftd                            numeric                  
+    ftd_amount                               numeric                  
+    novos_depositantes                       bigint                   
+    contas                                   numeric                  
+  Sample (top 3):
+    date | novos_usuarios | ftd | conversao_ftd | ftd_amount | novos_depositantes | contas
+    2026-03-11 | 1 | 0 | NULL | 0 | 0 | 1
+    2026-03-12 | 1 | 0 | NULL | 0 | 0 | 2
+    2026-03-25 | 27 | 10 | 0.37 | 6810.000000000000000000 | 10 | 29
+
+  [VIEW] public.vw_carteiras_saldo — ~? linhas
+  Colunas (3):
+    saldo_real                               numeric                  
+    saldo_bonus                              numeric                  
+    saldo_total                              numeric                  
+  Sample (top 3):
+    saldo_real | saldo_bonus | saldo_total
+    79238.514004999999910200 | 22194.972000000000021149 | 101433.486004999999931349
+
+  [VIEW] public.vw_casino_resumo — ~? linhas
+  Colunas (9):
+    data                                     date                     
+    bets_total                               numeric                  
+    bets_dinheiro_real                       numeric                  
+    bets_free_spins                          numeric                  
+    wins_total                               numeric                  
+    wins_free_spins                          numeric                  
+    ggr                                      numeric                  
+    rodadas                                  bigint                   
+    clientes_ativos                          bigint                   
+  Sample (top 3):
+    data | bets_total | bets_dinheiro_real | bets_free_spins | wins_total | wins_free_spins | ggr | rodadas | clientes_ativos
+    2026-03-27 | 68012.9400 | 67912.9400 | 100.0000 | 60440.7050 | 60440.7050 | 7572.2350 | 6153 | 26
+    2026-03-28 | 184527.0900 | 184527.0900 | 0.0000 | 171344.5900 | 171344.5900 | 13182.5000 | 8221 | 21
+    2026-03-29 | 103820.2050 | 103820.2050 | 0.0000 | 93629.1310 | 93629.1310 | 10191.0740 | 3932 | 20
+
+  [VIEW] public.vw_creditacoes — ~? linhas
+  Colunas (11):
+    data                                     date                     
+    adicao_manual_qtd                        bigint                   
+    adicao_manual_valor                      numeric                  
+    remocao_manual_qtd                       bigint                   
+    remocao_manual_valor                     numeric                  
+    bonus_ativados_qtd                       bigint                   
+    bonus_ativados_valor                     numeric                  
+    bonus_removidos_qtd                      bigint                   
+    bonus_removidos_valor                    numeric                  
+    bonus_convertidos_qtd                    bigint                   
+    bonus_convertidos_valor                  numeric                  
+  Sample (top 3):
+    data | adicao_manual_qtd | adicao_manual_valor | remocao_manual_qtd | remocao_manual_valor | bonus_ativados_qtd | bonus_ativados_valor | bonus_removidos_qtd | bonus_removidos_valor | bonus_convertidos_qtd | bonus_convertidos_valor
+    2026-04-09 | 1 | 100.000000000000000000 | 0 | 0 | 4 | 2400.000000000000000000 | 3 | 1964.647995000000000000 | 0 | 0
+    2026-04-08 | 5 | 1600.000000000000000000 | 0 | 0 | 25 | 13800.000000000000000000 | 6 | 6009.410000000000000000 | 1 | 900.000000000000000000
+    2026-04-07 | 0 | 0 | 0 | 0 | 41 | 39100.000000000000000000 | 8 | 10345.250000000000000200 | 2 | 1045.250000000000000200
+
+  [VIEW] public.vw_movimentacao_financeira — ~? linhas
+  Colunas (12):
+    date                                     date                     
+    processadora                             text                     
+    qtd_deposito                             bigint                   
+    deposito                                 numeric                  
+    media_deposito                           numeric                  
+    usuarios_depositantes                    bigint                   
+    qtd_saque                                bigint                   
+    saque                                    numeric                  
+    media_saque                              numeric                  
+    usuarios_sacantes                        bigint                   
+    net_deposit                              numeric                  
+    taxa_net_deposit                         numeric                  
+  Sample (top 3):
+    date | processadora | qtd_deposito | deposito | media_deposito | usuarios_depositantes | qtd_saque | saque | media_saque | usuarios_sacantes | net_deposit | taxa_net_deposit
+    2026-03-25 | pk_payin_jazzcash | 20 | 9610.00 | 480.50 | 10 | 0 | 0 | NULL | 0 | 9610.00 | 100.00
+    2026-03-26 | pk_payin_easypaisa | 7 | 3100.00 | 442.86 | 7 | 0 | 0 | NULL | 0 | 3100.00 | 100.00
+    2026-03-26 | pk_payin_jazzcash | 10 | 6303.00 | 630.30 | 10 | 0 | 0 | NULL | 0 | 6303.00 | 100.00
+
+  [VIEW] public.vw_top_jogos_ggr — ~? linhas
+  Colunas (6):
+    jogo                                     character varying        
+    data                                     date                     
+    total_apostado                           numeric                  
+    total_pago                               numeric                  
+    ggr                                      numeric                  
+    rodadas                                  bigint                   
+  Sample (top 3):
+    jogo | data | total_apostado | total_pago | ggr | rodadas
+    CRASH | 2026-03-30 | 10.0000 | 0.0000 | 10.0000 | 1
+    WILD VEGAS | 2026-04-03 | 390.0000 | 1150.5000 | -760.5000 | 195
+    GOLDEN BUFFALO | 2026-03-27 | 3509.2000 | 3487.2000 | 22.0000 | 270
+
+  [VIEW] public.vw_totais_gerais — ~? linhas
+  Colunas (9):
+    data                                     date                     
+    total_apostado                           numeric                  
+    total_pago                               numeric                  
+    total_ggr                                numeric                  
+    hold_pct                                 numeric                  
+    clientes_ativos                          bigint                   
+    ngr                                      numeric                  
+    ngr_hold_pct                             numeric                  
+    bonus_convertidos_valor                  numeric                  
+  Sample (top 3):
+    data | total_apostado | total_pago | total_ggr | hold_pct | clientes_ativos | ngr | ngr_hold_pct | bonus_convertidos_valor
+    2026-03-25 | 0 | 0 | 0 | 0.00 | 0 | 0 | 0.00 | 0
+    2026-03-26 | 0 | 0 | 0 | 0.00 | 0 | 0 | 0.00 | 0
+    2026-03-27 | 68012.940000000000000000 | 60440.705000000000000000 | 7572.235000000000000000 | 0.33 | 26 | 7572.235000000000000000 | 0.33 | 0
+
+================================================================================
+FOREIGN DATA WRAPPERS & SERVERS
+================================================================================
+  Nenhum foreign server encontrado.
+
+================================================================================
+MATERIALIZED VIEWS
+================================================================================
+  Nenhuma materialized view encontrada.
+
+Extensions: plpgsql (1.0), uuid-ossp (1.1)
+
+Tamanho do banco: 101 MB

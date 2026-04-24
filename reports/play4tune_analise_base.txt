@@ -1,0 +1,118 @@
+======================================================================
+ANALISE BASE PLAY4TUNE — 09/04/2026 10:34
+======================================================================
+
+RESUMO GERAL
+=======================================================
+Total usuarios:                1443
+Depositaram com sucesso:       236 (16.4%)
+Tentaram dep e falharam:       48
+Com depositos PENDENTES:       33
+Com depositos EXPIRADOS:       198
+Sacaram com sucesso:           53 (3.7%)
+Saques cancelados (admin):     17
+Saques falhados/rejeitados:    11
+Jogaram casino:                201 (13.9%)
+=======================================================
+Total depositado (COMPLETED):  Rs 215,493.00
+Total dep PENDING (travado):   Rs 52,100.00
+Total sacado (COMPLETED):      Rs 76,512.00
+Total saque CANCELADO:         Rs 94,039.00
+Net deposit:                   Rs 138,981.00
+Saldo real em carteiras:       Rs 80,277.69
+Saldo bonus em carteiras:      Rs 22,383.18
+
+FUNIL DE CONVERSAO
+=======================================================
+Cadastro:       1443  (100%)
+Depositou:       236  (16.4%)
+Jogou:           201  (13.9%)
+Sacou:            53  (3.7%)
+
+======================================================================
+ANALISE POR OPERADORA DE TELEFONE
+======================================================================
+No Paquistao, telefone = identidade financeira (como CPF no Brasil).
+Jazzcash = Jazz/Warid | Easypaisa = Telenor | Zong = nao suportado?
+
+Operadora             Users  DepOK  DepFail  DepPend  DepExp  SaqOK  SaqCanc      DepRs      SaqRs
+----------------------------------------------------------------------------------------------------
+Jazz                    445  83(19%)    14        8      62     16        3     85,895     22,680
+Zong                    290  52(18%)     5        6      36     14        4     39,298     20,400
+Telenor                 246  26(11%)    10        7      27      9        2     43,200     19,300
+Ufone                   152  26(17%)     5        6      18      8        4     19,100      8,900
+Jazz (Warid)            105  15(14%)     1        4      15      1        1      8,500        400
+FORMATO_DESCONHECIDO     41   0(0%)     0        1      14      0        0          0          0
+DESCONHECIDO (329)       31   3(10%)     0        0       6      0        1      1,000          0
+DESCONHECIDO (923)       25   2(8%)     0        0       4      0        0      2,000          0
+DESCONHECIDO (328)       18   3(17%)     0        0       1      1        0      3,500      2,000
+SCOM                     18   3(17%)     1        0       1      0        0        900          0
+DESCONHECIDO (327)       14   0(0%)     0        0       3      0        0          0          0
+DESCONHECIDO (326)       11   2(18%)     1        0       2      0        0      1,200          0
+DESCONHECIDO (339)        5   1(20%)     0        0       2      0        0        200          0
+DESCONHECIDO (412)        4   3(75%)     0        0       0      0        0      1,200          0
+DESCONHECIDO (034)        4   2(50%)     0        0       3      2        0      1,200        400
+DESCONHECIDO (031)        3   2(67%)     0        0       1      0        0        800          0
+DESCONHECIDO (032)        3   1(33%)     0        0       1      1        1      1,400      1,732
+DESCONHECIDO (432)        3   0(0%)     0        0       0      0        0          0          0
+DESCONHECIDO (421)        2   1(50%)     0        0       0      0        0        400          0
+DESCONHECIDO (030)        2   2(100%)     0        0       0      0        1        700          0
+
+======================================================================
+DEPOSITOS PENDENTES HOJE (09/04) — POSSIVEL INSTABILIDADE
+======================================================================
+Username             PID        Phone                 Valor Metodo          Data Erro
+--------------------------------------------------------------------------------------------------------------
+irfanrie             C8JoBKCAo  +923491840637        300.00 Easypaisa       2026-04-09 13:27:21  [Telenor] 
+Carry29              jxfDbJN98  +923344655229        300.00 Jazzcash        2026-04-09 12:59:50  [Ufone] 
+contato299776        PYBu4INLN  +923141241312       1000.00 Jazzcash        2026-04-09 12:49:51  [Zong] 
+contato299776        PYBu4INLN  +923141241312       1000.00 Easypaisa       2026-04-09 12:49:44  [Zong] 
+secondcup            Y5CT9YD3q  +923707192331        500.00 Easypaisa       2026-04-09 12:49:25  [Zong] 
+secondcup            Y5CT9YD3q  +923707192331        500.00 Easypaisa       2026-04-09 12:46:51  [Zong] 
+filipeteste01111111  DVfUF0CsW  +923701982732        500.00 Easypaisa       2026-04-09 12:45:44  [Zong] 
+filipeteste01111111  DVfUF0CsW  +923701982732        500.00 Jazzcash        2026-04-09 12:45:31  [Zong] 
+secondcup            Y5CT9YD3q  +923707192331        500.00 Jazzcash        2026-04-09 12:43:52  [Zong] 
+secondcup            Y5CT9YD3q  +923707192331        500.00 Easypaisa       2026-04-09 12:43:01  [Zong] 
+secondcup            Y5CT9YD3q  +923707192331        500.00 Easypaisa       2026-04-09 12:42:28  [Zong] 
+secondcup            Y5CT9YD3q  +923707192331        500.00 Easypaisa       2026-04-09 12:42:03  [Zong] 
+blueskypopper        JW9ygcw4Y  +923445213634        500.00 Easypaisa       2026-04-09 12:29:14  [Telenor] 
+blueskypopper        JW9ygcw4Y  +923445213634        300.00 Easypaisa       2026-04-09 12:18:01  [Telenor] 
+blueskypopper        JW9ygcw4Y  +923445213634        500.00 Jazzcash        2026-04-09 12:15:06  [Telenor] 
+blueskypopper        JW9ygcw4Y  +923445213634        300.00 Easypaisa       2026-04-09 12:14:58  [Telenor] 
+ggr                  QXP2CqBQo  +923002563985       5000.00 Easypaisa       2026-04-09 11:39:48  [Jazz] 
+ggr                  QXP2CqBQo  +923002563985       1000.00 Jazzcash        2026-04-09 11:39:35  [Jazz] 
+teste01706337        4R1ciOyWj  +923094646464       1000.00 Easypaisa       2026-04-09 11:29:12  [Jazz (Warid)] 
+teste01706337        4R1ciOyWj  +923094646464       1000.00 Jazzcash        2026-04-09 11:29:04  [Jazz (Warid)] 
+Ismail1168           rVrZIsjFj  +923051878443        300.00 Jazzcash        2026-04-09 10:35:16  [Jazz (Warid)] 
+mianali368           QNSy5vJPW  +923059509785        300.00 Jazzcash        2026-04-09 10:10:33  [Jazz (Warid)] 
+mianali368           QNSy5vJPW  +923059509785        300.00 Jazzcash        2026-04-09 10:09:56  [Jazz (Warid)] 
+mianali368           QNSy5vJPW  +923059509785        300.00 Jazzcash        2026-04-09 10:09:38  [Jazz (Warid)] 
+mianali368           QNSy5vJPW  +923059509785        500.00 Jazzcash        2026-04-09 10:09:25  [Jazz (Warid)] 
+shakeel4886          iL8vInuMq  +923437864886        300.00 Jazzcash        2026-04-09 09:31:11  [Telenor] 
+Mohammad             myG2bRjKa  +923459600370        300.00 Jazzcash        2026-04-09 06:31:24  [Telenor] 
+03181070472          Jk1FmHOSm  +923181070472        500.00 Jazzcash        2026-04-09 04:51:37  [Zong] 
+3491812887           GWtYtD6el  +923491812887        500.00 Easypaisa       2026-04-09 02:57:32  [Telenor] 
+aliqasim0002         JVh72lUNq  +923337400501        100.00 Jazzcash        2026-04-09 02:45:25  [Ufone] 
+aliqasim0002         JVh72lUNq  +923337400501        100.00 Jazzcash        2026-04-09 02:11:57  [Ufone] 
+teste01706337        4R1ciOyWj  +923094646464       1000.00 Easypaisa       2026-04-09 02:11:11  [Jazz (Warid)] 
+teste01706337        4R1ciOyWj  +923094646464       1000.00 Jazzcash        2026-04-09 02:11:03  [Jazz (Warid)] 
+aliqasim0002         JVh72lUNq  +923337400501        100.00 Jazzcash        2026-04-09 02:10:27  [Ufone] 
+contato299776        PYBu4INLN  +923141241312       1000.00 Easypaisa       2026-04-09 01:51:54  [Zong] 
+
+Total: 35 depositos pendentes hoje
+
+======================================================================
+SAQUES FALHADOS / PENDENTES (ultimos 7 dias)
+======================================================================
+Nenhum saque com problema nos ultimos 7 dias.
+
+======================================================================
+TAXA DE SUCESSO POR METODO DE PAGAMENTO
+======================================================================
+Metodo                    Tipo          Total     OK   Fail   Pend   Canc  Taxa OK      Rs OK    Rs Pend
+---------------------------------------------------------------------------------------------------------
+Easypaisa                 DEPOSIT         540    166    181     24      0    30.7%    134,960     29,800
+Easypaisa Pay In          DEPOSIT           4      0      4      0      0     0.0%          0          0
+Jazzcash                  DEPOSIT         488    158     89     38      0    32.4%     88,543     22,300
+
+CSV exportado: reports/play4tune_base_jogadores.csv (1443 jogadores)

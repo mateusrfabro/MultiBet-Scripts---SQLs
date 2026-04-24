@@ -1,0 +1,24 @@
+[
+  {
+    "eid": "6e5e2a67-2731-4ed1-8b1c-e9a7ca51f04c",
+    "event_date": 1776787335611,
+    "ext_brand_id": "multibet",
+    "user_ext_id": "189011773504811",
+    "event_type": "update_profile",
+    "payload": {
+      "+core_external_segment": [
+        "PCR_RATING_C"
+      ],
+      "-core_external_markers": [
+        "PCR_RATING_S",
+        "PCR_RATING_A",
+        "PCR_RATING_B",
+        "PCR_RATING_C",
+        "PCR_RATING_D",
+        "PCR_RATING_E",
+        "PCR_RATING_NEW"
+      ],
+      "skip_cjm": true
+    }
+  }
+]

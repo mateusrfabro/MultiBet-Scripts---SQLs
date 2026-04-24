@@ -1,0 +1,74 @@
+LEGENDA — cadastros_sem_ftd_464673_21_22abr_FINAL.csv
+============================================================
+Gerado em: 2026-04-22
+Periodo de cadastro: 2026-04-21 (D-1) ate 2026-04-22 (D-0)
+Fonte: ps_bi.dim_user + anti-join cashier_ec2.tbl_cashier_deposit (Athena)
+Demanda: gestor de trafego — base de remarketing
+
+FILTROS APLICADOS
+-----------------
+- affiliate_id = '464673' (Meta)
+- signup_datetime (BRT) entre 2026-04-21 e 2026-04-22
+- ftd_date IS NULL  (nunca fez primeiro deposito no ps_bi)
+- is_test = false (ps_bi.dim_user) AND c_test_user = false (ecr_ec2.tbl_ecr_flags)
+  — duplo filtro de test_users conforme feedback_test_users_filtro_completo
+- ANTI-JOIN cashier_ec2: exclui quem tem deposito c_txn_status='txn_confirmed_success'
+  desde 2026-04-21 00:00 BRT ate agora — resolve delay do dbt em ftd_date
+
+DICIONARIO DE COLUNAS
+---------------------
+canal                 - Meta (affiliate 464673)
+affiliate_id          - ID do afiliado/canal de trafego
+external_id           - ID externo do jogador (identificador Smartico)
+nome                  - Nome completo (first + last)
+first_name            - Primeiro nome — usar na personalizacao da msg
+mobile_number         - Celular no formato cru (como cadastrado pelo jogador)
+mobile_e164           - Celular normalizado E.164 (+55DDDNumero) — USAR ESTE no
+                        disparo via WhatsApp Business API / Zenvia / Twilio
+mobile_valido         - True se mobile_e164 passou na normalizacao E.164
+email                 - E-mail (alternativa ou complemento)
+signup_date_brt       - Data do cadastro (BRT)
+signup_datetime_brt   - Data/hora exata do cadastro em BRT
+tracker_id            - Sub-tracker dentro do afiliado (campanha/banner)
+utm_campaign          - Campanha UTM (quando preenchida)
+utm_source            - Fonte UTM (quando preenchida)
+utm_medium            - Meio UTM (quando preenchida)
+
+FORMATO DE TELEFONE (E.164)
+---------------------------
+Padrao aceito por WhatsApp Business API, Zenvia, Twilio, Meta Cloud API:
+  +55 (DDI BR) + DDD (2 digitos) + numero (8 ou 9 digitos)
+  Ex: +5551999998888
+mobile_e164 ja entrega nesse formato. Se o disparo for via API que nao aceita
+o '+', remover prefixo antes do envio.
+
+TOTAL: 978 jogadores
+  - 2026-04-21: 452
+  - 2026-04-22: 526
+
+COBERTURA DE CONTATO
+--------------------
+Com telefone (raw):    978 (100.0%)
+Telefone valido E.164: 978 (100.0%)
+Com email:             978 (100.0%)
+Com nome:              978 (100.0%)
+
+OBSERVACOES
+-----------
+1. Base de REMARKETING — cadastraram em Meta mas NAO converteram (sem FTD).
+2. Fuso: cadastro em horario BRT (America/Sao_Paulo).
+3. D-0 (22/04) esta PARCIAL — o dbt do ps_bi tem delay ~horas. Alguns REGs
+   recentes de hoje podem nao ter sido carregados ainda. Para remarketing
+   e aceitavel (subcontar > disparar pra quem ja depositou). Para KPI
+   consolidado, regerar apos a carga dbt (~08h BRT D+1).
+4. Janela de risco residual: jogadores que depositem ENTRE a geracao deste
+   arquivo e o momento do disparo. Para janela critica, regerar dentro de
+   30min do envio.
+5. Validacao cruzada com BigQuery NAO foi feita — acesso BQ desativado (19/04).
+
+GLOSSARIO
+---------
+FTD = First Time Deposit (primeiro deposito na casa)
+D-1 = ontem (21/04) — dia fechado, dados consolidados
+D-0 = hoje (22/04) — dia corrente, dados parciais
+Anti-join = exclusao de registros que existem em outra tabela

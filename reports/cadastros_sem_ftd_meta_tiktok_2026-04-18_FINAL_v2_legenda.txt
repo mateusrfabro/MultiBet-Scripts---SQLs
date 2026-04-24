@@ -1,0 +1,53 @@
+LEGENDA — cadastros_sem_ftd_meta_tiktok_2026-04-18_FINAL_v2.csv
+============================================================
+Gerado em: 2026-04-19 (versao auditada)
+Periodo de cadastro: 2026-04-18 (sabado, dia fechado BRT)
+Fonte: ps_bi.dim_user + anti-join cashier_ec2.tbl_cashier_deposit (Athena)
+Demanda: Augusto (gestor de trafego Multibet) — disparo WhatsApp/SMS
+
+FILTROS APLICADOS
+-----------------
+- affiliate_id IN ('464673', '477668')  -> Meta e TikTok
+- signup_datetime (BRT) = 2026-04-18
+- ftd_date IS NULL  (nunca fez primeiro deposito no ps_bi)
+- is_test = false  (exclui contas de teste)
+- ANTI-JOIN cashier_ec2: exclui quem tem deposito c_txn_status='txn_confirmed_success'
+  desde 2026-04-18 00:00 BRT ate agora — resolve delay do dbt em ftd_date
+
+DICIONARIO DE COLUNAS
+---------------------
+canal                 - Meta (464673) ou TikTok (477668)
+affiliate_id          - ID do afiliado/canal de trafego
+external_id           - ID externo do jogador (identificador Smartico)
+nome                  - Nome completo (first + last)
+first_name            - Primeiro nome — usar na personalizacao da msg
+mobile_number         - Celular (para disparo WhatsApp/SMS)
+email                 - E-mail (alternativa ou complemento)
+signup_datetime_brt   - Data/hora exata do cadastro em BRT
+tracker_id            - Sub-tracker dentro do afiliado (campanha)
+utm_campaign          - Campanha UTM (quando preenchida)
+
+TOTAL: 3,882 jogadores
+  - Meta:   2,146
+  - TikTok: 1,736
+
+COBERTURA DE CONTATO
+--------------------
+Com telefone: 3,882 (100.0%)
+Com nome:     3,882 (100.0%)
+
+OBSERVACOES
+-----------
+1. Base de REMARKETING — todos cadastraram nas Super Odds mas NAO converteram (sem FTD).
+2. Fuso: cadastro em horario BRT (America/Sao_Paulo), ponto-de-corte 00:00-23:59 de 2026-04-18.
+3. v2 (auditada): corrige 16 jogadores que apareciam na v1 mas ja tinham
+   deposito hoje entre 07:01-07:33 BRT (delay do dbt em ftd_date). O anti-join
+   contra cashier_ec2.tbl_cashier_deposit foi adicionado no SQL.
+4. Validacao cruzada com BigQuery NAO foi feita — acesso BQ desativado em 19/04.
+5. Janela de risco residual: jogadores que depositem ENTRE a geracao deste arquivo
+   e o momento do disparo. Para janela critica, regerar dentro de 30min do envio.
+
+GLOSSARIO
+---------
+FTD = First Time Deposit (primeiro deposito na casa)
+D-1 = ontem (dia fechado, dados consolidados)

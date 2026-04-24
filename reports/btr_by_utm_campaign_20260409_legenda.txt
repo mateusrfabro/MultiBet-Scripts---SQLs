@@ -1,0 +1,35 @@
+LEGENDA — BTR por utm_campaign
+================================
+
+FONTE DOS DADOS:
+  - Trackings: Super Nova DB -> multibet.trackings (user_id, utm_campaign)
+  - BTR: Athena -> fund_ec2.tbl_realcash_sub_fund_txn (c_txn_type=20, c_op_type=CR, valor>0)
+    NOTA: tbl_real_fund_txn.c_amount e SEMPRE 0 para type 20 -- usar sub-fund
+  - Bridge: Athena -> ps_bi.dim_user (external_id -> ecr_id, excluindo test users)
+
+O QUE É BTR (Bonus Turned Real):
+  Quando um jogador cumpre o wagering de um bônus, o valor restante
+  é convertido de bônus para dinheiro real (real cash). É o "lucro" do
+  jogador vindo de um bônus — e um custo para a casa.
+
+COLUNAS:
+  utm_campaign      Identificador da campanha (Keitaro/UTM original)
+  total_users       Jogadores únicos que fizeram BTR nessa campanha
+  total_btr_events  Quantidade de transações BTR
+  total_btr_brl     Valor total convertido em R$ (custo para a casa)
+  avg_btr_per_user  Média de BTR por jogador — indica "generosidade" da conversão
+  median_btr        Mediana por transação — menos sensível a outliers
+  min_btr / max_btr Faixa de valores individuais
+  first_btr         Primeiro BTR dessa campanha (BRT)
+  last_btr          Último BTR dessa campanha (BRT)
+
+COMO INTERPRETAR:
+  - Campanhas com alto total_btr_brl e poucos users = bônus "caros" por jogador
+  - avg_btr_per_user alto pode indicar abuso de bônus ou perfil high-roller
+  - Se median << avg, há outliers puxando a média (investigar max_btr)
+  - Campanhas sem BTR não aparecem (jogadores não converteram bônus)
+
+AÇÃO SUGERIDA:
+  - Avaliar ROI: cruzar BTR com depósitos e GGR do mesmo grupo
+  - Identificar campanhas com BTR alto e GGR baixo = custo sem retorno
+  - Campanhas com BTR saudável (baixo) e GGR alto = boas para escalar

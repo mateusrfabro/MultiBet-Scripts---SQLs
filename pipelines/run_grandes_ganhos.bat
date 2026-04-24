@@ -3,8 +3,8 @@
 :: Log salvo em pipelines/logs/grandes_ganhos_YYYY-MM-DD.log
 
 set PYTHON="C:\Users\NITRO\AppData\Local\Programs\Python\Python312\python.exe"
-set SCRIPT="C:\Users\NITRO\OneDrive - PGX\MultiBet\pipelines\grandes_ganhos.py"
-set LOG_DIR="C:\Users\NITRO\OneDrive - PGX\MultiBet\pipelines\logs"
+set SCRIPT="C:\Users\NITRO\OneDrive - PGX\Projetos - Super Nova\MultiBet\pipelines\grandes_ganhos.py"
+set LOG_DIR="C:\Users\NITRO\OneDrive - PGX\Projetos - Super Nova\MultiBet\pipelines\logs"
 
 :: Cria pasta de logs se não existir
 if not exist %LOG_DIR% mkdir %LOG_DIR%

@@ -1,0 +1,54 @@
+LEGENDA - remarketing_sportsbook_meta_2026-02-20_2026-04-19_FINAL.csv
+======================================================================
+Gerado em: 2026-04-20
+Periodo de cadastro: 2026-02-20 a 2026-04-19 (2 meses corridos, D-1 fechado BRT)
+Canal: Meta
+Affiliates incluidos: 464673, 532571
+Demanda: Augusto (gestor de trafego Multibet) - remarketing Meta/TikTok de esporte
+
+FILTROS APLICADOS
+-----------------
+- affiliate_id IN (464673, 532571)  -> Meta Sportsbook
+- signup_datetime (BRT) entre 2026-02-20 e 2026-04-19
+- ftd_date IS NULL  (nunca fez primeiro deposito no ps_bi)
+- is_test = false  (exclui contas de teste)
+- ANTI-JOIN cashier_ec2: exclui quem tem deposito confirmado
+  (c_txn_status='txn_confirmed_success') desde 2026-02-20 00:00 BRT ate agora -
+  resolve delay do dbt em ftd_date
+
+DICIONARIO DE COLUNAS
+---------------------
+canal                 - Meta
+affiliate_id          - ID do afiliado/canal de trafego
+external_id           - ID externo do jogador (identificador Smartico)
+nome                  - Nome completo (first + last)
+first_name            - Primeiro nome (usar na personalizacao da msg)
+mobile_number         - Celular (para disparo WhatsApp/SMS/Meta Ads audience)
+email                 - E-mail (para Meta Ads custom audience)
+signup_datetime_brt   - Data/hora exata do cadastro em BRT
+tracker_id            - Sub-tracker dentro do afiliado (campanha/criativo)
+utm_campaign          - Campanha UTM (quando preenchida)
+
+TOTAL: 21,527 jogadores
+COBERTURA
+  Com telefone: 21,527 (100.0%)
+  Com email:    21,527 (100.0%)
+  Com nome:     21,527 (100.0%)
+
+OBSERVACOES
+-----------
+1. Base de REMARKETING - todos cadastraram via campanhas de esporte mas NAO
+   converteram (sem FTD ate 2026-04-20).
+2. Fuso: cadastro em horario BRT (America/Sao_Paulo).
+3. Sobre a lista de criativos (BraboGordinho, Josias, Thiago, etc.): nosso
+   sistema nao recebe o nome do criativo puro porque o redirect intermediario
+   (Keitaro) reescreve os parametros antes de chegar. Por isso a extracao foi
+   feita pelos AFFILIATES de esporte (nivel canal) em vez dos criativos
+   individuais - pega todo mundo que caiu via Meta/TikTok esporte no periodo.
+4. Validacao cruzada com BigQuery NAO feita (acesso desativado em 19/04).
+5. Janela de risco residual: jogadores que depositem ENTRE a geracao e o envio
+   ao Meta Ads. Para janela critica, regerar em ate 30min do upload.
+
+GLOSSARIO
+---------
+FTD = First Time Deposit (primeiro deposito na casa)

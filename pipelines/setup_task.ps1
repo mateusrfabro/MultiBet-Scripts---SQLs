@@ -4,7 +4,7 @@
 #   - StartWhenAvailable: roda no próximo horário se o PC estava desligado/em sleep
 
 $action = New-ScheduledTaskAction `
-    -Execute "C:\Users\NITRO\OneDrive - PGX\MultiBet\pipelines\run_grandes_ganhos.bat"
+    -Execute "C:\Users\NITRO\OneDrive - PGX\Projetos - Super Nova\MultiBet\pipelines\run_grandes_ganhos.bat"
 
 $trigger = New-ScheduledTaskTrigger -Daily -At "00:30"
 

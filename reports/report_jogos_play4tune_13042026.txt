@@ -1,0 +1,1326 @@
+================================================================================
+REPORT JOGOS PLAY4TUNE (P4T)
+Data: 13/04/2026 08:55 | Moeda: PKR (Rupia Paquistanesa)
+Fonte: casino_game_metrics + casino_user_game_metrics (supernova_bet)
+================================================================================
+
+Sanidade: 839 registros game_metrics | 1672 registros user_game_metrics | 136 jogos ativos
+Periodo: 2026-03-27 a 2026-04-13 (18 dias)
+Totais: GGR Rs 184,276.98 | Turnover Rs 3,394,236.47 | Giros 117,459
+
+================================================================================
+REPORT 1 — TOP JOGOS POR GGR (Receita Bruta da Casa)
+================================================================================
+GGR = Apostado - Pago ao jogador. Positivo = casa ganhou. Negativo = casa perdeu.
+
+  # Jogo                          GGR (Rs)     Turnover    Giros   Hold% RTP Cat RTP Real  Dias
+-----------------------------------------------------------------------------------------------
+  1 CRASH                        16,588.90   663,090.00      341   2.50%   97.5%    97.5%    14
+  2 WILD BOUNTY SHOWDOWN         14,266.60   104,749.00    5,826  13.62%   86.4%    86.4%    17
+  3 GOLDEN OX                    10,423.30   145,807.00    6,660   7.15%   92.8%    92.8%    13
+  4 BINGO LUCKY CLOVER            9,977.43    33,735.50    1,701  29.58%   70.4%    70.4%    14
+  5 GOLDEN BUFFALO                9,309.24    45,856.80    2,161  20.30%   79.7%    79.7%    13
+  6 BELL DEER                     9,124.33    41,347.75    2,956  22.07%   77.9%    77.9%    15
+  7 SUPER ACE                     8,187.60    83,221.00    5,953   9.84%   90.2%    90.2%    18
+  8 88 FORTUNES                   7,611.20    32,374.20    1,804  23.51%   76.5%    76.5%    13
+  9 Fish On! Bass Hunter          7,311.25    42,153.00      786  17.34%   82.7%    82.7%     6
+ 10 Money Mania II                6,964.00    81,802.00    2,188   8.51%   91.5%    91.5%    12
+ 11 MYTHICAL ANIMALS              6,893.00   182,650.00      149   3.77%   96.2%    96.2%     7
+ 12 PLINKO                        6,036.00    16,371.00      159  36.87%   63.1%    63.1%     4
+ 13 CHICKEN ROAD 2                5,553.57     8,263.00      134  67.21%   32.8%    32.8%    10
+ 14 RAILROAD RICHES               4,879.39   101,083.50    7,152   4.83%   95.2%    95.2%    17
+ 15 TRUMP IT                      4,794.76   124,020.00   11,785   3.87%   96.1%    96.1%    17
+ 16 FORTUNE GEMS                  4,699.55    87,147.75    4,754   5.39%   94.6%    94.6%    17
+ 17 ROULETTE                      4,540.00     8,600.00       12  52.79%   47.2%    47.2%     3
+ 18 777 FRUIT                     4,504.07    39,645.00    2,495  11.36%   88.6%    88.6%    17
+ 19 INFERNO                       4,345.52    18,150.00      186  23.94%   76.1%    76.1%     5
+ 20 ZEUS POWER                    4,344.00    32,491.00    1,671  13.37%   86.6%    86.6%    14
+ 21 HUFF N PUFF                   4,217.36    13,896.00      536  30.35%   69.6%    69.7%     5
+ 22 X-PLOSIVE ROCK                4,134.80    26,672.00      672  15.50%   84.5%    84.5%     6
+ 23 AVIATOR                       4,123.53    38,731.00       94  10.65%   89.4%    89.3%    16
+ 24 MONEY MANIA                   4,041.00    53,134.00    1,574   7.61%   92.4%    92.4%    12
+ 25 FORTUNE RABBIT                3,907.20    90,841.00    3,453   4.30%   95.7%    95.7%    12
+ 26 LAND OF GEMS                  3,478.25    15,748.00    1,151  22.09%   77.9%    77.9%    13
+ 27 KING KONG                     3,437.50    29,885.00    1,538  11.50%   88.5%    88.5%     9
+ 28 SWEET BONANZA                 3,392.40     7,685.00      106  44.14%   55.9%    55.9%     3
+ 29 ZOO ROULETTE                  3,020.00    38,520.00      273   7.84%   92.2%    92.2%     4
+ 30 QUICK LUDO                    2,987.00    10,410.00       58  28.69%   71.3%    71.3%     8
+ 31 FISHING                       2,945.92    12,587.74      106  23.40%   76.6%    76.6%     9
+ 32 FRUIT MARY                    2,853.58    21,737.70    1,168  13.13%   86.9%    86.9%    12
+ 33 JIN JI MAHJONG                2,834.24    34,089.00    2,515   8.31%   91.7%    91.7%    12
+ 34 POWER OF KRAKEN               2,672.67    17,923.00    1,159  14.91%   85.1%    85.1%     8
+ 35 PHOENIX                       2,647.20    40,660.00    1,889   6.51%   93.5%    93.5%    11
+ 36 MR.FRANKENSTEIN               2,624.73    50,458.80    1,088   5.20%   94.8%    94.8%     7
+ 37 CLEOPATRA'S FLAME             2,408.69    26,318.00    1,798   9.15%   90.8%    90.8%     8
+ 38 MINES PLUS                    2,334.50     3,522.00       25  66.28%   33.7%    33.7%     2
+ 39 FORTUNE BAMBOO PANDA          2,322.80    14,276.00      462  16.27%   83.7%    83.7%     6
+ 40 LIMBO                         2,196.30     6,603.00       78  33.26%   66.7%    66.7%     7
+ 41 ELVES                         2,065.44    30,624.20    2,109   6.74%   93.3%    93.3%    16
+ 42 JUNGLE TIGER                  1,979.35    16,348.00    1,079  12.11%   87.9%    87.9%    10
+ 43 RISING FORTUNES               1,903.78    33,587.00    3,546   5.67%   94.3%    94.3%    13
+ 44 FORTUNE MOUSE                 1,880.20    33,308.50    1,808   5.64%   94.4%    94.4%    12
+ 45 HALLOWEEN                     1,776.67    16,436.50    1,124  10.81%   89.2%    89.2%     9
+ 46 FATHER KIM                    1,724.70    29,124.90    2,347   5.92%   94.1%    94.1%    12
+ 47 MINES                         1,629.56     5,618.00      104  29.01%   71.0%    71.0%     9
+ 48 GATES OF OLYMPUS              1,624.45     9,041.00      647  17.97%   82.0%    82.0%    11
+ 49 GOLDEN CENTURY                1,586.44     4,034.75      509  39.32%   60.7%    60.7%     6
+ 50 STARLIGHT PRINCESS 1000       1,334.60    30,491.00    1,319   4.38%   95.6%    95.6%    13
+ 51 TOSS A COIN                   1,319.00    17,270.00      103   7.64%   92.4%    92.4%     5
+ 52 MAGIC DROP                    1,178.50     2,625.00       52  44.90%   55.1%    55.1%     2
+ 53 WILD BANDITO                  1,121.75    13,947.00      650   8.04%   92.0%    92.0%     7
+ 54 CHICKEN RUN                   1,107.00     1,130.00       41  97.96%    2.0%     2.0%     7
+ 55 RED VS BLACK                  1,079.00     2,210.00        9  48.82%   51.2%    51.2%     1
+ 56 Snakes & Ladders              1,048.20     4,310.00       44  24.32%   75.7%    75.7%     6
+ 57 MEDUSA UNLEASHED                991.80    31,085.50    1,439   3.19%   96.8%    96.8%    10
+ 58 RAMPAGE BUFFALO                 955.70    24,331.00    1,420   3.93%   96.1%    96.1%    14
+ 59 FORTUNE DRAGON                  941.59     7,215.50      469  13.05%   87.0%    87.0%     7
+ 60 TRIPLE FORTUNE                  923.90     4,528.25      333  20.40%   79.6%    79.6%     3
+ 61 TEEN PATTI                      862.94    97,777.17      154   0.88%   99.1%    99.1%     3
+ 62 WILD VEGAS                      860.40     6,170.40      848  13.94%   86.1%    86.1%     6
+ 63 ANDAR VS BAHAR                  816.50    21,210.00      139   3.85%   96.2%    96.2%     4
+ 64 Y-PLOSIVE ROCK                  771.00     9,743.00      227   7.91%   92.1%    92.1%     5
+ 65 FORTUNE DRAGON II               678.40     5,189.00      350  13.07%   86.9%    86.9%     6
+ 66 TH SICBO                        677.00     1,340.00        7  50.52%   49.5%    49.5%     1
+ 67 FORTUNE GONG                    623.99     7,408.50      533   8.42%   91.6%    91.6%     7
+ 68 VORTEX                          505.65    22,532.00      864   2.24%   97.8%    97.8%    10
+ 69 BLACK JACK                      476.00     1,614.50        8  29.48%   70.5%    70.5%     1
+ 70 DRAGON & TIGER                  458.60     3,377.00      331  13.58%   86.4%    86.4%     4
+ 71 ORB OF GANESHA                  439.90     6,146.50      456   7.16%   92.8%    92.8%     4
+ 72 ANDAR BAHAR                     425.00       600.00        2  70.83%   29.2%    29.2%     1
+ 73 BEST CLUB                       404.00       560.00        5  72.14%   27.9%    27.9%     1
+ 74 POINT RUMMY                     400.00       400.00        1 100.00%     n/a     0.0%     1
+ 75 FISHDOM                         361.18     8,366.77       21   4.32%   95.7%    95.7%    10
+ 76 TREASURE OF AZTEC               358.22     3,613.00      367   9.91%   90.1%    90.1%     7
+ 77 GOD OF FORTUNE                  249.46     4,867.25      492   5.13%   94.9%    94.9%     6
+ 78 DICE                            246.48       382.00       15  64.52%   35.5%    35.5%     2
+ 79 DRAGON TIGER                    211.00     2,590.00       31   8.15%   91.8%    91.8%     3
+ 80 RSING FORTUNES II               195.24       291.00       97  67.09%   32.9%    32.9%     1
+ 81 CHEESE CLASH                    187.65     2,236.35      265   8.39%   91.6%    91.6%     5
+ 82 PUMPKIN PARTY                   163.92     2,440.40      366   6.72%   93.3%    93.3%     4
+ 83 GOLD MANIA                      155.33     2,142.50      208   7.25%   92.8%    92.8%     2
+ 84 JHANDI MUNDA                    150.00       150.00        1 100.00%     n/a     0.0%     1
+ 85 HORSE RACING                    130.00     1,900.00       31   6.84%   93.2%    93.2%     2
+ 86 CALL BREAK                      100.00       100.00        1 100.00%     n/a     0.0%     1
+ 87 HOO HEY HOW                      65.00       260.00        4  25.00%   75.0%    75.0%     1
+ 88 BLOOD OF THE FALLEN              16.25     4,547.00      238   0.36%   99.6%    99.6%     7
+ 89 DOOM BULLET                     -52.50    27,131.00      363  -0.19%  100.2%   100.2%     4
+ 90 CAR ROULETTE                    -80.00        20.00        1 -400.00%  500.0%   500.0%     1
+ 91 COSMIC BLITZ                    -88.00        88.00       11 -100.00%  200.0%   200.0%     1
+ 92 LUCKY LOTTERY                   -92.00       340.00        4 -27.06%  127.1%   127.1%     1
+ 93 GOD OF WEALTH                  -154.65    27,547.50    1,558  -0.56%  100.6%   100.6%    16
+ 94 LUCKY NEKO                     -162.65    54,704.00    1,276  -0.30%  100.3%   100.3%    10
+ 95 LABUBU'S LUCKY BOX             -232.00       360.00       45 -64.44%  164.4%   164.4%     1
+ 96 7 UP DOWN                      -240.00       520.00        7 -46.15%  146.2%   146.2%     1
+ 97 FORTUNE TIGER                  -289.70    61,070.00    2,257  -0.47%  100.5%   100.5%    13
+ 98 FAFAFA                         -317.00     5,454.00      361  -5.81%  105.8%   105.8%     5
+ 99 AFRICAN BUFFALO                -399.80     1,369.60      121 -29.19%  129.2%   129.2%     3
+100 CRAZY LUDO                     -475.00       500.00        1 -95.00%  195.0%   195.0%     1
+101 CRAZY WIN                      -483.00     6,750.00       23  -7.16%  107.2%   107.2%     4
+102 GOLDEN RICHES                  -510.80     4,784.00      237 -10.68%  110.7%   110.7%     4
+103 JIN LOONG                      -695.60     1,440.00      114 -48.31%  148.3%   148.3%     2
+104 MAUBINH                        -712.50    11,815.79        2  -6.03%  106.0%   106.0%     1
+105 SABONG                         -736.13     3,220.00       30 -22.86%  122.9%   122.9%     2
+106 COLOR GAME                   -1,030.00     1,390.00       14 -74.10%  174.1%   174.1%     2
+107 BACCARAT                     -1,056.00     1,310.00       14 -80.61%  180.6%   180.6%     1
+108 ENDLESS TREASURE             -1,087.15    38,561.00    3,501  -2.82%  102.8%   102.8%    10
+109 ROMA                         -1,106.60     6,440.70      463 -17.18%  117.2%   117.2%     8
+110 LUCKY JET                    -1,150.00    10,560.00       12 -10.89%  110.9%   110.9%     4
+111 ORIENTAL RICHES              -1,412.29     4,015.20      359 -35.17%  135.2%   135.2%     3
+112 LEPRECHAUN'S COIN            -1,912.73    16,331.00      588 -11.71%  111.7%   111.7%     6
+113 CASHPOWER MANIA              -2,539.00    14,720.00      152 -17.25%  117.2%   117.2%     2
+114 PIGGY BANKIN                 -2,550.90    41,343.00    1,153  -6.17%  106.2%   106.2%    10
+115 MERMAID'S DANCE              -3,204.90    20,347.00      440 -15.75%  115.8%   115.8%     7
+116 FOOTBALL                     -3,533.13     2,009.50      384 -175.82%  275.8%   275.8%     9
+117 CRASH II                    -41,513.10    48,620.00      138 -85.38%  185.4%   185.4%    12
+-----------------------------------------------------------------------------------------------
+    TOTAL                       184,276.99 3,394,236.47  117,459
+
+  ATENCAO: 29 jogo(s) com GGR negativo (casa PERDEU dinheiro):
+    - DOOM BULLET: Rs -52.50 (turnover Rs 27,131.00, 363 giros)
+    - CAR ROULETTE: Rs -80.00 (turnover Rs 20.00, 1 giros)
+    - COSMIC BLITZ: Rs -88.00 (turnover Rs 88.00, 11 giros)
+    - LUCKY LOTTERY: Rs -92.00 (turnover Rs 340.00, 4 giros)
+    - GOD OF WEALTH: Rs -154.65 (turnover Rs 27,547.50, 1,558 giros)
+    - LUCKY NEKO: Rs -162.65 (turnover Rs 54,704.00, 1,276 giros)
+    - LABUBU'S LUCKY BOX: Rs -232.00 (turnover Rs 360.00, 45 giros)
+    - 7 UP DOWN: Rs -240.00 (turnover Rs 520.00, 7 giros)
+    - FORTUNE TIGER: Rs -289.70 (turnover Rs 61,070.00, 2,257 giros)
+    - FAFAFA: Rs -317.00 (turnover Rs 5,454.00, 361 giros)
+    - AFRICAN BUFFALO: Rs -399.80 (turnover Rs 1,369.60, 121 giros)
+    - CRAZY LUDO: Rs -475.00 (turnover Rs 500.00, 1 giros)
+    - CRAZY WIN: Rs -483.00 (turnover Rs 6,750.00, 23 giros)
+    - GOLDEN RICHES: Rs -510.80 (turnover Rs 4,784.00, 237 giros)
+    - JIN LOONG: Rs -695.60 (turnover Rs 1,440.00, 114 giros)
+    - MAUBINH: Rs -712.50 (turnover Rs 11,815.79, 2 giros)
+    - SABONG: Rs -736.13 (turnover Rs 3,220.00, 30 giros)
+    - COLOR GAME: Rs -1,030.00 (turnover Rs 1,390.00, 14 giros)
+    - BACCARAT: Rs -1,056.00 (turnover Rs 1,310.00, 14 giros)
+    - ENDLESS TREASURE: Rs -1,087.15 (turnover Rs 38,561.00, 3,501 giros)
+    - ROMA: Rs -1,106.60 (turnover Rs 6,440.70, 463 giros)
+    - LUCKY JET: Rs -1,150.00 (turnover Rs 10,560.00, 12 giros)
+    - ORIENTAL RICHES: Rs -1,412.29 (turnover Rs 4,015.20, 359 giros)
+    - LEPRECHAUN'S COIN: Rs -1,912.73 (turnover Rs 16,331.00, 588 giros)
+    - CASHPOWER MANIA: Rs -2,539.00 (turnover Rs 14,720.00, 152 giros)
+    - PIGGY BANKIN: Rs -2,550.90 (turnover Rs 41,343.00, 1,153 giros)
+    - MERMAID'S DANCE: Rs -3,204.90 (turnover Rs 20,347.00, 440 giros)
+    - FOOTBALL: Rs -3,533.13 (turnover Rs 2,009.50, 384 giros)
+    - CRASH II: Rs -41,513.10 (turnover Rs 48,620.00, 138 giros)
+
+--- Detalhamento por jogador (top 5 jogos por GGR) ---
+
+  BINGO LUCKY CLOVER:
+    Username           PID            GGR (Rs)     Turnover    Giros  Dias
+    ----------------------------------------------------------------------
+    mehmood88          y9eAgK4wl      3,742.50    14,550.00       97     1
+    LalaAwais          yMW2lci3X      1,298.50     2,130.00      124     1
+    sajidsajid         TnLhcFlh3        778.25     2,320.00      128     1
+    sufyan2244         2Pp6ufG4r        739.75     1,055.00       57     1
+    Samii              Amc3aO0C2        650.00     1,325.00       53     1
+    mohsinaliofficailads195305 LL6SSsJ1W        479.25     1,005.00       67     1
+    malik7             8V4d97F0z        473.25       775.00       22     1
+    UoPzlJTMk2Bo9was   0b7AZZ7XK        368.25       825.00       55     1
+    maliksulttan13504393 jOIZkIzmb        362.25       615.00       41     1
+    abdulsaeedpk       ny43lYvfM        357.20       628.00       31     1
+    shan26115          jqLNGFG8T        310.20     1,138.50      134     1
+    chsohailshabeer033854335 BE9pqz61N        263.25     2,040.00      136     1
+    newsaher           9q2jgjWHf        228.05       707.00       48     1
+    rafiqbaloch313rb253159 SGam5fqMb        138.00       750.00       27     1
+    irfanrie           C8JoBKCAo        103.78       170.50       41     1
+    msherazsherazi998727804 kkmJ8YwCw         85.90       179.00       90     1
+    chmukarram53746473 ZDWhD1NvT         70.00        84.00       24     1
+    zuhraemaan42271987 qqW6VYERI         58.93        77.50       25     1
+    pAt5vvHc9YXds69A   TyPVsKg1Z         49.68       154.00       35     1
+    raeessabir         nsKUOTna3         43.58        70.00       20     1
+    Usmanrajput396824426 GlIB7tWsK         39.75        57.00        8     1
+    Zainulabideen      V0EkD7gBF         38.25       166.50       37     1
+    rayyanpr99317552   isl65ELc5         30.40        45.50       14     1
+    dan123             tHCjqcFKl         26.78       367.50      105     1
+    sulttanmalik7792893 3uHHuFkLS         19.50     1,020.00       68     1
+    mmaannii2245980243 Pp0zNQS1d         19.15        45.00       45     1
+    khalique12         21q1lj5lZ          2.00         3.00        3     1
+    tiktok.uk.007007629829 0eT05QVCG          0.90         1.00        1     1
+    rajazainjanjuajanjua188752 6xTywyeoj        -10.58        99.00       22     1
+    adnanshoaib145349139 wWO0Od2YV        -17.53       282.50       73     1
+    nazimabbasi        WnqdI3qvd       -316.50       345.00       23     1
+    3003002884         3o06WGsJE       -455.25       705.00       47     1
+
+  CRASH:
+    Username           PID            GGR (Rs)     Turnover    Giros  Dias
+    ----------------------------------------------------------------------
+    mehmood88          y9eAgK4wl     10,652.30   645,470.00      208     4
+    filipe.molon367635 NqDvXdHuc      1,197.90     1,220.00        6     2
+    Darwash67          UKXjJ36t1      1,000.00     3,800.00        4     1
+    maharshani44377634693 DNHL1rscq        927.10     1,670.00        5     1
+    qasimkhan95550     akaHiZep5        739.80     7,840.00       49     2
+    ajA5F11NQJEjb8zZ   7qIePvdu3        600.00       600.00        4     1
+    vRPojqo4X3He3E0B   txk4TEGMw        590.00       590.00        1     1
+    babakhan           BzbP0Kjm2        300.00       300.00        2     1
+    3491812887         GWtYtD6el        210.00       210.00        1     1
+    aliqasim0003       h0Mf9nWJt        170.00       170.00        1     1
+    adeels             4yhIXFZdg        150.00       150.00        3     1
+    contato299776      PYBu4INLN        112.20       460.00       38     1
+    4crJsxLaEpr90GI2   6eE1AeEuM        100.00       100.00        2     1
+    hovzzLpxi3PHzF0R   En6lkkkup        100.00       100.00        1     1
+    malikfalak747184894 VU5ggBC19         60.00        60.00        4     3
+    khankkr            LD9c7B5TY         30.00        30.00        1     1
+    OA1mLopXytM1su3i   5KUb30KsW         10.00        10.00        1     1
+    marcelofresendeo330398 d77rNwT3w        -30.00        60.00        1     1
+    PMz80YiBJJAxhinK   JvRS5LHWQ        -49.60        70.00        6     1
+    abubakarrajput14v691179 Z38eoR5Rv       -280.80       180.00        3     1
+
+  GOLDEN BUFFALO:
+    Username           PID            GGR (Rs)     Turnover    Giros  Dias
+    ----------------------------------------------------------------------
+    mehmood88          y9eAgK4wl      6,894.00    17,160.00      143     1
+    umama              RleDKVLSC      3,582.00     5,160.00       43     1
+    jnii00             MsKrChVQu        980.80     1,408.00       44     1
+    zeeshan.shah110358697 8ZkcLEJEu        719.60     1,000.00       70     1
+    tauqeerk610        NJnu49Ld9        495.60       780.00       65     1
+    rayyanpr99317552   isl65ELc5        370.00       396.00       15     1
+    iftakhar           SdKIsLFXV        303.42       390.00       43     1
+    sidiuqe            wwySUYVdD        288.90       583.20       50     1
+    dumaninaturals837622 IbUOWcF1V        282.00       288.00       24     1
+    shabu              FecUSYgj1        232.90     2,470.80      148     1
+    asimshahzad795795218 SAsDGqyFF        227.40     1,740.00      117     1
+    Arslan             qjGW8eNSu        198.60       324.00       27     1
+    maliksulttan13504393 jOIZkIzmb        192.60     1,584.00      132     1
+    3003002884         3o06WGsJE        168.00       492.00       41     1
+    ahmad03023692161622 wTxWs7n9H        128.98       157.60       44     1
+    Najeeb685575       y2MymMVxk        125.44       162.40       58     2
+    mmaidad04275936    ZoAFumZWE        122.20       197.60       18     1
+    chsohailshabeer033854335 BE9pqz61N        103.86       144.00       40     1
+    Muhamma19          ZIiCKQDKi         99.58       143.60       42     1
+    UsmanHaider42      lVx0Kjvu4         91.20       588.00       84     1
+    filipe.molon367635 NqDvXdHuc         80.10        86.40       24     1
+    maharshani44377634693 DNHL1rscq         65.70        90.00       25     1
+    muhammadhumayun07711743802 VoOXDIxVy         62.20       108.40       21     1
+    raeessabir         nsKUOTna3         52.02        72.00       20     1
+    masoomzidagi       nKriiYgjH         18.00        18.00        5     1
+    waseem.sattar8229830 dTsAvULGx        -24.00       192.00        6     1
+    rajazainjanjuajanjua188752 6xTywyeoj        -63.36        10.80        3     1
+    subhan11           Mmcr0wqF7       -106.82       184.80       66     1
+    qaiserhabib        KkIoPnIyc       -114.98     1,193.20       47     1
+    abidhussain03458911615946805 I4JBAmxN5       -144.06       561.60       72     1
+    msherazsherazi998727804 kkmJ8YwCw       -201.84       898.40      300     2
+    sulttanmalik7792893 3uHHuFkLS       -608.00     1,240.00       62     1
+    faiz123            skHkyJ8Ek       -754.20       348.00       29     1
+    qamarulzaman       KWUmYb31C       -835.00     1,800.00       90     1
+    CUD5BJTpweUxaB7Y   V87BWUzm5     -1,060.20       972.00       49     1
+    newsaher           9q2jgjWHf     -2,663.40     2,912.00       94     2
+
+  GOLDEN OX:
+    Username           PID            GGR (Rs)     Turnover    Giros  Dias
+    ----------------------------------------------------------------------
+    mehmood88          y9eAgK4wl     13,710.00    27,300.00       91     1
+    nB8lfoEAIoH1tMJ3   zyhFQiJoi        993.60     1,580.00       73     1
+    Zaka112            y0KBdzcjc        802.00     1,060.00       53     1
+    khangkhan          I6pWnxseh        654.00     1,608.00       81     1
+    sulttanmalik7792893 3uHHuFkLS        521.20     3,376.00      197     1
+    adeels             4yhIXFZdg        490.00     3,940.00      197     1
+    hePTIUJfQvsjbcIV   wANPidhqS        459.30     1,698.00      277     1
+    malik7             8V4d97F0z        412.00     2,796.00       61     1
+    chmukarram53746473 ZDWhD1NvT        339.20       696.00       87     1
+    subhan11           Mmcr0wqF7        308.40       900.00      150     1
+    nazimabbasi        WnqdI3qvd        274.00       340.00       17     1
+    akkhanafridi88588883 e6vyXXCsI        178.40       312.00       39     1
+    GMXqtt2xnVWjUJhe   bWwEHczHG        169.60       288.00       36     1
+    azharahmed         HhuOwlGX9        163.20       414.00       69     1
+    oyyWw8xoGjdTAJAv   9s4sm7hAu         79.80       102.00       17     1
+    rajazainjanjuajanjua188752 6xTywyeoj         38.40       138.00       35     1
+    zoheeb203708212    Q7VVqimPl          6.60       791.00       86     1
+    dahrizahid99272226 zRA6IeEtw         -6.00       126.00       42     1
+    4mzvSFBWQYTtHsno   D8toibbOq        -10.80       684.00      114     1
+    gxQyS246UyI3UnOv   dzCvhwgvA        -20.80       632.00       79     1
+    ahmedaligujjar71677007 qgtusmwCD        -22.00       400.00       20     1
+    dan123             tHCjqcFKl        -58.80       348.00       58     1
+    shabir4528         yFEPOjLmK        -80.80       392.00       49     1
+    aftabjan           59YcxyE3G        -92.00     3,148.00      158     1
+    raeessabir         nsKUOTna3       -157.80       120.00       20     1
+    asimshahzad795795218 SAsDGqyFF       -176.00       558.00       91     1
+    qaiserhabib        KkIoPnIyc       -200.80       640.00       80     1
+    wajidrie           blAsL3tsa       -290.80     3,356.00      444     2
+    faiz123            skHkyJ8Ek       -630.00     6,840.00       76     1
+    maliksulttan13504393 jOIZkIzmb       -751.60     1,907.00      281     2
+    abdulsaeedpk       ny43lYvfM     -1,443.50     5,095.00      394     2
+    newsaher           9q2jgjWHf     -5,234.70    74,222.00    3,188     5
+
+  WILD BOUNTY SHOWDOWN:
+    Username           PID            GGR (Rs)     Turnover    Giros  Dias
+    ----------------------------------------------------------------------
+    TK9Kfbr5txc3DfGz   SeAxij4Zj      3,989.50     5,540.00       60     1
+    mehmood88          y9eAgK4wl      3,950.00     8,900.00       15     1
+    waseem.sattar8229830 dTsAvULGx      2,206.00     7,320.00      151     1
+    adeels             4yhIXFZdg      1,663.50     7,140.00      115     2
+    zahidjni           Ga4LJKRzT      1,500.70     7,128.00      377     1
+    abid31             bXll7jmmv      1,000.00     1,739.00       88     1
+    alijavaid714122082 XXNTl5VNp        995.50     5,150.00      250     1
+    majid              ti9x2Hwk3        767.50     1,490.00      149     1
+    Y9jcLTUBlrzdiGax   GioenE6Vi        642.00     1,020.00      102     1
+    EOajeuH0BAS7tFw4   P3YoIUd3h        599.50     1,503.00      162     1
+    kb4106184471539    9SUXnJ4lE        501.00     1,491.00       77     1
+    waheed705          HlVvWE48c        500.00     2,590.00      130     1
+    sabir03002515400636441 ZkJj4vzon        499.90     5,961.00      105     1
+    azadbhi            7cwONOn2h        450.90     1,491.00      124     1
+    afroz001           2OleIqVqm        399.50     2,997.00      119     1
+    ramesh             Aw9gfRD9K        399.25       837.00       99     1
+    abdullahshah7      4kGFhfQ7B        383.55    10,909.00      647     2
+    8FzE77pPAJUt8mCq   Oy4IeXj5C        348.00       470.00       47     1
+    khangkhan          I6pWnxseh        323.00     1,840.00       19     1
+    DEgZm5sQd4jeF40h   cr3jyN1kk        280.70     2,579.00      668     1
+    taswargondal342943687 vCBtPlra8        279.00     5,080.00      254     3
+    Zainulabideen      V0EkD7gBF        247.95       378.00       42     1
+    wajidrie           blAsL3tsa        227.25       860.00      172     1
+    asimshahzad795795218 SAsDGqyFF        204.00       240.00       24     1
+    ak6170050746856    T65A5KAVR        200.00       260.00       39     1
+    malikawan          9TgTICyzB        198.00       350.00       35     1
+    hadi786kpr897266   Os8oDLaZV        190.00       750.00        1     1
+    babakhan           BzbP0Kjm2        124.80       600.00        2     1
+    kmkmkm             3KR3Kocm9        103.15       377.00       67     1
+    3215588224         z1YFB5oZY         60.40       336.00       42     1
+    msherazsherazi998727804 kkmJ8YwCw         50.25       105.00       21     1
+    samiullah          oURkynMrs         35.00        82.00       53     1
+    dumaninaturals837622 IbUOWcF1V         33.00       940.00       61     1
+    filipe.molon367635 NqDvXdHuc         29.80        63.00       12     1
+    Raees64            XmbOqWqRV         25.60        26.00       13     1
+    aliraza            gwgNHRENJ         21.45        34.00       28     1
+    rayyanpr99317552   isl65ELc5         20.50        60.00       17     1
+    khalique12         21q1lj5lZ         17.10       274.00      130     2
+    zoheeb203708212    Q7VVqimPl         -1.50       160.00       16     1
+    sshahidmalikk104525 8cdhcXDBL        -92.00     1,970.00      197     1
+    CUD5BJTpweUxaB7Y   V87BWUzm5       -142.00     1,155.00        5     1
+    qarar123           CNkH2h1p4       -498.40        61.00       28     1
+    perveezakhter      sVE5dFK6b       -831.75     1,843.00      220     1
+    faiz123            skHkyJ8Ek     -1,264.00     2,750.00       53     1
+    waheed             PEtKxdRgD     -1,341.00       240.00       24     1
+    gulfam002          SCAp5y23T     -2,006.00     1,610.00      161     1
+    arsam              HlEEW2QZQ     -3,024.00     6,050.00      605     4
+
+================================================================================
+REPORT 2 — TOP JOGOS POR TURNOVER (Volume Apostado)
+================================================================================
+Turnover = total apostado pelos jogadores. Quanto maior, mais o jogo engaja.
+
+  # Jogo                       Turnover (Rs)          GGR    Giros   Hold%  %Total  Dias
+---------------------------------------------------------------------------------------
+  1 CRASH                         663,090.00    16,588.90      341   2.50%   19.5%    14
+  2 MYTHICAL ANIMALS              182,650.00     6,893.00      149   3.77%    5.4%     7
+  3 GOLDEN OX                     145,807.00    10,423.30    6,660   7.15%    4.3%    13
+  4 TRUMP IT                      124,020.00     4,794.76   11,785   3.87%    3.7%    17
+  5 WILD BOUNTY SHOWDOWN          104,749.00    14,266.60    5,826  13.62%    3.1%    17
+  6 RAILROAD RICHES               101,083.50     4,879.39    7,152   4.83%    3.0%    17
+  7 TEEN PATTI                     97,777.17       862.94      154   0.88%    2.9%     3
+  8 FORTUNE RABBIT                 90,841.00     3,907.20    3,453   4.30%    2.7%    12
+  9 FORTUNE GEMS                   87,147.75     4,699.55    4,754   5.39%    2.6%    17
+ 10 SUPER ACE                      83,221.00     8,187.60    5,953   9.84%    2.5%    18
+ 11 Money Mania II                 81,802.00     6,964.00    2,188   8.51%    2.4%    12
+ 12 FORTUNE TIGER                  61,070.00      -289.70    2,257  -0.47%    1.8%    13
+ 13 LUCKY NEKO                     54,704.00      -162.65    1,276  -0.30%    1.6%    10
+ 14 MONEY MANIA                    53,134.00     4,041.00    1,574   7.61%    1.6%    12
+ 15 MR.FRANKENSTEIN                50,458.80     2,624.73    1,088   5.20%    1.5%     7
+ 16 CRASH II                       48,620.00   -41,513.10      138 -85.38%    1.4%    12
+ 17 GOLDEN BUFFALO                 45,856.80     9,309.24    2,161  20.30%    1.4%    13
+ 18 Fish On! Bass Hunter           42,153.00     7,311.25      786  17.34%    1.2%     6
+ 19 BELL DEER                      41,347.75     9,124.33    2,956  22.07%    1.2%    15
+ 20 PIGGY BANKIN                   41,343.00    -2,550.90    1,153  -6.17%    1.2%    10
+ 21 PHOENIX                        40,660.00     2,647.20    1,889   6.51%    1.2%    11
+ 22 777 FRUIT                      39,645.00     4,504.07    2,495  11.36%    1.2%    17
+ 23 AVIATOR                        38,731.00     4,123.53       94  10.65%    1.1%    16
+ 24 ENDLESS TREASURE               38,561.00    -1,087.15    3,501  -2.82%    1.1%    10
+ 25 ZOO ROULETTE                   38,520.00     3,020.00      273   7.84%    1.1%     4
+ 26 JIN JI MAHJONG                 34,089.00     2,834.24    2,515   8.31%    1.0%    12
+ 27 BINGO LUCKY CLOVER             33,735.50     9,977.43    1,701  29.58%    1.0%    14
+ 28 RISING FORTUNES                33,587.00     1,903.78    3,546   5.67%    1.0%    13
+ 29 FORTUNE MOUSE                  33,308.50     1,880.20    1,808   5.64%    1.0%    12
+ 30 ZEUS POWER                     32,491.00     4,344.00    1,671  13.37%    1.0%    14
+ 31 88 FORTUNES                    32,374.20     7,611.20    1,804  23.51%    1.0%    13
+ 32 MEDUSA UNLEASHED               31,085.50       991.80    1,439   3.19%    0.9%    10
+ 33 ELVES                          30,624.20     2,065.44    2,109   6.74%    0.9%    16
+ 34 STARLIGHT PRINCESS 1000        30,491.00     1,334.60    1,319   4.38%    0.9%    13
+ 35 KING KONG                      29,885.00     3,437.50    1,538  11.50%    0.9%     9
+ 36 FATHER KIM                     29,124.90     1,724.70    2,347   5.92%    0.9%    12
+ 37 GOD OF WEALTH                  27,547.50      -154.65    1,558  -0.56%    0.8%    16
+ 38 DOOM BULLET                    27,131.00       -52.50      363  -0.19%    0.8%     4
+ 39 X-PLOSIVE ROCK                 26,672.00     4,134.80      672  15.50%    0.8%     6
+ 40 CLEOPATRA'S FLAME              26,318.00     2,408.69    1,798   9.15%    0.8%     8
+ 41 RAMPAGE BUFFALO                24,331.00       955.70    1,420   3.93%    0.7%    14
+ 42 VORTEX                         22,532.00       505.65      864   2.24%    0.7%    10
+ 43 FRUIT MARY                     21,737.70     2,853.58    1,168  13.13%    0.6%    12
+ 44 ANDAR VS BAHAR                 21,210.00       816.50      139   3.85%    0.6%     4
+ 45 MERMAID'S DANCE                20,347.00    -3,204.90      440 -15.75%    0.6%     7
+ 46 INFERNO                        18,150.00     4,345.52      186  23.94%    0.5%     5
+ 47 POWER OF KRAKEN                17,923.00     2,672.67    1,159  14.91%    0.5%     8
+ 48 TOSS A COIN                    17,270.00     1,319.00      103   7.64%    0.5%     5
+ 49 HALLOWEEN                      16,436.50     1,776.67    1,124  10.81%    0.5%     9
+ 50 PLINKO                         16,371.00     6,036.00      159  36.87%    0.5%     4
+ 51 JUNGLE TIGER                   16,348.00     1,979.35    1,079  12.11%    0.5%    10
+ 52 LEPRECHAUN'S COIN              16,331.00    -1,912.73      588 -11.71%    0.5%     6
+ 53 LAND OF GEMS                   15,748.00     3,478.25    1,151  22.09%    0.5%    13
+ 54 CASHPOWER MANIA                14,720.00    -2,539.00      152 -17.25%    0.4%     2
+ 55 FORTUNE BAMBOO PANDA           14,276.00     2,322.80      462  16.27%    0.4%     6
+ 56 WILD BANDITO                   13,947.00     1,121.75      650   8.04%    0.4%     7
+ 57 HUFF N PUFF                    13,896.00     4,217.36      536  30.35%    0.4%     5
+ 58 FISHING                        12,587.74     2,945.92      106  23.40%    0.4%     9
+ 59 MAUBINH                        11,815.79      -712.50        2  -6.03%    0.3%     1
+ 60 LUCKY JET                      10,560.00    -1,150.00       12 -10.89%    0.3%     4
+ 61 QUICK LUDO                     10,410.00     2,987.00       58  28.69%    0.3%     8
+ 62 Y-PLOSIVE ROCK                  9,743.00       771.00      227   7.91%    0.3%     5
+ 63 GATES OF OLYMPUS                9,041.00     1,624.45      647  17.97%    0.3%    11
+ 64 ROULETTE                        8,600.00     4,540.00       12  52.79%    0.3%     3
+ 65 FISHDOM                         8,366.77       361.18       21   4.32%    0.2%    10
+ 66 CHICKEN ROAD 2                  8,263.00     5,553.57      134  67.21%    0.2%    10
+ 67 SWEET BONANZA                   7,685.00     3,392.40      106  44.14%    0.2%     3
+ 68 FORTUNE GONG                    7,408.50       623.99      533   8.42%    0.2%     7
+ 69 FORTUNE DRAGON                  7,215.50       941.59      469  13.05%    0.2%     7
+ 70 CRAZY WIN                       6,750.00      -483.00       23  -7.16%    0.2%     4
+ 71 LIMBO                           6,603.00     2,196.30       78  33.26%    0.2%     7
+ 72 ROMA                            6,440.70    -1,106.60      463 -17.18%    0.2%     8
+ 73 WILD VEGAS                      6,170.40       860.40      848  13.94%    0.2%     6
+ 74 ORB OF GANESHA                  6,146.50       439.90      456   7.16%    0.2%     4
+ 75 MINES                           5,618.00     1,629.56      104  29.01%    0.2%     9
+ 76 FAFAFA                          5,454.00      -317.00      361  -5.81%    0.2%     5
+ 77 FORTUNE DRAGON II               5,189.00       678.40      350  13.07%    0.2%     6
+ 78 GOD OF FORTUNE                  4,867.25       249.46      492   5.13%    0.1%     6
+ 79 GOLDEN RICHES                   4,784.00      -510.80      237 -10.68%    0.1%     4
+ 80 BLOOD OF THE FALLEN             4,547.00        16.25      238   0.36%    0.1%     7
+ 81 TRIPLE FORTUNE                  4,528.25       923.90      333  20.40%    0.1%     3
+ 82 Snakes & Ladders                4,310.00     1,048.20       44  24.32%    0.1%     6
+ 83 GOLDEN CENTURY                  4,034.75     1,586.44      509  39.32%    0.1%     6
+ 84 ORIENTAL RICHES                 4,015.20    -1,412.29      359 -35.17%    0.1%     3
+ 85 TREASURE OF AZTEC               3,613.00       358.22      367   9.91%    0.1%     7
+ 86 MINES PLUS                      3,522.00     2,334.50       25  66.28%    0.1%     2
+ 87 DRAGON & TIGER                  3,377.00       458.60      331  13.58%    0.1%     4
+ 88 SABONG                          3,220.00      -736.13       30 -22.86%    0.1%     2
+ 89 MAGIC DROP                      2,625.00     1,178.50       52  44.90%    0.1%     2
+ 90 DRAGON TIGER                    2,590.00       211.00       31   8.15%    0.1%     3
+ 91 PUMPKIN PARTY                   2,440.40       163.92      366   6.72%    0.1%     4
+ 92 CHEESE CLASH                    2,236.35       187.65      265   8.39%    0.1%     5
+ 93 RED VS BLACK                    2,210.00     1,079.00        9  48.82%    0.1%     1
+ 94 GOLD MANIA                      2,142.50       155.33      208   7.25%    0.1%     2
+ 95 FOOTBALL                        2,009.50    -3,533.13      384 -175.82%    0.1%     9
+ 96 HORSE RACING                    1,900.00       130.00       31   6.84%    0.1%     2
+ 97 BLACK JACK                      1,614.50       476.00        8  29.48%    0.0%     1
+ 98 JIN LOONG                       1,440.00      -695.60      114 -48.31%    0.0%     2
+ 99 COLOR GAME                      1,390.00    -1,030.00       14 -74.10%    0.0%     2
+100 AFRICAN BUFFALO                 1,369.60      -399.80      121 -29.19%    0.0%     3
+101 TH SICBO                        1,340.00       677.00        7  50.52%    0.0%     1
+102 BACCARAT                        1,310.00    -1,056.00       14 -80.61%    0.0%     1
+103 CHICKEN RUN                     1,130.00     1,107.00       41  97.96%    0.0%     7
+104 ANDAR BAHAR                       600.00       425.00        2  70.83%    0.0%     1
+105 BEST CLUB                         560.00       404.00        5  72.14%    0.0%     1
+106 7 UP DOWN                         520.00      -240.00        7 -46.15%    0.0%     1
+107 CRAZY LUDO                        500.00      -475.00        1 -95.00%    0.0%     1
+108 POINT RUMMY                       400.00       400.00        1 100.00%    0.0%     1
+109 DICE                              382.00       246.48       15  64.52%    0.0%     2
+110 LABUBU'S LUCKY BOX                360.00      -232.00       45 -64.44%    0.0%     1
+111 LUCKY LOTTERY                     340.00       -92.00        4 -27.06%    0.0%     1
+112 RSING FORTUNES II                 291.00       195.24       97  67.09%    0.0%     1
+113 HOO HEY HOW                       260.00        65.00        4  25.00%    0.0%     1
+114 JHANDI MUNDA                      150.00       150.00        1 100.00%    0.0%     1
+115 CALL BREAK                        100.00       100.00        1 100.00%    0.0%     1
+116 COSMIC BLITZ                       88.00       -88.00       11 -100.00%    0.0%     1
+117 CAR ROULETTE                       20.00       -80.00        1 -400.00%    0.0%     1
+---------------------------------------------------------------------------------------
+    TOTAL                       3,394,236.47   184,276.99  117,459
+
+  Concentracao: top 3 jogos = 29.2% do turnover total
+
+--- Detalhamento por jogador (top 5 jogos por Turnover) ---
+
+  CRASH:
+    Username           PID         Turnover (Rs)          GGR    Giros   Ticket  Dias
+    --------------------------------------------------------------------------------
+    mehmood88          y9eAgK4wl      645,470.00    10,652.30      208 3,103.22     4
+    qasimkhan95550     akaHiZep5        7,840.00       739.80       49   160.00     2
+    Darwash67          UKXjJ36t1        3,800.00     1,000.00        4   950.00     1
+    maharshani44377634693 DNHL1rscq        1,670.00       927.10        5   334.00     1
+    filipe.molon367635 NqDvXdHuc        1,220.00     1,197.90        6   203.33     2
+    ajA5F11NQJEjb8zZ   7qIePvdu3          600.00       600.00        4   150.00     1
+    vRPojqo4X3He3E0B   txk4TEGMw          590.00       590.00        1   590.00     1
+    contato299776      PYBu4INLN          460.00       112.20       38    12.11     1
+    babakhan           BzbP0Kjm2          300.00       300.00        2   150.00     1
+    3491812887         GWtYtD6el          210.00       210.00        1   210.00     1
+    abubakarrajput14v691179 Z38eoR5Rv          180.00      -280.80        3    60.00     1
+    aliqasim0003       h0Mf9nWJt          170.00       170.00        1   170.00     1
+    adeels             4yhIXFZdg          150.00       150.00        3    50.00     1
+    hovzzLpxi3PHzF0R   En6lkkkup          100.00       100.00        1   100.00     1
+    4crJsxLaEpr90GI2   6eE1AeEuM          100.00       100.00        2    50.00     1
+    PMz80YiBJJAxhinK   JvRS5LHWQ           70.00       -49.60        6    11.67     1
+    malikfalak747184894 VU5ggBC19           60.00        60.00        4    15.00     3
+    marcelofresendeo330398 d77rNwT3w           60.00       -30.00        1    60.00     1
+    khankkr            LD9c7B5TY           30.00        30.00        1    30.00     1
+    OA1mLopXytM1su3i   5KUb30KsW           10.00        10.00        1    10.00     1
+
+  GOLDEN OX:
+    Username           PID         Turnover (Rs)          GGR    Giros   Ticket  Dias
+    --------------------------------------------------------------------------------
+    newsaher           9q2jgjWHf       74,222.00    -5,234.70    3,188    23.28     5
+    mehmood88          y9eAgK4wl       27,300.00    13,710.00       91   300.00     1
+    faiz123            skHkyJ8Ek        6,840.00      -630.00       76    90.00     1
+    abdulsaeedpk       ny43lYvfM        5,095.00    -1,443.50      394    12.93     2
+    adeels             4yhIXFZdg        3,940.00       490.00      197    20.00     1
+    sulttanmalik7792893 3uHHuFkLS        3,376.00       521.20      197    17.14     1
+    wajidrie           blAsL3tsa        3,356.00      -290.80      444     7.56     2
+    aftabjan           59YcxyE3G        3,148.00       -92.00      158    19.92     1
+    malik7             8V4d97F0z        2,796.00       412.00       61    45.84     1
+    maliksulttan13504393 jOIZkIzmb        1,907.00      -751.60      281     6.79     2
+    hePTIUJfQvsjbcIV   wANPidhqS        1,698.00       459.30      277     6.13     1
+    khangkhan          I6pWnxseh        1,608.00       654.00       81    19.85     1
+    nB8lfoEAIoH1tMJ3   zyhFQiJoi        1,580.00       993.60       73    21.64     1
+    Zaka112            y0KBdzcjc        1,060.00       802.00       53    20.00     1
+    subhan11           Mmcr0wqF7          900.00       308.40      150     6.00     1
+    zoheeb203708212    Q7VVqimPl          791.00         6.60       86     9.20     1
+    chmukarram53746473 ZDWhD1NvT          696.00       339.20       87     8.00     1
+    4mzvSFBWQYTtHsno   D8toibbOq          684.00       -10.80      114     6.00     1
+    qaiserhabib        KkIoPnIyc          640.00      -200.80       80     8.00     1
+    gxQyS246UyI3UnOv   dzCvhwgvA          632.00       -20.80       79     8.00     1
+    asimshahzad795795218 SAsDGqyFF          558.00      -176.00       91     6.13     1
+    azharahmed         HhuOwlGX9          414.00       163.20       69     6.00     1
+    ahmedaligujjar71677007 qgtusmwCD          400.00       -22.00       20    20.00     1
+    shabir4528         yFEPOjLmK          392.00       -80.80       49     8.00     1
+    dan123             tHCjqcFKl          348.00       -58.80       58     6.00     1
+    nazimabbasi        WnqdI3qvd          340.00       274.00       17    20.00     1
+    akkhanafridi88588883 e6vyXXCsI          312.00       178.40       39     8.00     1
+    GMXqtt2xnVWjUJhe   bWwEHczHG          288.00       169.60       36     8.00     1
+    rajazainjanjuajanjua188752 6xTywyeoj          138.00        38.40       35     3.94     1
+    dahrizahid99272226 zRA6IeEtw          126.00        -6.00       42     3.00     1
+    raeessabir         nsKUOTna3          120.00      -157.80       20     6.00     1
+    oyyWw8xoGjdTAJAv   9s4sm7hAu          102.00        79.80       17     6.00     1
+
+  MYTHICAL ANIMALS:
+    Username           PID         Turnover (Rs)          GGR    Giros   Ticket  Dias
+    --------------------------------------------------------------------------------
+    ajmal              LVjXgnWA4      147,680.00       522.00       93 1,587.96     1
+    mehmood88          y9eAgK4wl       13,000.00     2,615.00        3 4,333.33     1
+    uIRpoP6J3u7Yk3Rs   MMGX0Bcyy        9,620.00       403.00       32   300.63     1
+    waseemkhan90       u2cLv6Jah        9,360.00     1,990.00        5 1,872.00     1
+    sohrabsolar840774  FPvRwtaOR        1,690.00       838.50        8   211.25     1
+    abidhussain03458911615946805 I4JBAmxN5          650.00       270.00        4   162.50     1
+    rajazainjanjuajanjua188752 6xTywyeoj          520.00       224.50        3   173.33     1
+    Sajjad1            raQ8EirmV          130.00        30.00        1   130.00     1
+
+  TRUMP IT:
+    Username           PID         Turnover (Rs)          GGR    Giros   Ticket  Dias
+    --------------------------------------------------------------------------------
+    irfanrie           C8JoBKCAo       34,560.00    -5,237.90    1,880    18.38     3
+    wajidrie           blAsL3tsa       23,392.00    -4,270.82    4,604     5.08     6
+    testeste           istDPgqeh       15,001.00    10,313.66       16   937.56     1
+    Darwash67          UKXjJ36t1        9,350.00       320.00       95    98.42     1
+    ghazijajja9115338657 F9patzgXn        3,025.00     1,017.00      121    25.00     1
+    mehmood88          y9eAgK4wl        3,000.00     1,383.00       20   150.00     1
+    vRPojqo4X3He3E0B   txk4TEGMw        2,833.50      -930.03      198    14.31     1
+    aliqasim0003       h0Mf9nWJt        2,405.50       382.11      130    18.50     1
+    abdullahshah7      4kGFhfQ7B        2,235.00       972.90      149    15.00     1
+    waris              lJV1Sifl0        2,199.50      -627.95    1,099     2.00     1
+    chmukarram53746473 ZDWhD1NvT        1,740.00       536.00       94    18.51     1
+    quAS2yav4BiwM6Rz   SoLWKg6fQ        1,530.00         9.00      102    15.00     1
+    sulttanmalik7792893 3uHHuFkLS        1,485.00      -603.00       99    15.00     1
+    ahsanali345        z4UZnnkB1        1,450.00       896.00       29    50.00     1
+    Arfanili           7185ZWx9t        1,366.50       202.47      131    10.43     2
+    lw1u8ErYWyP9HuEd   XDTd7vzZf        1,198.50       383.50       85    14.10     1
+    UsmanHaider42      lVx0Kjvu4        1,152.00      -281.94       88    13.09     1
+    marcelofresendeo330398 d77rNwT3w          975.50       528.17       48    20.32     2
+    filipe.molon367635 NqDvXdHuc          974.00        23.46       55    17.71     7
+    5Dn2naC2foztacNX   FX3ak4jmB          960.00      -634.50       64    15.00     1
+    akkhanafridi88588883 e6vyXXCsI          930.00        85.50       62    15.00     1
+    monty007           WNaICgzqw          705.00    -1,057.20       47    15.00     1
+    Uz3NOqiobDK3Rk41   QDFNoCPLo          690.00       604.50       46    15.00     1
+    imraniqbal3033200140 sgrFbHfDW          616.50       -23.61       67     9.20     1
+    8FzE77pPAJUt8mCq   Oy4IeXj5C          600.00      -101.00       24    25.00     1
+    waheed705          HlVvWE48c          566.00       505.10       40    14.15     1
+    muhammadhumayun07711743802 VoOXDIxVy          552.00       137.46      257     2.15     1
+    Waqas              tOBRGCXoi          550.00       407.00       22    25.00     1
+    rajazainjanjuajanjua188752 6xTywyeoj          506.50      -285.64       47    10.78     2
+    ta1441891298572    xp3JWRQ5p          476.00        56.91      136     3.50     1
+    dan123             tHCjqcFKl          474.00      -100.24      237     2.00     1
+    mmaannii2245980243 Pp0zNQS1d          450.00        58.74      310     1.45     1
+    heloone88946207    WGStXh1fR          450.00       159.90       30    15.00     1
+    rayyanpr99317552   isl65ELc5          433.00      -504.21       20    21.65     1
+    2zHfL16cfRKYTbyE   VYf2EMZdb          428.00       140.30      126     3.40     1
+    adeels             4yhIXFZdg          390.00       350.94       33    11.82     1
+    zoheeb203708212    Q7VVqimPl          360.00       163.05       45     8.00     1
+    aliqasim0001       F1SzQp8Br          360.00       110.16       80     4.50     1
+    Y9jcLTUBlrzdiGax   GioenE6Vi          346.50       -61.74       77     4.50     1
+    asimshahzad795795218 SAsDGqyFF          307.50       202.71       31     9.92     1
+    dumaninaturals837622 IbUOWcF1V          300.00      -418.50       20    15.00     1
+    ZGtIAnJZ1QHlNirJ   WW0Xf1lsC          235.00       132.90       87     2.70     1
+    assasf22           SdXdmS1p5          214.00        99.92       50     4.28     1
+    syedalishah3284830232618742 O5xbRe9MB          201.00        43.56      171     1.18     1
+    CUD5BJTpweUxaB7Y   V87BWUzm5          189.00        99.18       42     4.50     1
+    qasimkhan95550     akaHiZep5          175.50       111.96       39     4.50     1
+    gulhassankalhoro291654530 WLUfjel4V          175.50       142.29       39     4.50     1
+    msherazsherazi998727804 kkmJ8YwCw          175.00       -29.26       50     3.50     1
+    Najeeb685575       y2MymMVxk          166.50        38.34       37     4.50     1
+    moaviajaved        DIsCgkGMZ          157.50      -405.06       21     7.50     1
+    ak6170050746856    T65A5KAVR          152.00        98.72       34     4.47     1
+    khalique12         21q1lj5lZ          138.50      -117.02       49     2.83     1
+    qaiserhabib        KkIoPnIyc          126.00      -173.52       28     4.50     1
+    arsam              HlEEW2QZQ          121.50        46.62       27     4.50     1
+    adnanshoaib145349139 wWO0Od2YV          115.00      -169.05       26     4.42     1
+    mistri9270615776   4CC9qiIBr          100.00        58.24       50     2.00     1
+    emperorenterprise786495818 rcKR0qnAe           92.00       -12.64       46     2.00     1
+    zEso4IVWMFaiyZnA   1EAzvqXxK           45.00        40.32       10     4.50     1
+    chsohailshabeer033854335 BE9pqz61N           42.00        31.12       42     1.00     1
+    contato299776      PYBu4INLN           41.00         1.76       41     1.00     3
+    tiktok.uk.007007629829 0eT05QVCG           30.00        -9.68       30     1.00     1
+    teste977807        0XFqNV2pB            4.00       -45.20        2     2.00     1
+
+  WILD BOUNTY SHOWDOWN:
+    Username           PID         Turnover (Rs)          GGR    Giros   Ticket  Dias
+    --------------------------------------------------------------------------------
+    abdullahshah7      4kGFhfQ7B       10,909.00       383.55      647    16.86     2
+    mehmood88          y9eAgK4wl        8,900.00     3,950.00       15   593.33     1
+    waseem.sattar8229830 dTsAvULGx        7,320.00     2,206.00      151    48.48     1
+    adeels             4yhIXFZdg        7,140.00     1,663.50      115    62.09     2
+    zahidjni           Ga4LJKRzT        7,128.00     1,500.70      377    18.91     1
+    arsam              HlEEW2QZQ        6,050.00    -3,024.00      605    10.00     4
+    sabir03002515400636441 ZkJj4vzon        5,961.00       499.90      105    56.77     1
+    TK9Kfbr5txc3DfGz   SeAxij4Zj        5,540.00     3,989.50       60    92.33     1
+    alijavaid714122082 XXNTl5VNp        5,150.00       995.50      250    20.60     1
+    taswargondal342943687 vCBtPlra8        5,080.00       279.00      254    20.00     3
+    afroz001           2OleIqVqm        2,997.00       399.50      119    25.18     1
+    faiz123            skHkyJ8Ek        2,750.00    -1,264.00       53    51.89     1
+    waheed705          HlVvWE48c        2,590.00       500.00      130    19.92     1
+    DEgZm5sQd4jeF40h   cr3jyN1kk        2,579.00       280.70      668     3.86     1
+    sshahidmalikk104525 8cdhcXDBL        1,970.00       -92.00      197    10.00     1
+    perveezakhter      sVE5dFK6b        1,843.00      -831.75      220     8.38     1
+    khangkhan          I6pWnxseh        1,840.00       323.00       19    96.84     1
+    abid31             bXll7jmmv        1,739.00     1,000.00       88    19.76     1
+    gulfam002          SCAp5y23T        1,610.00    -2,006.00      161    10.00     1
+    EOajeuH0BAS7tFw4   P3YoIUd3h        1,503.00       599.50      162     9.28     1
+    azadbhi            7cwONOn2h        1,491.00       450.90      124    12.02     1
+    kb4106184471539    9SUXnJ4lE        1,491.00       501.00       77    19.36     1
+    majid              ti9x2Hwk3        1,490.00       767.50      149    10.00     1
+    CUD5BJTpweUxaB7Y   V87BWUzm5        1,155.00      -142.00        5   231.00     1
+    Y9jcLTUBlrzdiGax   GioenE6Vi        1,020.00       642.00      102    10.00     1
+    dumaninaturals837622 IbUOWcF1V          940.00        33.00       61    15.41     1
+    wajidrie           blAsL3tsa          860.00       227.25      172     5.00     1
+    ramesh             Aw9gfRD9K          837.00       399.25       99     8.45     1
+    hadi786kpr897266   Os8oDLaZV          750.00       190.00        1   750.00     1
+    babakhan           BzbP0Kjm2          600.00       124.80        2   300.00     1
+    8FzE77pPAJUt8mCq   Oy4IeXj5C          470.00       348.00       47    10.00     1
+    Zainulabideen      V0EkD7gBF          378.00       247.95       42     9.00     1
+    kmkmkm             3KR3Kocm9          377.00       103.15       67     5.63     1
+    malikawan          9TgTICyzB          350.00       198.00       35    10.00     1
+    3215588224         z1YFB5oZY          336.00        60.40       42     8.00     1
+    khalique12         21q1lj5lZ          274.00        17.10      130     2.11     2
+    ak6170050746856    T65A5KAVR          260.00       200.00       39     6.67     1
+    waheed             PEtKxdRgD          240.00    -1,341.00       24    10.00     1
+    asimshahzad795795218 SAsDGqyFF          240.00       204.00       24    10.00     1
+    zoheeb203708212    Q7VVqimPl          160.00        -1.50       16    10.00     1
+    msherazsherazi998727804 kkmJ8YwCw          105.00        50.25       21     5.00     1
+    samiullah          oURkynMrs           82.00        35.00       53     1.55     1
+    filipe.molon367635 NqDvXdHuc           63.00        29.80       12     5.25     1
+    qarar123           CNkH2h1p4           61.00      -498.40       28     2.18     1
+    rayyanpr99317552   isl65ELc5           60.00        20.50       17     3.53     1
+    aliraza            gwgNHRENJ           34.00        21.45       28     1.21     1
+    Raees64            XmbOqWqRV           26.00        25.60       13     2.00     1
+
+================================================================================
+REPORT 3 — TOP JOGOS POR GIROS (Rodadas Jogadas)
+================================================================================
+Giros = total de rodadas jogadas. Indica engajamento e popularidade do jogo.
+
+  # Jogo                           Giros     Turnover          GGR Ticket Med  %Total  Dias
+------------------------------------------------------------------------------------------
+  1 TRUMP IT                      11,785   124,020.00     4,794.76      10.52   10.0%    17
+  2 RAILROAD RICHES                7,152   101,083.50     4,879.39      14.13    6.1%    17
+  3 GOLDEN OX                      6,660   145,807.00    10,423.30      21.89    5.7%    13
+  4 SUPER ACE                      5,953    83,221.00     8,187.60      13.98    5.1%    18
+  5 WILD BOUNTY SHOWDOWN           5,826   104,749.00    14,266.60      17.98    5.0%    17
+  6 FORTUNE GEMS                   4,754    87,147.75     4,699.55      18.33    4.0%    17
+  7 RISING FORTUNES                3,546    33,587.00     1,903.78       9.47    3.0%    13
+  8 ENDLESS TREASURE               3,501    38,561.00    -1,087.15      11.01    3.0%    10
+  9 FORTUNE RABBIT                 3,453    90,841.00     3,907.20      26.31    2.9%    12
+ 10 BELL DEER                      2,956    41,347.75     9,124.33      13.99    2.5%    15
+ 11 JIN JI MAHJONG                 2,515    34,089.00     2,834.24      13.55    2.1%    12
+ 12 777 FRUIT                      2,495    39,645.00     4,504.07      15.89    2.1%    17
+ 13 FATHER KIM                     2,347    29,124.90     1,724.70      12.41    2.0%    12
+ 14 FORTUNE TIGER                  2,257    61,070.00      -289.70      27.06    1.9%    13
+ 15 Money Mania II                 2,188    81,802.00     6,964.00      37.39    1.9%    12
+ 16 GOLDEN BUFFALO                 2,161    45,856.80     9,309.24      21.22    1.8%    13
+ 17 ELVES                          2,109    30,624.20     2,065.44      14.52    1.8%    16
+ 18 PHOENIX                        1,889    40,660.00     2,647.20      21.52    1.6%    11
+ 19 FORTUNE MOUSE                  1,808    33,308.50     1,880.20      18.42    1.5%    12
+ 20 88 FORTUNES                    1,804    32,374.20     7,611.20      17.95    1.5%    13
+ 21 CLEOPATRA'S FLAME              1,798    26,318.00     2,408.69      14.64    1.5%     8
+ 22 BINGO LUCKY CLOVER             1,701    33,735.50     9,977.43      19.83    1.4%    14
+ 23 ZEUS POWER                     1,671    32,491.00     4,344.00      19.44    1.4%    14
+ 24 MONEY MANIA                    1,574    53,134.00     4,041.00      33.76    1.3%    12
+ 25 GOD OF WEALTH                  1,558    27,547.50      -154.65      17.68    1.3%    16
+ 26 KING KONG                      1,538    29,885.00     3,437.50      19.43    1.3%     9
+ 27 MEDUSA UNLEASHED               1,439    31,085.50       991.80      21.60    1.2%    10
+ 28 RAMPAGE BUFFALO                1,420    24,331.00       955.70      17.13    1.2%    14
+ 29 STARLIGHT PRINCESS 1000        1,319    30,491.00     1,334.60      23.12    1.1%    13
+ 30 LUCKY NEKO                     1,276    54,704.00      -162.65      42.87    1.1%    10
+ 31 FRUIT MARY                     1,168    21,737.70     2,853.58      18.61    1.0%    12
+ 32 POWER OF KRAKEN                1,159    17,923.00     2,672.67      15.46    1.0%     8
+ 33 PIGGY BANKIN                   1,153    41,343.00    -2,550.90      35.86    1.0%    10
+ 34 LAND OF GEMS                   1,151    15,748.00     3,478.25      13.68    1.0%    13
+ 35 HALLOWEEN                      1,124    16,436.50     1,776.67      14.62    1.0%     9
+ 36 MR.FRANKENSTEIN                1,088    50,458.80     2,624.73      46.38    0.9%     7
+ 37 JUNGLE TIGER                   1,079    16,348.00     1,979.35      15.15    0.9%    10
+ 38 VORTEX                           864    22,532.00       505.65      26.08    0.7%    10
+ 39 WILD VEGAS                       848     6,170.40       860.40       7.28    0.7%     6
+ 40 Fish On! Bass Hunter             786    42,153.00     7,311.25      53.63    0.7%     6
+ 41 X-PLOSIVE ROCK                   672    26,672.00     4,134.80      39.69    0.6%     6
+ 42 WILD BANDITO                     650    13,947.00     1,121.75      21.46    0.6%     7
+ 43 GATES OF OLYMPUS                 647     9,041.00     1,624.45      13.97    0.6%    11
+ 44 LEPRECHAUN'S COIN                588    16,331.00    -1,912.73      27.77    0.5%     6
+ 45 HUFF N PUFF                      536    13,896.00     4,217.36      25.93    0.5%     5
+ 46 FORTUNE GONG                     533     7,408.50       623.99      13.90    0.5%     7
+ 47 GOLDEN CENTURY                   509     4,034.75     1,586.44       7.93    0.4%     6
+ 48 GOD OF FORTUNE                   492     4,867.25       249.46       9.89    0.4%     6
+ 49 FORTUNE DRAGON                   469     7,215.50       941.59      15.38    0.4%     7
+ 50 ROMA                             463     6,440.70    -1,106.60      13.91    0.4%     8
+ 51 FORTUNE BAMBOO PANDA             462    14,276.00     2,322.80      30.90    0.4%     6
+ 52 ORB OF GANESHA                   456     6,146.50       439.90      13.48    0.4%     4
+ 53 MERMAID'S DANCE                  440    20,347.00    -3,204.90      46.24    0.4%     7
+ 54 FOOTBALL                         384     2,009.50    -3,533.13       5.23    0.3%     9
+ 55 TREASURE OF AZTEC                367     3,613.00       358.22       9.84    0.3%     7
+ 56 PUMPKIN PARTY                    366     2,440.40       163.92       6.67    0.3%     4
+ 57 DOOM BULLET                      363    27,131.00       -52.50      74.74    0.3%     4
+ 58 FAFAFA                           361     5,454.00      -317.00      15.11    0.3%     5
+ 59 ORIENTAL RICHES                  359     4,015.20    -1,412.29      11.18    0.3%     3
+ 60 FORTUNE DRAGON II                350     5,189.00       678.40      14.83    0.3%     6
+ 61 CRASH                            341   663,090.00    16,588.90   1,944.55    0.3%    14
+ 62 TRIPLE FORTUNE                   333     4,528.25       923.90      13.60    0.3%     3
+ 63 DRAGON & TIGER                   331     3,377.00       458.60      10.20    0.3%     4
+ 64 ZOO ROULETTE                     273    38,520.00     3,020.00     141.10    0.2%     4
+ 65 CHEESE CLASH                     265     2,236.35       187.65       8.44    0.2%     5
+ 66 BLOOD OF THE FALLEN              238     4,547.00        16.25      19.11    0.2%     7
+ 67 GOLDEN RICHES                    237     4,784.00      -510.80      20.19    0.2%     4
+ 68 Y-PLOSIVE ROCK                   227     9,743.00       771.00      42.92    0.2%     5
+ 69 GOLD MANIA                       208     2,142.50       155.33      10.30    0.2%     2
+ 70 INFERNO                          186    18,150.00     4,345.52      97.58    0.2%     5
+ 71 PLINKO                           159    16,371.00     6,036.00     102.96    0.1%     4
+ 72 TEEN PATTI                       154    97,777.17       862.94     634.92    0.1%     3
+ 73 CASHPOWER MANIA                  152    14,720.00    -2,539.00      96.84    0.1%     2
+ 74 MYTHICAL ANIMALS                 149   182,650.00     6,893.00   1,225.84    0.1%     7
+ 75 ANDAR VS BAHAR                   139    21,210.00       816.50     152.59    0.1%     4
+ 76 CRASH II                         138    48,620.00   -41,513.10     352.32    0.1%    12
+ 77 CHICKEN ROAD 2                   134     8,263.00     5,553.57      61.66    0.1%    10
+ 78 AFRICAN BUFFALO                  121     1,369.60      -399.80      11.32    0.1%     3
+ 79 JIN LOONG                        114     1,440.00      -695.60      12.63    0.1%     2
+ 80 SWEET BONANZA                    106     7,685.00     3,392.40      72.50    0.1%     3
+ 81 FISHING                          106    12,587.74     2,945.92     118.75    0.1%     9
+ 82 MINES                            104     5,618.00     1,629.56      54.02    0.1%     9
+ 83 TOSS A COIN                      103    17,270.00     1,319.00     167.67    0.1%     5
+ 84 RSING FORTUNES II                 97       291.00       195.24       3.00    0.1%     1
+ 85 AVIATOR                           94    38,731.00     4,123.53     412.03    0.1%    16
+ 86 LIMBO                             78     6,603.00     2,196.30      84.65    0.1%     7
+ 87 QUICK LUDO                        58    10,410.00     2,987.00     179.48    0.0%     8
+ 88 MAGIC DROP                        52     2,625.00     1,178.50      50.48    0.0%     2
+ 89 LABUBU'S LUCKY BOX                45       360.00      -232.00       8.00    0.0%     1
+ 90 Snakes & Ladders                  44     4,310.00     1,048.20      97.95    0.0%     6
+ 91 CHICKEN RUN                       41     1,130.00     1,107.00      27.56    0.0%     7
+ 92 DRAGON TIGER                      31     2,590.00       211.00      83.55    0.0%     3
+ 93 HORSE RACING                      31     1,900.00       130.00      61.29    0.0%     2
+ 94 SABONG                            30     3,220.00      -736.13     107.33    0.0%     2
+ 95 MINES PLUS                        25     3,522.00     2,334.50     140.88    0.0%     2
+ 96 CRAZY WIN                         23     6,750.00      -483.00     293.48    0.0%     4
+ 97 FISHDOM                           21     8,366.77       361.18     398.42    0.0%    10
+ 98 DICE                              15       382.00       246.48      25.47    0.0%     2
+ 99 COLOR GAME                        14     1,390.00    -1,030.00      99.29    0.0%     2
+100 BACCARAT                          14     1,310.00    -1,056.00      93.57    0.0%     1
+101 ROULETTE                          12     8,600.00     4,540.00     716.67    0.0%     3
+102 LUCKY JET                         12    10,560.00    -1,150.00     880.00    0.0%     4
+103 COSMIC BLITZ                      11        88.00       -88.00       8.00    0.0%     1
+104 RED VS BLACK                       9     2,210.00     1,079.00     245.56    0.0%     1
+105 BLACK JACK                         8     1,614.50       476.00     201.81    0.0%     1
+106 TH SICBO                           7     1,340.00       677.00     191.43    0.0%     1
+107 7 UP DOWN                          7       520.00      -240.00      74.29    0.0%     1
+108 BEST CLUB                          5       560.00       404.00     112.00    0.0%     1
+109 HOO HEY HOW                        4       260.00        65.00      65.00    0.0%     1
+110 LUCKY LOTTERY                      4       340.00       -92.00      85.00    0.0%     1
+111 ANDAR BAHAR                        2       600.00       425.00     300.00    0.0%     1
+112 MAUBINH                            2    11,815.79      -712.50   5,907.90    0.0%     1
+113 POINT RUMMY                        1       400.00       400.00     400.00    0.0%     1
+114 JHANDI MUNDA                       1       150.00       150.00     150.00    0.0%     1
+115 CALL BREAK                         1       100.00       100.00     100.00    0.0%     1
+116 CAR ROULETTE                       1        20.00       -80.00      20.00    0.0%     1
+117 CRAZY LUDO                         1       500.00      -475.00     500.00    0.0%     1
+------------------------------------------------------------------------------------------
+    TOTAL                        117,459 3,394,236.47   184,276.99
+
+  Concentracao: top 3 jogos = 21.8% dos giros totais
+
+--- Detalhamento por jogador (top 5 jogos por Giros) ---
+
+  GOLDEN OX:
+    Username           PID             Giros     Turnover          GGR   Ticket  Dias
+    --------------------------------------------------------------------------------
+    newsaher           9q2jgjWHf       3,188    74,222.00    -5,234.70    23.28     5
+    wajidrie           blAsL3tsa         444     3,356.00      -290.80     7.56     2
+    abdulsaeedpk       ny43lYvfM         394     5,095.00    -1,443.50    12.93     2
+    maliksulttan13504393 jOIZkIzmb         281     1,907.00      -751.60     6.79     2
+    hePTIUJfQvsjbcIV   wANPidhqS         277     1,698.00       459.30     6.13     1
+    adeels             4yhIXFZdg         197     3,940.00       490.00    20.00     1
+    sulttanmalik7792893 3uHHuFkLS         197     3,376.00       521.20    17.14     1
+    aftabjan           59YcxyE3G         158     3,148.00       -92.00    19.92     1
+    subhan11           Mmcr0wqF7         150       900.00       308.40     6.00     1
+    4mzvSFBWQYTtHsno   D8toibbOq         114       684.00       -10.80     6.00     1
+    mehmood88          y9eAgK4wl          91    27,300.00    13,710.00   300.00     1
+    asimshahzad795795218 SAsDGqyFF          91       558.00      -176.00     6.13     1
+    chmukarram53746473 ZDWhD1NvT          87       696.00       339.20     8.00     1
+    zoheeb203708212    Q7VVqimPl          86       791.00         6.60     9.20     1
+    khangkhan          I6pWnxseh          81     1,608.00       654.00    19.85     1
+    qaiserhabib        KkIoPnIyc          80       640.00      -200.80     8.00     1
+    gxQyS246UyI3UnOv   dzCvhwgvA          79       632.00       -20.80     8.00     1
+    faiz123            skHkyJ8Ek          76     6,840.00      -630.00    90.00     1
+    nB8lfoEAIoH1tMJ3   zyhFQiJoi          73     1,580.00       993.60    21.64     1
+    azharahmed         HhuOwlGX9          69       414.00       163.20     6.00     1
+    malik7             8V4d97F0z          61     2,796.00       412.00    45.84     1
+    dan123             tHCjqcFKl          58       348.00       -58.80     6.00     1
+    Zaka112            y0KBdzcjc          53     1,060.00       802.00    20.00     1
+    shabir4528         yFEPOjLmK          49       392.00       -80.80     8.00     1
+    dahrizahid99272226 zRA6IeEtw          42       126.00        -6.00     3.00     1
+    akkhanafridi88588883 e6vyXXCsI          39       312.00       178.40     8.00     1
+    GMXqtt2xnVWjUJhe   bWwEHczHG          36       288.00       169.60     8.00     1
+    rajazainjanjuajanjua188752 6xTywyeoj          35       138.00        38.40     3.94     1
+    ahmedaligujjar71677007 qgtusmwCD          20       400.00       -22.00    20.00     1
+    raeessabir         nsKUOTna3          20       120.00      -157.80     6.00     1
+    oyyWw8xoGjdTAJAv   9s4sm7hAu          17       102.00        79.80     6.00     1
+    nazimabbasi        WnqdI3qvd          17       340.00       274.00    20.00     1
+
+  RAILROAD RICHES:
+    Username           PID             Giros     Turnover          GGR   Ticket  Dias
+    --------------------------------------------------------------------------------
+    mirzaibrar         VYXSTVmH9       1,617    15,791.50       678.58     9.77     3
+    GMXqtt2xnVWjUJhe   bWwEHczHG         335     2,450.00       248.33     7.31     2
+    yYwRUsFcjXrReLl7   cy26PdIfN         207       442.50        99.62     2.14     1
+    DsHHry0fq9nNaDH9   lQhlDaBLk         194       747.00       162.96     3.85     1
+    zeeshan.shah110358697 8ZkcLEJEu         188     1,686.00       454.35     8.97     2
+    Usmanrajput396824426 GlIB7tWsK         186     5,408.50     1,000.50    29.08     1
+    msherazsherazi998727804 kkmJ8YwCw         186       706.00       299.85     3.80     1
+    chsohailshabeer033854335 BE9pqz61N         182     1,813.00       -13.28     9.96     2
+    wajidrie           blAsL3tsa         148       666.00       204.84     4.50     1
+    mazharali.finance903120 bv2GMMQfH         139       625.50      -153.45     4.50     1
+    newsaher           9q2jgjWHf         137     3,405.00       848.10    24.85     5
+    irfanrie           C8JoBKCAo         125     6,250.00     3,193.00    50.00     1
+    vRPojqo4X3He3E0B   txk4TEGMw         123     1,875.00       915.90    15.24     1
+    abdullahshah7      4kGFhfQ7B         109     1,635.00    -1,073.40    15.00     2
+    3003002884         3o06WGsJE         102     1,477.50       362.10    14.49     1
+    sulttanmalik7792893 3uHHuFkLS          97     1,455.00      -284.10    15.00     1
+    Rabnawaz           3fjW6Zhfg          96       431.00       191.70     4.49     1
+    raum66             P7rXDV7zH          96     1,839.50       996.50    19.16     1
+    aqeel              QHMz6bRRU          92     2,300.00    -1,004.00    25.00     1
+    rafiqbaloch313rb253159 SGam5fqMb          89     3,510.00      -754.70    39.44     2
+    maliksulttan13504393 jOIZkIzmb          88     1,320.00      -399.00    15.00     1
+    perveezakhter      sVE5dFK6b          86     2,816.00     1,909.15    32.74     1
+    kb4106184471539    9SUXnJ4lE          84     1,861.00       499.00    22.15     1
+    asimshahzad795795218 SAsDGqyFF          82     1,198.50      -570.15    14.62     1
+    zeronin            ucRh9MGL7          80     1,074.00       499.50    13.43     2
+    subhan11           Mmcr0wqF7          80       160.00        11.00     2.00     1
+    azharahmed12       Ip2quceFb          77     4,014.00     3,000.00    52.13     1
+    Najeeb685575       y2MymMVxk          74     1,057.50       727.65    14.29     1
+    yasir              jHkrGgRA3          72     1,750.00    -3,505.00    24.31     1
+    ks7260393814081    sedDxpGsM          72       209.50       -90.30     2.91     1
+    qamarzaman         kBBKY8Qvn          72     1,069.50       808.50    14.85     1
+    azadbhi            7cwONOn2h          68       967.50    -1,004.13    14.23     1
+    abidhussain03458911615946805 I4JBAmxN5          67       853.50       108.42    12.74     1
+    4mzvSFBWQYTtHsno   D8toibbOq          65       975.00      -134.40    15.00     1
+    khudabuxphanwar423793 6wgFWUdUd          63       777.00       494.20    12.33     1
+    azharahmed         HhuOwlGX9          60       550.50    -1,100.10     9.18     1
+    waseemkhan90       u2cLv6Jah          59     1,295.00    -2,306.90    21.95     1
+    raheelsolangi090659111 cK2vQCSlR          59       767.00       499.70    13.00     1
+    kmkmkm             3KR3Kocm9          57       855.00       598.50    15.00     1
+    gulfam002          SCAp5y23T          54       243.00        86.40     4.50     1
+    gullc625563839     b6sF3JK8w          51       995.00      -203.00    19.51     1
+    quAS2yav4BiwM6Rz   SoLWKg6fQ          50       225.00        96.12     4.50     1
+    qaiserhabib        KkIoPnIyc          47       642.00       339.00    13.66     1
+    maliksamarasif6277600380 s8D5ezdaP          45     1,125.00    -1,046.00    25.00     1
+    tiktok.uk.007007629829 0eT05QVCG          45        45.00        36.00     1.00     1
+    Arslan             qjGW8eNSu          44       660.00      -202.50    15.00     1
+    ras0011            XvJ6WxWTY          39       308.00       219.40     7.90     1
+    romeoo09           JBL3jBhdN          39       585.00    -1,074.00    15.00     1
+    xsq8CDOMHJARLzX3   zJOWoz4fI          38       570.00         7.50    15.00     1
+    mehmood88          y9eAgK4wl          38     5,700.00     1,995.00   150.00     1
+    mohsinaliofficailads195305 LL6SSsJ1W          38       810.00       692.00    21.32     1
+    zahidjni           Ga4LJKRzT          37       774.50       499.00    20.93     1
+    sufyan2244         2Pp6ufG4r          36       540.00      -313.50    15.00     1
+    UsmanHaider42      lVx0Kjvu4          36       456.00        84.45    12.67     1
+    tauqeerk610        NJnu49Ld9          36       156.00       104.25     4.33     1
+    akkhanafridi88588883 e6vyXXCsI          36       540.00       402.30    15.00     1
+    chmukarram53746473 ZDWhD1NvT          35       525.00        28.50    15.00     1
+    faiz123            skHkyJ8Ek          32       480.00      -132.90    15.00     1
+    babakhan           BzbP0Kjm2          32       144.00       132.30     4.50     1
+    malikawan          9TgTICyzB          32       217.50         0.00     6.80     1
+    waheed             PEtKxdRgD          31       297.00       -64.80     9.58     1
+    arsam              HlEEW2QZQ          30       345.00       -86.40    11.50     1
+    nasir11            Y1ThOktrc          29       130.50      -130.05     4.50     1
+    hj7205729407786    HvrCSJ3mu          29        58.00        31.92     2.00     1
+    haider780807       lc7Qr5reV          28       409.50       137.70    14.63     1
+    abdulsaeedpk       ny43lYvfM          26       227.00      -937.20     8.73     1
+    sajidsajid         TnLhcFlh3          25       375.00       225.00    15.00     1
+    zoheeb203708212    Q7VVqimPl          21        94.50        77.40     4.50     1
+    dan123             tHCjqcFKl          20        70.00      -128.10     3.50     1
+    maliktariqali8485673187 YeKmtTuPV          20       247.50        87.90    12.38     1
+    ahmedaligujjar71677007 qgtusmwCD          20       300.00       -90.30    15.00     1
+    UoPzlJTMk2Bo9was   0b7AZZ7XK          20       300.00       198.60    15.00     1
+    waseem.sattar8229830 dTsAvULGx          20       800.00       788.00    40.00     1
+    rayyanpr99317552   isl65ELc5          19       540.00       395.40    28.42     1
+    mistri9270615776   4CC9qiIBr          19        38.00         0.64     2.00     1
+    strong1122         XfUfxaTCv          18       270.00      -339.00    15.00     1
+    naeemmalik0335290299 6lDf0pD5D          14       210.00        33.00    15.00     1
+    Samii              Amc3aO0C2          13       195.00      -274.80    15.00     1
+    Waqas              tOBRGCXoi          12        75.00        50.97     6.25     1
+    filipe.molon367635 NqDvXdHuc          11        26.50      -429.75     2.41     2
+    Uz3NOqiobDK3Rk41   QDFNoCPLo          10       150.00      -128.70    15.00     1
+    3491812887         GWtYtD6el          10       138.50        96.50    13.85     1
+    8FzE77pPAJUt8mCq   Oy4IeXj5C           9       135.00      -182.10    15.00     1
+    raosameer12        3MkD6idKU           9       103.50      -719.10    11.50     1
+    Arfanili           7185ZWx9t           9       114.00      -254.70    12.67     1
+    mosankhan          6H0HfwFV0           7        31.50        29.70     4.50     1
+    adnanshoaib145349139 wWO0Od2YV           6        27.00       -48.15     4.50     1
+    adeels             4yhIXFZdg           5     1,500.00    -1,410.00   300.00     1
+    rajazainjanjuajanjua188752 6xTywyeoj           4        18.00       -41.85     4.50     1
+    sidiuqe            wwySUYVdD           3        13.50      -196.20     4.50     1
+    7c6TDcSfXgERZD8c   UYCGwwA9I           1         3.50         3.50     3.50     1
+    jutt               bapgO64EL           1        15.00        15.00    15.00     1
+
+  SUPER ACE:
+    Username           PID             Giros     Turnover          GGR   Ticket  Dias
+    --------------------------------------------------------------------------------
+    haneef45           vtzttKjpB       1,145    23,220.00      -928.00    20.28     1
+    iftakhar           SdKIsLFXV         370     3,210.00      -711.10     8.68     1
+    kalsombebe         lMbnBhMdS         326     2,306.00       593.90     7.07     1
+    hassamjawad173234399 dd28sJTDQ         322    11,492.00    -2,069.90    35.69     2
+    moazsajjad5        4IeTFz3PI         303     3,032.00      -576.80    10.01     1
+    masoomzidagi       nKriiYgjH         260     1,832.00       499.30     7.05     1
+    zeeshan.shah110358697 8ZkcLEJEu         197     1,972.00        -2.60    10.01     1
+    Sajjad1            raQ8EirmV         185     2,404.00       855.00    12.99     1
+    3474531597         LkCvYAFJl         184       957.00       397.30     5.20     1
+    DEgZm5sQd4jeF40h   cr3jyN1kk         180       687.00       318.60     3.82     1
+    Y9jcLTUBlrzdiGax   GioenE6Vi         166     1,328.00       389.20     8.00     1
+    ks7260393814081    sedDxpGsM         156       908.00       180.35     5.82     2
+    3215588224         z1YFB5oZY         135       810.00       119.40     6.00     1
+    azad123            MnrLMcNnV         115     1,640.00       980.20    14.26     1
+    GAOpuad0TbrNOo64   22Ip66rKz         113       678.00      -100.80     6.00     1
+    khalique12         21q1lj5lZ          85       231.00       103.05     2.72     1
+    pAt5vvHc9YXds69A   TyPVsKg1Z          82       243.00       -51.60     2.96     1
+    malikawan          9TgTICyzB          81     1,612.00       571.00    19.90     1
+    GMXqtt2xnVWjUJhe   bWwEHczHG          80       640.00       209.20     8.00     1
+    newsaher           9q2jgjWHf          74     1,468.00       827.80    19.84     3
+    Raees64            XmbOqWqRV          73       219.00       169.05     3.00     1
+    abdulsaeedpk       ny43lYvfM          71     1,540.00       937.30    21.69     2
+    rajazainjanjuajanjua188752 6xTywyeoj          68       544.00       111.20     8.00     1
+    shahmirkhan8283708351 yacNIkJpb          66       166.00        93.45     2.52     1
+    haider780807       lc7Qr5reV          63       504.00       328.80     8.00     1
+    zaneeat7           gk2imI67x          62     1,240.00       636.00    20.00     1
+    mPeUYi4UcMlM6IEt   9uI15Ku1E          62     1,216.00       593.00    19.61     1
+    naveedkk208        lZSt0FzOQ          59       472.00       235.20     8.00     1
+    maliksamarasif6277600380 s8D5ezdaP          53     2,570.00      -307.00    48.49     1
+    aqeel              QHMz6bRRU          52     2,701.00     1,131.90    51.94     1
+    kkashif148         HAqRlJE4j          48     1,440.00    -1,263.00    30.00     1
+    2YRq8Bm2gsD1H3Ej   glTyJI0ZG          41       328.00       199.20     8.00     1
+    sulttanmalik7792893 3uHHuFkLS          40       800.00       586.00    20.00     1
+    amir.302921110     jQ3J4TWVY          39       279.00       178.10     7.15     1
+    dan123             tHCjqcFKl          39       117.00        73.05     3.00     1
+    hj7205729407786    HvrCSJ3mu          37       111.00      -179.40     3.00     1
+    UsmanHaider42      lVx0Kjvu4          37       296.00       -92.40     8.00     1
+    ahmedaligujjar71677007 qgtusmwCD          36       288.00        42.40     8.00     1
+    mehmood88          y9eAgK4wl          35     3,150.00     2,929.50    90.00     1
+    Arfanili           7185ZWx9t          32       141.00        65.70     4.41     1
+    5Dn2naC2foztacNX   FX3ak4jmB          31       395.00       195.75    12.74     1
+    abidhussain03458911615946805 I4JBAmxN5          29       232.00        66.40     8.00     1
+    quAS2yav4BiwM6Rz   SoLWKg6fQ          28       224.00       117.20     8.00     1
+    mirzaibrar         VYXSTVmH9          28       138.00       102.50     4.93     1
+    CUD5BJTpweUxaB7Y   V87BWUzm5          28       224.00       130.80     8.00     1
+    sufyan2244         2Pp6ufG4r          28       560.00       345.00    20.00     1
+    gxQyS246UyI3UnOv   dzCvhwgvA          25       200.00        68.00     8.00     1
+    Usmanrajput396824426 GlIB7tWsK          23       138.00        50.40     6.00     1
+    adeels             4yhIXFZdg          21       420.00      -961.00    20.00     1
+    gullc625563839     b6sF3JK8w          21       420.00       199.00    20.00     1
+    irfanrie           C8JoBKCAo          17       340.00       231.00    20.00     1
+    n6782384248690     RNoHwOZzU          17       232.00       196.40    13.65     1
+    mailk2             ve4LIjK8q          17       124.00       113.60     7.29     1
+    asimshahzad795795218 SAsDGqyFF          14       112.00        81.60     8.00     1
+    Najeeb685575       y2MymMVxk          13       104.00        53.60     8.00     1
+    waheed             PEtKxdRgD          10       200.00      -153.00    20.00     1
+    rayyanpr99317552   isl65ELc5           9       144.00        95.20    16.00     1
+    alikijaans512331791 0OljbUMry           8        48.00       -48.60     6.00     1
+    aneesh             snBbHwQJS           6       120.00      -630.00    20.00     1
+    filipe.molon367635 NqDvXdHuc           5        30.00      -145.80     6.00     1
+    UoPzlJTMk2Bo9was   0b7AZZ7XK           3        24.00         8.00     8.00     1
+
+  TRUMP IT:
+    Username           PID             Giros     Turnover          GGR   Ticket  Dias
+    --------------------------------------------------------------------------------
+    wajidrie           blAsL3tsa       4,604    23,392.00    -4,270.82     5.08     6
+    irfanrie           C8JoBKCAo       1,880    34,560.00    -5,237.90    18.38     3
+    waris              lJV1Sifl0       1,099     2,199.50      -627.95     2.00     1
+    mmaannii2245980243 Pp0zNQS1d         310       450.00        58.74     1.45     1
+    muhammadhumayun07711743802 VoOXDIxVy         257       552.00       137.46     2.15     1
+    dan123             tHCjqcFKl         237       474.00      -100.24     2.00     1
+    vRPojqo4X3He3E0B   txk4TEGMw         198     2,833.50      -930.03    14.31     1
+    syedalishah3284830232618742 O5xbRe9MB         171       201.00        43.56     1.18     1
+    abdullahshah7      4kGFhfQ7B         149     2,235.00       972.90    15.00     1
+    ta1441891298572    xp3JWRQ5p         136       476.00        56.91     3.50     1
+    Arfanili           7185ZWx9t         131     1,366.50       202.47    10.43     2
+    aliqasim0003       h0Mf9nWJt         130     2,405.50       382.11    18.50     1
+    2zHfL16cfRKYTbyE   VYf2EMZdb         126       428.00       140.30     3.40     1
+    ghazijajja9115338657 F9patzgXn         121     3,025.00     1,017.00    25.00     1
+    quAS2yav4BiwM6Rz   SoLWKg6fQ         102     1,530.00         9.00    15.00     1
+    sulttanmalik7792893 3uHHuFkLS          99     1,485.00      -603.00    15.00     1
+    Darwash67          UKXjJ36t1          95     9,350.00       320.00    98.42     1
+    chmukarram53746473 ZDWhD1NvT          94     1,740.00       536.00    18.51     1
+    UsmanHaider42      lVx0Kjvu4          88     1,152.00      -281.94    13.09     1
+    ZGtIAnJZ1QHlNirJ   WW0Xf1lsC          87       235.00       132.90     2.70     1
+    lw1u8ErYWyP9HuEd   XDTd7vzZf          85     1,198.50       383.50    14.10     1
+    aliqasim0001       F1SzQp8Br          80       360.00       110.16     4.50     1
+    Y9jcLTUBlrzdiGax   GioenE6Vi          77       346.50       -61.74     4.50     1
+    imraniqbal3033200140 sgrFbHfDW          67       616.50       -23.61     9.20     1
+    5Dn2naC2foztacNX   FX3ak4jmB          64       960.00      -634.50    15.00     1
+    akkhanafridi88588883 e6vyXXCsI          62       930.00        85.50    15.00     1
+    filipe.molon367635 NqDvXdHuc          55       974.00        23.46    17.71     7
+    assasf22           SdXdmS1p5          50       214.00        99.92     4.28     1
+    mistri9270615776   4CC9qiIBr          50       100.00        58.24     2.00     1
+    msherazsherazi998727804 kkmJ8YwCw          50       175.00       -29.26     3.50     1
+    khalique12         21q1lj5lZ          49       138.50      -117.02     2.83     1
+    marcelofresendeo330398 d77rNwT3w          48       975.50       528.17    20.32     2
+    rajazainjanjuajanjua188752 6xTywyeoj          47       506.50      -285.64    10.78     2
+    monty007           WNaICgzqw          47       705.00    -1,057.20    15.00     1
+    Uz3NOqiobDK3Rk41   QDFNoCPLo          46       690.00       604.50    15.00     1
+    emperorenterprise786495818 rcKR0qnAe          46        92.00       -12.64     2.00     1
+    zoheeb203708212    Q7VVqimPl          45       360.00       163.05     8.00     1
+    chsohailshabeer033854335 BE9pqz61N          42        42.00        31.12     1.00     1
+    CUD5BJTpweUxaB7Y   V87BWUzm5          42       189.00        99.18     4.50     1
+    contato299776      PYBu4INLN          41        41.00         1.76     1.00     3
+    waheed705          HlVvWE48c          40       566.00       505.10    14.15     1
+    gulhassankalhoro291654530 WLUfjel4V          39       175.50       142.29     4.50     1
+    qasimkhan95550     akaHiZep5          39       175.50       111.96     4.50     1
+    Najeeb685575       y2MymMVxk          37       166.50        38.34     4.50     1
+    ak6170050746856    T65A5KAVR          34       152.00        98.72     4.47     1
+    adeels             4yhIXFZdg          33       390.00       350.94    11.82     1
+    asimshahzad795795218 SAsDGqyFF          31       307.50       202.71     9.92     1
+    tiktok.uk.007007629829 0eT05QVCG          30        30.00        -9.68     1.00     1
+    heloone88946207    WGStXh1fR          30       450.00       159.90    15.00     1
+    ahsanali345        z4UZnnkB1          29     1,450.00       896.00    50.00     1
+    qaiserhabib        KkIoPnIyc          28       126.00      -173.52     4.50     1
+    arsam              HlEEW2QZQ          27       121.50        46.62     4.50     1
+    adnanshoaib145349139 wWO0Od2YV          26       115.00      -169.05     4.42     1
+    8FzE77pPAJUt8mCq   Oy4IeXj5C          24       600.00      -101.00    25.00     1
+    Waqas              tOBRGCXoi          22       550.00       407.00    25.00     1
+    moaviajaved        DIsCgkGMZ          21       157.50      -405.06     7.50     1
+    mehmood88          y9eAgK4wl          20     3,000.00     1,383.00   150.00     1
+    rayyanpr99317552   isl65ELc5          20       433.00      -504.21    21.65     1
+    dumaninaturals837622 IbUOWcF1V          20       300.00      -418.50    15.00     1
+    testeste           istDPgqeh          16    15,001.00    10,313.66   937.56     1
+    zEso4IVWMFaiyZnA   1EAzvqXxK          10        45.00        40.32     4.50     1
+    teste977807        0XFqNV2pB           2         4.00       -45.20     2.00     1
+
+  WILD BOUNTY SHOWDOWN:
+    Username           PID             Giros     Turnover          GGR   Ticket  Dias
+    --------------------------------------------------------------------------------
+    DEgZm5sQd4jeF40h   cr3jyN1kk         668     2,579.00       280.70     3.86     1
+    abdullahshah7      4kGFhfQ7B         647    10,909.00       383.55    16.86     2
+    arsam              HlEEW2QZQ         605     6,050.00    -3,024.00    10.00     4
+    zahidjni           Ga4LJKRzT         377     7,128.00     1,500.70    18.91     1
+    taswargondal342943687 vCBtPlra8         254     5,080.00       279.00    20.00     3
+    alijavaid714122082 XXNTl5VNp         250     5,150.00       995.50    20.60     1
+    perveezakhter      sVE5dFK6b         220     1,843.00      -831.75     8.38     1
+    sshahidmalikk104525 8cdhcXDBL         197     1,970.00       -92.00    10.00     1
+    wajidrie           blAsL3tsa         172       860.00       227.25     5.00     1
+    EOajeuH0BAS7tFw4   P3YoIUd3h         162     1,503.00       599.50     9.28     1
+    gulfam002          SCAp5y23T         161     1,610.00    -2,006.00    10.00     1
+    waseem.sattar8229830 dTsAvULGx         151     7,320.00     2,206.00    48.48     1
+    majid              ti9x2Hwk3         149     1,490.00       767.50    10.00     1
+    waheed705          HlVvWE48c         130     2,590.00       500.00    19.92     1
+    khalique12         21q1lj5lZ         130       274.00        17.10     2.11     2
+    azadbhi            7cwONOn2h         124     1,491.00       450.90    12.02     1
+    afroz001           2OleIqVqm         119     2,997.00       399.50    25.18     1
+    adeels             4yhIXFZdg         115     7,140.00     1,663.50    62.09     2
+    sabir03002515400636441 ZkJj4vzon         105     5,961.00       499.90    56.77     1
+    Y9jcLTUBlrzdiGax   GioenE6Vi         102     1,020.00       642.00    10.00     1
+    ramesh             Aw9gfRD9K          99       837.00       399.25     8.45     1
+    abid31             bXll7jmmv          88     1,739.00     1,000.00    19.76     1
+    kb4106184471539    9SUXnJ4lE          77     1,491.00       501.00    19.36     1
+    kmkmkm             3KR3Kocm9          67       377.00       103.15     5.63     1
+    dumaninaturals837622 IbUOWcF1V          61       940.00        33.00    15.41     1
+    TK9Kfbr5txc3DfGz   SeAxij4Zj          60     5,540.00     3,989.50    92.33     1
+    faiz123            skHkyJ8Ek          53     2,750.00    -1,264.00    51.89     1
+    samiullah          oURkynMrs          53        82.00        35.00     1.55     1
+    8FzE77pPAJUt8mCq   Oy4IeXj5C          47       470.00       348.00    10.00     1
+    3215588224         z1YFB5oZY          42       336.00        60.40     8.00     1
+    Zainulabideen      V0EkD7gBF          42       378.00       247.95     9.00     1
+    ak6170050746856    T65A5KAVR          39       260.00       200.00     6.67     1
+    malikawan          9TgTICyzB          35       350.00       198.00    10.00     1
+    qarar123           CNkH2h1p4          28        61.00      -498.40     2.18     1
+    aliraza            gwgNHRENJ          28        34.00        21.45     1.21     1
+    waheed             PEtKxdRgD          24       240.00    -1,341.00    10.00     1
+    asimshahzad795795218 SAsDGqyFF          24       240.00       204.00    10.00     1
+    msherazsherazi998727804 kkmJ8YwCw          21       105.00        50.25     5.00     1
+    khangkhan          I6pWnxseh          19     1,840.00       323.00    96.84     1
+    rayyanpr99317552   isl65ELc5          17        60.00        20.50     3.53     1
+    zoheeb203708212    Q7VVqimPl          16       160.00        -1.50    10.00     1
+    mehmood88          y9eAgK4wl          15     8,900.00     3,950.00   593.33     1
+    Raees64            XmbOqWqRV          13        26.00        25.60     2.00     1
+    filipe.molon367635 NqDvXdHuc          12        63.00        29.80     5.25     1
+    CUD5BJTpweUxaB7Y   V87BWUzm5           5     1,155.00      -142.00   231.00     1
+    babakhan           BzbP0Kjm2           2       600.00       124.80   300.00     1
+    hadi786kpr897266   Os8oDLaZV           1       750.00       190.00   750.00     1
+
+================================================================================
+ANALISE EXECUTIVA — CONCENTRACAO E RISCOS
+================================================================================
+
+Top 15 jogadores por Turnover (all-time):
+  # Username           PID         Turnover (Rs)          GGR    Giros  Jogos  Dias   Ticket
+--------------------------------------------------------------------------------------------
+  1 mehmood88          y9eAgK4wl    1,164,617.00     7,886.68    3,494     47     4   333.32
+  2 ajmal              LVjXgnWA4      147,995.00       834.64      110      4     1 1,345.41
+  3 newsaher           9q2jgjWHf      143,740.00    -4,512.73    6,407     35     5    22.43
+  4 rajazainjanjuajanjua188752 6xTywyeoj      131,204.67     1,699.10    1,989     47     5    65.97
+  5 faiz123            skHkyJ8Ek      101,605.50     1,493.56    2,003     19     2    50.73
+  6 haneef45           vtzttKjpB       81,340.00     2,546.00    1,452      3     2    56.02
+  7 irfanrie           C8JoBKCAo       77,530.89     1,198.68    2,337     13     3    33.18
+  8 sulttanmalik7792893 3uHHuFkLS       74,491.60    -1,604.90    4,311     48     3    17.28
+  9 malikfalak747184894 VU5ggBC19       62,641.00     6,288.20      911      3     4    68.76
+ 10 abdulsaeedpk       ny43lYvfM       51,178.30     8,484.77    2,594     21     3    19.73
+ 11 kamiwolf786        9XCUDRSgk       47,487.00       285.90    1,438      3     2    33.02
+ 12 wajidrie           blAsL3tsa       38,113.60    -3,302.45    6,926     28     6     5.50
+ 13 mirzaibrar         VYXSTVmH9       36,702.70    -2,802.88    3,120     15     3    11.76
+ 14 jutt               bapgO64EL       32,754.00     5,999.80      579      6     1    56.57
+ 15 moazsajjad5        4IeTFz3PI       31,137.40    -1,504.64      987      9     2    31.55
+
+  Concentracao de Turnover:
+    Top 1 jogador: 34.3% do total
+    Top 3 jogadores: 42.9% do total
+    Top 5 jogadores: 49.8% do total
+
+  ALERTA: mehmood88 representa 34.3% do turnover total.
+  Risco altissimo de concentracao — se este jogador parar, a operacao sofre.
+
+  Jogos com poucos jogadores (turnover > Rs 1.000):
+    Jogo                       Jogadores     Turnover          GGR
+    --------------------------------------------------------------
+    TEEN PATTI                         1    97,777.17       862.94 <-- RISCO
+    MAUBINH                            1    11,815.79      -712.50 <-- RISCO
+    MINES PLUS                         1     3,522.00     2,334.50 <-- RISCO
+    RED VS BLACK                       1     2,210.00     1,079.00 <-- RISCO
+    BLACK JACK                         1     1,614.50       476.00 <-- RISCO
+    TH SICBO                           1     1,340.00       677.00 <-- RISCO
+    BACCARAT                           1     1,310.00    -1,056.00 <-- RISCO
+    ZOO ROULETTE                       2    38,520.00     3,020.00 <-- RISCO
+    ANDAR VS BAHAR                     2    21,210.00       816.50 <-- RISCO
+    CASHPOWER MANIA                    2    14,720.00    -2,539.00 <-- RISCO
+    SABONG                             2     3,220.00      -736.13 <-- RISCO
+    MAGIC DROP                         2     2,625.00     1,178.50 <-- RISCO
+    HORSE RACING                       2     1,900.00       130.00 <-- RISCO
+    COLOR GAME                         2     1,390.00    -1,030.00 <-- RISCO
+    ROULETTE                           3     8,600.00     4,540.00
+    SWEET BONANZA                      3     7,685.00     3,392.40
+    ORIENTAL RICHES                    3     4,015.20    -1,412.29
+    DRAGON TIGER                       3     2,590.00       211.00
+    GOLD MANIA                         3     2,142.50       155.33
+    JIN LOONG                          3     1,440.00      -695.60
+    AFRICAN BUFFALO                    3     1,369.60      -399.80
+    DOOM BULLET                        4    27,131.00       -52.50
+    LUCKY JET                          4    10,560.00    -1,150.00
+    Y-PLOSIVE ROCK                     4     9,743.00       771.00
+    CRAZY WIN                          4     6,750.00      -483.00
+    GOLDEN RICHES                      4     4,784.00      -510.80
+    TRIPLE FORTUNE                     4     4,528.25       923.90
+    HUFF N PUFF                        5    13,896.00     4,217.36
+    ORB OF GANESHA                     5     6,146.50       439.90
+    DRAGON & TIGER                     5     3,377.00       458.60
+    CHEESE CLASH                       5     2,236.35       187.65
+    FORTUNE DRAGON II                  6     5,189.00       678.40
+    PUMPKIN PARTY                      6     2,440.40       163.92
+    INFERNO                            7    18,150.00     4,345.52
+    PLINKO                             7    16,371.00     6,036.00
+    LIMBO                              7     6,603.00     2,196.30
+    WILD VEGAS                         7     6,170.40       860.40
+    GOLDEN CENTURY                     7     4,034.75     1,586.44
+    CHICKEN RUN                        7     1,130.00     1,107.00
+    MYTHICAL ANIMALS                   8   182,650.00     6,893.00
+    X-PLOSIVE ROCK                     8    26,672.00     4,134.80
+    CHICKEN ROAD 2                     8     8,263.00     5,553.57
+    FAFAFA                             8     5,454.00      -317.00
+    GOD OF FORTUNE                     8     4,867.25       249.46
+    BLOOD OF THE FALLEN                8     4,547.00        16.25
+    Snakes & Ladders                   8     4,310.00     1,048.20
+    MERMAID'S DANCE                    9    20,347.00    -3,204.90
+    TOSS A COIN                        9    17,270.00     1,319.00
+    FORTUNE BAMBOO PANDA               9    14,276.00     2,322.80
+    WILD BANDITO                      10    13,947.00     1,121.75
+    FOOTBALL                          10     2,009.50    -3,533.13
+    Fish On! Bass Hunter              11    42,153.00     7,311.25
+    PIGGY BANKIN                      11    41,343.00    -2,550.90
+    KING KONG                         11    29,885.00     3,437.50
+    FISHDOM                           11     8,366.77       361.18
+    FORTUNE GONG                      11     7,408.50       623.99
+    FORTUNE DRAGON                    11     7,215.50       941.59
+    CLEOPATRA'S FLAME                 12    26,318.00     2,408.69
+    POWER OF KRAKEN                   12    17,923.00     2,672.67
+    LEPRECHAUN'S COIN                 12    16,331.00    -1,912.73
+    TREASURE OF AZTEC                 12     3,613.00       358.22
+    FORTUNE MOUSE                     13    33,308.50     1,880.20
+    FISHING                           13    12,587.74     2,945.92
+    QUICK LUDO                        13    10,410.00     2,987.00
+    ENDLESS TREASURE                  14    38,561.00    -1,087.15
+    HALLOWEEN                         14    16,436.50     1,776.67
+    GATES OF OLYMPUS                  14     9,041.00     1,624.45
+    MR.FRANKENSTEIN                   15    50,458.80     2,624.73
+    VORTEX                            15    22,532.00       505.65
+    LUCKY NEKO                        16    54,704.00      -162.65
+    ROMA                              16     6,440.70    -1,106.60
+    MINES                             16     5,618.00     1,629.56
+    STARLIGHT PRINCESS 1000           17    30,491.00     1,334.60
+    JUNGLE TIGER                      17    16,348.00     1,979.35
+    MONEY MANIA                       18    53,134.00     4,041.00
+    CRASH II                          18    48,620.00   -41,513.10
+    RAMPAGE BUFFALO                   18    24,331.00       955.70
+    PHOENIX                           19    40,660.00     2,647.20
+    CRASH                             20   663,090.00    16,588.90
+    Money Mania II                    20    81,802.00     6,964.00
+    MEDUSA UNLEASHED                  20    31,085.50       991.80
+    FORTUNE TIGER                     21    61,070.00      -289.70
+    FRUIT MARY                        21    21,737.70     2,853.58
+    AVIATOR                           23    38,731.00     4,123.53
+    88 FORTUNES                       23    32,374.20     7,611.20
+    LAND OF GEMS                      23    15,748.00     3,478.25
+    FORTUNE RABBIT                    24    90,841.00     3,907.20
+    FATHER KIM                        24    29,124.90     1,724.70
+    ZEUS POWER                        26    32,491.00     4,344.00
+    GOLDEN OX                         32   145,807.00    10,423.30
+    BINGO LUCKY CLOVER                32    33,735.50     9,977.43
+    FORTUNE GEMS                      33    87,147.75     4,699.55
+    BELL DEER                         35    41,347.75     9,124.33
+    GOLDEN BUFFALO                    36    45,856.80     9,309.24
+    GOD OF WEALTH                     37    27,547.50      -154.65
+    JIN JI MAHJONG                    40    34,089.00     2,834.24
+    ELVES                             41    30,624.20     2,065.44
+    RISING FORTUNES                   42    33,587.00     1,903.78
+    WILD BOUNTY SHOWDOWN              47   104,749.00    14,266.60
+    777 FRUIT                         49    39,645.00     4,504.07
+    SUPER ACE                         61    83,221.00     8,187.60
+    TRUMP IT                          62   124,020.00     4,794.76
+    RAILROAD RICHES                   92   101,083.50     4,879.39
+
+================================================================================
+TENDENCIA DIARIA (ultimos dias disponiveis)
+================================================================================
+
+Data          Turnover (Rs)     GGR (Rs)    Giros  Jogos
+--------------------------------------------------------
+2026-03-27        61,258.00     4,411.41    4,685     47
+2026-03-28       188,328.19    14,626.13    9,325     74
+2026-03-29       101,981.01     9,000.90    4,005     54
+2026-03-30        84,811.43    10,837.97    3,875     40
+2026-03-31        72,245.35    -2,710.01    2,573     40
+2026-04-01        44,842.45     9,120.07    2,546     25
+2026-04-02        27,551.10     3,979.29    3,057     29
+2026-04-03       146,630.60    10,846.68    5,029     46
+2026-04-04        33,924.22     3,087.23    3,953     28
+2026-04-05        57,212.55     8,369.09    4,754     33
+2026-04-06        65,099.90    16,178.04    5,678     47
+2026-04-07       547,711.90    33,619.02   16,584     64
+2026-04-08       950,947.98   -12,842.41   15,132     73
+2026-04-09       436,216.20    17,330.87    6,850     50
+2026-04-10       266,717.75    33,764.23    8,923     37
+2026-04-11        76,295.40    -1,138.29    5,080     32
+2026-04-12       155,507.30    19,585.28    9,643     61
+2026-04-13        76,955.15     6,211.48    5,767     59
+
+================================================================================
+CROSS-REFERENCE — casino_game_metrics vs vw_top_jogos_ggr
+================================================================================
+  View vw_top_jogos_ggr nao acessivel: column "game_name" does not exist
+LINE 2:             SELECT game_name, ggr, total_bet, total_win, tot...
+                           ^
+
+  Colunas: ['jogo', 'data', 'total_apostado', 'total_pago', 'ggr', 'rodadas']
+
+================================================================================
+LEGENDA / GLOSSARIO
+================================================================================
+
+Colunas dos reports:
+- Jogo: nome do jogo no catalogo casino_games
+- GGR (Gross Gaming Revenue): Apostado - Pago = receita bruta da casa
+  Positivo = casa ganhou. Negativo = casa perdeu naquele jogo.
+- Turnover: total apostado pelos jogadores (volume de bets)
+- Giros: total de rodadas jogadas (played_rounds)
+- Hold%: GGR / Turnover * 100. Margem da casa.
+  Esperado saudavel: 2-5% para slots, variavel para crash/multiplier.
+- RTP Catalogo: Return to Player configurado pelo provider (2J Games)
+- RTP Real: retorno real ao jogador = 100% - Hold%
+- Ticket Medio: Turnover / Giros = valor medio por aposta
+- Dias: quantidade de dias com atividade naquele jogo
+- %Total: participacao percentual no total
+
+Jogadores:
+- Username: nome de login do jogador
+- PID: Public ID (identificador curto, uso publico)
+
+Interpretacao:
+- Jogo com GGR negativo = casa perdeu dinheiro nesse jogo (jogador ganhou mais)
+- Jogo com poucos jogadores + alto turnover = risco de concentracao
+- Hold% muito alto (>10%) = pode indicar jogo pouco atrativo (jogador perde rapido)
+- Hold% negativo = casa perdeu (evento normal em jogos high-stake/crash)
+
+Moeda: PKR (Rupia Paquistanesa)
+Fonte: casino_game_metrics, casino_user_game_metrics, casino_games, users
+Banco: supernova_bet (PostgreSQL 15.14)
+Periodo: desde o inicio da operacao ate a data do report

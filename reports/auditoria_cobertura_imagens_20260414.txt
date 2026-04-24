@@ -1,0 +1,199 @@
+================================================================================
+  AUDITORIA DE COBERTURA DE IMAGENS DE JOGOS
+  Data: 2026-04-14 22:30 BRT
+================================================================================
+
+>>> FONTE 1: Athena (bireports_ec2.tbl_vendor_games_mapping_data)
+----------------------------------------------------------------------
+  Jogos ativos unicos (dedup por nome): 2709
+  Vendors encontrados: 32
+
+  Top 15 vendors por qtd de jogos ativos:
+    pragmaticplay                    954 jogos
+    alea_redtiger                    253 jogos
+    alea_playtech                    205 jogos
+    alea_netent                      165 jogos
+    alea_hacksawgaming               131 jogos
+    alea_playngo                     126 jogos
+    alea_pgsoft                      103 jogos
+    alea_creedroomz                   88 jogos
+    alea_tadagaming                   76 jogos
+    alea_3oaksgaming                  68 jogos
+    alea_wazdan                       64 jogos
+    alea_rubyplay                     60 jogos
+    alea_evolution                    58 jogos
+    alea_bigtimegaming                56 jogos
+    alea_gamingcorps                  56 jogos
+
+>>> FONTE 2: CSV scraper (pipelines/jogos.csv)
+----------------------------------------------------------------------
+  Jogos unicos no CSV: 1585
+
+>>> FONTE 3: Super Nova DB (multibet.game_image_mapping)
+----------------------------------------------------------------------
+  Total registros no mapping: 2696
+  Com imagem (game_image_url preenchida): 2314
+  Sem imagem (game_image_url NULL):       382
+
+  Distribuicao por source:
+    scraper                    1585
+    athena                     1074
+    athena+cdn_fix               33
+    manual                        4
+
+================================================================================
+  ANALISE DE COBERTURA
+================================================================================
+
+>>> Jogos no Athena SEM imagem (nem no CSV, nem no mapping): 400 de 2709
+    Cobertura geral: 85.2%
+
+>>> Cobertura por vendor/provider:
+----------------------------------------------------------------------
+  VENDOR                          TOTAL  C/ IMG  S/ IMG   COBERT
+  ------------------------------ ------ ------- ------- --------
+  pragmaticplay                     954     945       9    99.1%
+  alea_redtiger                     253     252       1    99.6%
+  alea_playtech                     205     205       0   100.0%
+  alea_netent                       165     165       0   100.0%
+  alea_hacksawgaming                131       3     128     2.3%
+  alea_playngo                      126     126       0   100.0%
+  alea_pgsoft                       103      97       6    94.2%
+  alea_creedroomz                    88       0      88     0.0%
+  alea_tadagaming                    76      58      18    76.3%
+  alea_3oaksgaming                   68       0      68     0.0%
+  alea_wazdan                        64      64       0   100.0%
+  alea_rubyplay                      60      60       0   100.0%
+  alea_evolution                     58      57       1    98.3%
+  alea_bigtimegaming                 56      56       0   100.0%
+  alea_gamingcorps                   56      56       0   100.0%
+  alea_ezugi                         40      40       0   100.0%
+  alea_caleta                        26      26       0   100.0%
+  alea_platipus                      25       0      25     0.0%
+  alea_popok                         24      24       0   100.0%
+  alea_galaxsys                      21       1      20     4.8%
+  alea_netgaming                     20      20       0   100.0%
+  alea_7777gaming                    20       0      20     0.0%
+  alea_redrake                       15      15       0   100.0%
+  alea_1x2gaming                     14       0      14     0.0%
+  alea_skywind                       12      12       0   100.0%
+  alea_skywindlive                   11      11       0   100.0%
+  alea_spinoro                       10      10       0   100.0%
+  alea_hypetechgames                  3       3       0   100.0%
+  alea_spribe                         2       2       0   100.0%
+  alea_pragmaticplay                  1       1       0   100.0%
+  altenar                             1       0       1     0.0%
+  dummy                               1       0       1     0.0%
+
+>>> Cruzamento com CASINO_WIN (grandes_ganhos) - ultimos 30 dias
+----------------------------------------------------------------------
+  Jogos distintos com CASINO_WIN nos ultimos 30d: 1632
+  Total de wins no periodo: 11,693,673
+
+  Jogos com CASINO_WIN SEM imagem: 18
+  Wins afetados (sem imagem): 61,879 (0.53% do total)
+
+  TOP 20 jogos mais frequentes no grandes_ganhos SEM IMAGEM:
+    # JOGO                                     VENDOR                   WINS  PLAYERS     TOTAL R$
+  --- ---------------------------------------- -------------------- -------- -------- ------------
+    1 LUCKY JAGUAR 500                         alea_tadagaming        20,247    1,014   200,228.32
+    2 LUCKY MACAW                              alea_tadagaming        12,973      534   171,574.08
+    3 FORTUNE GEMS 500                         alea_tadagaming        10,772      662   194,133.20
+    4 EGYPT'S BOOK OF MYSTERY                  alea_pgsoft             5,042       86    16,147.96
+    5 3 WITCH'S LAMP                           alea_tadagaming         4,063      197    21,019.66
+    6 CASH COIN                                alea_tadagaming         2,262       99    15,258.50
+    7 WEREWOLF'S HUNT                          alea_pgsoft             1,838       63    11,302.86
+    8 JOKER COINS EXPANDED                     alea_tadagaming         1,159       59    12,606.30
+    9 CLOVER COINS 3X5                         alea_tadagaming         1,151       60     7,744.72
+   10 FORTUNE YURI 500                         alea_tadagaming           785       68    19,409.10
+   11 SUPERNOVA                                alea_tadagaming           570       47     6,073.06
+   12 CROWN OF FORTUNE                         alea_tadagaming           286       26       843.20
+   13 BLACKJACK LOBBY                          pragmaticplay             280       21       271.61
+   14 JOKER'S FORTUNE                          alea_tadagaming           254       21     2,211.60
+   15 MINES FOOTBALL                           alea_tadagaming           102       17       139.86
+   16 CASH STACK                               alea_tadagaming            86       38       791.14
+   17 CHICKEN DASH                             alea_tadagaming             7        4        38.10
+   18 D&W                                      pragmaticplay               2        1        69.00
+
+  Jogos no TOP 100 casino mais jogados SEM imagem: 1
+  Detalhamento:
+    - LUCKY JAGUAR 500 (alea_tadagaming) — 20,247 wins, 1014 players
+
+
+================================================================================
+  VERIFICACAO CDN - TOP 30 JOGOS SEM IMAGEM
+================================================================================
+
+  Tentando HEAD request em URLs padrao do CDN multi.bet.br...
+
+  [NAO ENCONTRADA] LUCKY JAGUAR 500                         (vendor=alea_tadagaming, game_id=24516)
+  [NAO ENCONTRADA] LUCKY MACAW                              (vendor=alea_tadagaming, game_id=22384)
+  [NAO ENCONTRADA] FORTUNE GEMS 500                         (vendor=alea_tadagaming, game_id=21563)
+  [NAO ENCONTRADA] EGYPT'S BOOK OF MYSTERY                  (vendor=alea_pgsoft, game_id=839)
+  [NAO ENCONTRADA] 3 WITCH'S LAMP                           (vendor=alea_tadagaming, game_id=22386)
+  [NAO ENCONTRADA] CASH COIN                                (vendor=alea_tadagaming, game_id=22810)
+  [NAO ENCONTRADA] WEREWOLF'S HUNT                          (vendor=alea_pgsoft, game_id=13003)
+  [NAO ENCONTRADA] JOKER COINS EXPANDED                     (vendor=alea_tadagaming, game_id=25622)
+  [NAO ENCONTRADA] CLOVER COINS 3X5                         (vendor=alea_tadagaming, game_id=25620)
+  [NAO ENCONTRADA] FORTUNE YURI 500                         (vendor=alea_tadagaming, game_id=24812)
+  [NAO ENCONTRADA] SUPERNOVA                                (vendor=alea_tadagaming, game_id=24515)
+  [NAO ENCONTRADA] CROWN OF FORTUNE                         (vendor=alea_tadagaming, game_id=22387)
+  [NAO ENCONTRADA] BLACKJACK LOBBY                          (vendor=pragmaticplay, game_id=103)
+  [NAO ENCONTRADA] JOKER'S FORTUNE                          (vendor=alea_tadagaming, game_id=22566)
+  [NAO ENCONTRADA] MINES FOOTBALL                           (vendor=alea_tadagaming, game_id=26379)
+  [NAO ENCONTRADA] CASH STACK                               (vendor=alea_tadagaming, game_id=22385)
+  [NAO ENCONTRADA] CHICKEN DASH                             (vendor=alea_tadagaming, game_id=24752)
+  [NAO ENCONTRADA] D&W                                      (vendor=pragmaticplay, game_id=110)
+  [NAO ENCONTRADA] 100 BLAZING CLOVER                       (vendor=alea_tadagaming, game_id=22040)
+  [NAO ENCONTRADA] 15 DRAGON PEARLS                         (vendor=alea_3oaksgaming, game_id=12985)
+  [NAO ENCONTRADA] 2 WILD 2 DIE                             (vendor=alea_hacksawgaming, game_id=12877)
+  [NAO ENCONTRADA] 3 AFRICAN DRUMS                          (vendor=alea_3oaksgaming, game_id=18387)
+  [NAO ENCONTRADA] 3 AZTEC TEMPLES HOLD AND WIN             (vendor=alea_3oaksgaming, game_id=19820)
+  [NAO ENCONTRADA] 3 CHINA POTS                             (vendor=alea_3oaksgaming, game_id=14441)
+  [NAO ENCONTRADA] 3 CLOVER POTS                            (vendor=alea_3oaksgaming, game_id=14440)
+  [NAO ENCONTRADA] 3 CLOVER POTS EXTRA                      (vendor=alea_3oaksgaming, game_id=18775)
+  [NAO ENCONTRADA] 3 COINS                                  (vendor=alea_3oaksgaming, game_id=12979)
+  [NAO ENCONTRADA] 3 DRAGON POTS                            (vendor=alea_1x2gaming, game_id=18711)
+  [NAO ENCONTRADA] 3 EGYPT CHESTS                           (vendor=alea_3oaksgaming, game_id=12917)
+  [NAO ENCONTRADA] 3 HOT CHILLIES                           (vendor=alea_3oaksgaming, game_id=12922)
+
+  Resultado CDN check: 0 encontradas, 30 nao encontradas de 30 verificadas
+
+================================================================================
+  JOGOS NO CSV QUE NAO ESTAO NO CATALOGO ATHENA
+================================================================================
+
+  Total: 4 jogos no CSV sem correspondencia no Athena
+  Primeiros 30:
+    - Captains Bounty
+    - Dragons Treasure Quest
+    - Genies 3 Wishes
+    - Plinko+
+
+  Jogos no Athena sem correspondencia no CSV: 1128 de 2709
+
+================================================================================
+  RESUMO EXECUTIVO
+================================================================================
+
+  Jogos ativos no Athena (catalogo):     2,709
+  Jogos no CSV (scraper site):           1,585
+  Registros no mapping (Super Nova DB):  2,696
+    - Com imagem:                        2,314
+    - Sem imagem:                        382
+
+  COBERTURA TOTAL (Athena com imagem):   2,309 / 2,709 = 85.2%
+  JOGOS SEM IMAGEM:                      400 (14.8%)
+
+  Jogos no grandes_ganhos (30d) sem imagem: 18
+  Wins afetados: 61,879 de 11,693,673 (0.53%)
+
+  ACOES RECOMENDADAS:
+  1. Rodar fix_missing_game_images.py com os jogos CDN encontrados
+  2. Re-executar scraper (capturar_jogos_pc.py) para jogos novos
+  3. Para jogos Live Casino (Evolution), verificar se CDN tem imagem alternativa
+  4. Jogos sem imagem no top grandes_ganhos impactam a experiencia do usuario
+
+================================================================================
+  FIM DA AUDITORIA
+================================================================================

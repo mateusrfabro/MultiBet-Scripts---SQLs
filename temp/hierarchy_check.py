@@ -1,6 +1,6 @@
 """Verificar hierarquia affiliate → tracker e se tbl_affiliate_tracker_mapping existe."""
 import sys
-sys.path.insert(0, "c:/Users/NITRO/OneDrive - PGX/MultiBet")
+sys.path.insert(0, "c:/Users/NITRO/OneDrive - PGX/Projetos - Super Nova/MultiBet")
 from db.athena import query_athena
 
 # 1. Buscar tabelas com 'affiliate' em todos os databases

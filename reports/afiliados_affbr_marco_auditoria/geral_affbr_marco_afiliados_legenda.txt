@@ -1,0 +1,44 @@
+LEGENDA — geral_affbr_marco_afiliados.csv
+Periodo: 2026-03-01 a 2026-03-31 (BRT) — marco completo
+Fonte: Athena fund_ec2.tbl_real_fund_txn (TODAS as transacoes financeiras, c_txn_status='SUCCESS')
+Grao: 1 linha por transacao (deposito, saque, bet, win, rollback, ajuste, etc.)
+Valores em BRL real (/100 de centavos)
+
+Mapeamento coluna PDF -> origem Athena:
+- id                = c_txn_id
+- type              = descricao do c_txn_type (REAL_CASH_DEPOSIT, CASINO_BUYIN, SB_BUYIN, etc.)
+- type_id           = c_txn_type (int)
+- amount            = c_amount_in_ecr_ccy / 100.0
+- status            = c_txn_status (filtrado SUCCESS)
+- user_id           = c_ecr_id
+- wallet_id         = (sem equivalente granular - NULL)
+- src               = c_product_id (CASINO | SPORTSBOOK | vazio p/ ledger)
+- src_id            = c_sub_vendor_id
+- created_at        = c_start_time (BRT)
+- updated_at        = NULL (coluna c_end_time nao existe em fund_ec2.tbl_real_fund_txn)
+- bonus_wallet_id   = (sem equivalente granular - NULL; ver bonus_ec2 p/ detalhe)
+- credit_percent    = (sem equivalente - NULL)
+- bonus_percent     = (sem equivalente - NULL)
+- cashed_out_amount = (sem equivalente direto aqui — ver cashier_ec2.tbl_cashier_cashout)
+- old_balance       = (sem equivalente - fund_ec2 nao persiste saldo antes, usar tbl_real_fund)
+- old_bonus_balance = (sem equivalente - NULL)
+- op_type           = c_op_type (CR/DB) — EXTRA
+- channel           = c_channel — EXTRA
+- game_id           = c_game_id (se casino/sportsbook) — EXTRA
+- session_id        = c_session_id — EXTRA
+- affiliate_id      = ps_bi.dim_user.affiliate_id
+- affiliate_name    = ps_bi.dim_user.affiliate
+
+Categorias de c_txn_type cobertas:
+  * Financeiro: 1=DEPOSIT, 2=WITHDRAW, 3=ADD_CS, 4=REMOVE_CS, 36=CASHOUT_REVERSAL,
+    51=POS_ADJUSTMENT, 52=NEG_ADJUSTMENT, 54=CASHOUT_FEE, 126=DEPOSIT_REFUND
+  * Casino: 27=BUYIN, 45=WIN, 65=JACKPOT, 72=BUYIN_CANCEL, 77=WIN_CANCEL, 80=FREESPIN_WIN
+  * Sportsbook: 59=SB_BUYIN, 60=SB_LEAVE, 61=SB_BUYIN_CANCEL
+  * Bonus relacionados: estao em bonus_ec2 separadamente — esta tabela so tem movimentos REALCASH
+
+Filtros:
+- c_start_time entre 2026-03-01 03:00:00 e 2026-04-01 03:00:00 (UTC = 01/03 00h a 01/04 00h BRT)
+- c_txn_status = 'SUCCESS'
+- ps_bi.dim_user.is_test = false
+- ps_bi.dim_user.signup_datetime < 2026-04-01 00:00 BRT (players cadastrados ate 31/03)
+- ps_bi.dim_user.affiliate_id IN (97 afiliados AffiliatesBR (lote grande))

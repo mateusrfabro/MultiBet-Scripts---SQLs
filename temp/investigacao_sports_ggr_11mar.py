@@ -6,7 +6,7 @@ Investigação Sports GGR 11/03/2026
 """
 
 import sys
-sys.path.insert(0, r"C:\Users\NITRO\OneDrive - PGX\MultiBet")
+sys.path.insert(0, r"C:\Users\NITRO\OneDrive - PGX\Projetos - Super Nova\MultiBet")
 
 import pandas as pd
 pd.set_option('display.max_columns', None)

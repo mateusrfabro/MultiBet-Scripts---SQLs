@@ -1,0 +1,32 @@
+{
+  "generated_at": "2026-04-20T17:45:52.753404",
+  "total_events": 1,
+  "sample": [
+    {
+      "player": {
+        "player_id": "639277961791998861",
+        "user_ext_id": "30275517",
+        "rating": "A",
+        "pvs": 70.55,
+        "snapshot_date": "2026-04-20",
+        "tag_aplicada": "PCR_RATING_A"
+      },
+      "payload": {
+        "eid": "9caf5404-c888-4852-a913-92a15f054007",
+        "event_date": 1776717952752,
+        "ext_brand_id": "multibet",
+        "user_ext_id": "30275517",
+        "event_type": "update_profile",
+        "payload": {
+          "^core_external_markers": [
+            "PCR_RATING_*"
+          ],
+          "+core_external_markers": [
+            "PCR_RATING_A"
+          ],
+          "skip_cjm": true
+        }
+      }
+    }
+  ]
+}

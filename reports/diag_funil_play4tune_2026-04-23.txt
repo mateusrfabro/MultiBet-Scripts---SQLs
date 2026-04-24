@@ -1,0 +1,497 @@
+# Diagnostico Funil Play4Tune
+# Executado em: 23/04/2026 15:52 BRT
+# Janela: 2026-04-01 -> 2026-04-22 (BRT)
+# Test users excluidos: 75
+
+============================================================================================
+A. INVENTARIO ATUAL - Gateways e Payment Methods
+============================================================================================
+
+[A.1] Colunas da tabela `gateways`:
+  id                             uuid
+  code                           character varying
+  name                           character varying
+  type                           character varying
+  supported_currencies           ARRAY
+  api_host                       character varying
+  credentials                    jsonb
+  active                         boolean
+  created_at                     timestamp without time zone
+  updated_at                     timestamp without time zone
+  image                          character varying
+
+[A.2] Gateways cadastrados:
+  (2 gateway(s) cadastrados)
+    id                  : 019cdd15-5c8c-74d7-b2f0-e4f57051b10a
+    code                : pk
+    name                : PK Gateway
+    type                : BOTH
+    supported_currencies: ['PKR']
+    api_host            : https://mch-api.bctyso.com
+    credentials         : {'mchId': 43, 'payinSecret': '666655f7-f66e-44eb-8062-bae0fde4d17e', 'payoutSecret': '7fe5f42d-c3b3-432a-a1e4-23f2e3fed7cb'}
+    active              : True
+    created_at          : 2026-03-11 13:28:10.637071
+    updated_at          : 2026-03-12 02:31:48.286486
+    image               : None
+    ----------------------------------------
+    id                  : 019db7e8-9732-7048-b1f4-a2080a29914e
+    code                : okexpay
+    name                : OKExPay
+    type                : BOTH
+    supported_currencies: ['PKR']
+    api_host            : https://api.wpay.life
+    credentials         : {'key': 'e7d990bd561cb943f5040a5d4a710330', 'mchId': '5176'}
+    active              : True
+    created_at          : 2026-04-23 01:16:06.839783
+    updated_at          : 2026-04-23 01:20:53.697040
+    image               : None
+    ----------------------------------------
+
+[A.3] Colunas da tabela `payment_methods`:
+  id
+  code
+  name
+  operation_type
+  min_amount
+  max_amount
+  amount_ranges
+  quota
+  suggested_amounts
+  active
+  last_synced_at
+  currency_id
+  gateway_id
+  created_at
+  updated_at
+  gateway_min_amount
+  gateway_max_amount
+  image
+
+[A.4] Payment methods cadastrados:
+    id                  : 019cdfe5-782d-77ae-a585-4a9a036cc970
+    code                : pk_payin_jazzcash
+    name                : Jazzcash
+    operation_type      : PAYIN
+    min_amount          : 100.000000000000000000
+    max_amount          : 50000.000000000000000000
+    amount_ranges       : [{'max': '50000', 'min': '100'}]
+    quota               : []
+    suggested_amounts   : []
+    active              : True
+    last_synced_at      : 2026-04-09 01:51:23.826000
+    currency_id         : 019cdd15-5c7d-74df-a586-bdf7026b5df5
+    gateway_id          : 019cdd15-5c8c-74d7-b2f0-e4f57051b10a
+    created_at          : 2026-03-12 02:34:43.631759
+    updated_at          : 2026-04-09 01:51:23.831210
+    gateway_min_amount  : 100.000000000000000000
+    gateway_max_amount  : 50000
+    image               : None
+    ----------------------------------------
+    id                  : 019cdfe5-783a-776a-a000-20370c434cb5
+    code                : pk_payin_easypaisa
+    name                : Easypaisa
+    operation_type      : PAYIN
+    min_amount          : 200.000000000000000000
+    max_amount          : 50000.000000000000000000
+    amount_ranges       : [{'max': '50000', 'min': '100'}]
+    quota               : []
+    suggested_amounts   : []
+    active              : True
+    last_synced_at      : 2026-04-09 01:51:23.834000
+    currency_id         : 019cdd15-5c7d-74df-a586-bdf7026b5df5
+    gateway_id          : 019cdd15-5c8c-74d7-b2f0-e4f57051b10a
+    created_at          : 2026-03-12 02:34:43.643007
+    updated_at          : 2026-04-16 19:43:37.030568
+    gateway_min_amount  : 100
+    gateway_max_amount  : 50000
+    image               : None
+    ----------------------------------------
+    id                  : 019cdfe5-7841-74e4-a943-2d2e9051c431
+    code                : pk_payout_easypaisa
+    name                : Easypaisa
+    operation_type      : PAYOUT
+    min_amount          : 500.000000000000000000
+    max_amount          : 50000.000000000000000000
+    amount_ranges       : [{'max': '100000', 'min': '100'}]
+    quota               : []
+    suggested_amounts   : []
+    active              : True
+    last_synced_at      : 2026-04-09 01:51:23.847000
+    currency_id         : 019cdd15-5c7d-74df-a586-bdf7026b5df5
+    gateway_id          : 019cdd15-5c8c-74d7-b2f0-e4f57051b10a
+    created_at          : 2026-03-12 02:34:43.650183
+    updated_at          : 2026-04-16 11:42:38.554864
+    gateway_min_amount  : 100.000000000000000000
+    gateway_max_amount  : 100000.000000000000000000
+    image               : None
+    ----------------------------------------
+    id                  : 019cdfe5-7851-72fa-834d-1bdbc26e5b02
+    code                : pk_payout_jazzcash
+    name                : Jazzcash
+    operation_type      : PAYOUT
+    min_amount          : 500.000000000000000000
+    max_amount          : 50000.000000000000000000
+    amount_ranges       : [{'max': '100000', 'min': '100'}]
+    quota               : []
+    suggested_amounts   : []
+    active              : True
+    last_synced_at      : 2026-04-09 01:51:23.841000
+    currency_id         : 019cdd15-5c7d-74df-a586-bdf7026b5df5
+    gateway_id          : 019cdd15-5c8c-74d7-b2f0-e4f57051b10a
+    created_at          : 2026-03-12 02:34:43.666595
+    updated_at          : 2026-04-09 01:51:23.845717
+    gateway_min_amount  : 100.000000000000000000
+    gateway_max_amount  : 100000.000000000000000000
+    image               : None
+    ----------------------------------------
+    id                  : 019db7ed-0cbd-77ca-be10-f14d7d2b287b
+    code                : okexpay_payin_JZ
+    name                : JazzCash (OKExPay)
+    operation_type      : PAYIN
+    min_amount          : 100.000000000000000000
+    max_amount          : 500000.000000000000000000
+    amount_ranges       : [{'max': '500000', 'min': '100'}]
+    quota               : []
+    suggested_amounts   : []
+    active              : True
+    last_synced_at      : 2026-04-23 01:20:59.068000
+    currency_id         : 019cdd15-5c7d-74df-a586-bdf7026b5df5
+    gateway_id          : 019db7e8-9732-7048-b1f4-a2080a29914e
+    created_at          : 2026-04-23 01:20:59.071862
+    updated_at          : 2026-04-23 01:20:59.078042
+    gateway_min_amount  : 100
+    gateway_max_amount  : 500000
+    image               : None
+    ----------------------------------------
+    id                  : 019db7ed-0cc8-738f-90d5-9937df40a231
+    code                : okexpay_payin_EP
+    name                : EasyPaisa (OKExPay)
+    operation_type      : PAYIN
+    min_amount          : 100.000000000000000000
+    max_amount          : 500000.000000000000000000
+    amount_ranges       : [{'max': '500000', 'min': '100'}]
+    quota               : []
+    suggested_amounts   : []
+    active              : True
+    last_synced_at      : 2026-04-23 01:20:59.079000
+    currency_id         : 019cdd15-5c7d-74df-a586-bdf7026b5df5
+    gateway_id          : 019db7e8-9732-7048-b1f4-a2080a29914e
+    created_at          : 2026-04-23 01:20:59.083046
+    updated_at          : 2026-04-23 01:20:59.087681
+    gateway_min_amount  : 100
+    gateway_max_amount  : 500000
+    image               : None
+    ----------------------------------------
+    id                  : 019db7ed-0cd2-7028-9e0a-03e79bc37937
+    code                : okexpay_payout_JZ
+    name                : JazzCash (OKExPay)
+    operation_type      : PAYOUT
+    min_amount          : 100.000000000000000000
+    max_amount          : 500000.000000000000000000
+    amount_ranges       : [{'max': '500000', 'min': '100'}]
+    quota               : []
+    suggested_amounts   : []
+    active              : False
+    last_synced_at      : 2026-04-23 01:20:59.089000
+    currency_id         : 019cdd15-5c7d-74df-a586-bdf7026b5df5
+    gateway_id          : 019db7e8-9732-7048-b1f4-a2080a29914e
+    created_at          : 2026-04-23 01:20:59.092711
+    updated_at          : 2026-04-23 01:22:54.984572
+    gateway_min_amount  : 100
+    gateway_max_amount  : 500000
+    image               : None
+    ----------------------------------------
+    id                  : 019db7ed-0cdb-701d-a79f-b0cf4cf56cee
+    code                : okexpay_payout_EP
+    name                : EasyPaisa (OKExPay)
+    operation_type      : PAYOUT
+    min_amount          : 100.000000000000000000
+    max_amount          : 500000.000000000000000000
+    amount_ranges       : [{'max': '500000', 'min': '100'}]
+    quota               : []
+    suggested_amounts   : []
+    active              : False
+    last_synced_at      : 2026-04-23 01:20:59.098000
+    currency_id         : 019cdd15-5c7d-74df-a586-bdf7026b5df5
+    gateway_id          : 019db7e8-9732-7048-b1f4-a2080a29914e
+    created_at          : 2026-04-23 01:20:59.101906
+    updated_at          : 2026-04-23 01:23:01.035794
+    gateway_min_amount  : 100
+    gateway_max_amount  : 500000
+    image               : None
+    ----------------------------------------
+    id                  : 019db7ed-0ce5-764e-9bb7-392f8fa4fc76
+    code                : okexpay_payout_BANK
+    name                : Bank Transfer (IBFT) (OKExPay)
+    operation_type      : PAYOUT
+    min_amount          : 1000.000000000000000000
+    max_amount          : 2000000.000000000000000000
+    amount_ranges       : [{'max': '2000000', 'min': '1000'}]
+    quota               : []
+    suggested_amounts   : []
+    active              : False
+    last_synced_at      : 2026-04-23 01:20:59.108000
+    currency_id         : 019cdd15-5c7d-74df-a586-bdf7026b5df5
+    gateway_id          : 019db7e8-9732-7048-b1f4-a2080a29914e
+    created_at          : 2026-04-23 01:20:59.112215
+    updated_at          : 2026-04-23 01:21:22.386151
+    gateway_min_amount  : 1000
+    gateway_max_amount  : 2000000
+    image               : None
+    ----------------------------------------
+
+[A.5] Primeira transacao por payment_method (desde quando opera):
+  payment_method                 primeira_tx            ultima_tx                qtd_tx
+  Jazzcash                       2026-03-25 17:20       2026-04-23 17:06           1133
+  Easypaisa                      2026-03-25 17:33       2026-04-23 18:37           1193
+  Easypaisa                      -                      -                             1
+  Jazzcash                       -                      -                             1
+  JazzCash (OKExPay)             -                      -                             1
+  Bank Transfer (IBFT) (OKExPay) -                      -                             1
+  JazzCash (OKExPay)             -                      -                             1
+  EasyPaisa (OKExPay)            -                      -                             1
+  EasyPaisa (OKExPay)            -                      -                             1
+
+============================================================================================
+B. FUNIL DIARIO 01/04 -> 22/04 (BRT)
+============================================================================================
+
+dia            cad  tent  aprv  fail  pend expir  canc  aprv%  ftd   cv%      val_pkr
+2026-04-01      83    32    12     0     0    20     0   37.5    7   8.4        7,900
+2026-04-02      44    24    11     0     0    13     0   45.8    8  18.2        5,660
+2026-04-03      81    32    10     0     0    22     0   31.3    6   7.4        6,300
+2026-04-04      70    19     8     0     0    11     0   42.1    6   8.6        2,000
+2026-04-05      59    30    17     0     0    13     0   56.7   14  23.7       12,900
+2026-04-06     112    98    18    58     0    22     0   18.4   15  13.4       15,100
+2026-04-07     189    82    49     0     0    33     0   59.8   42  22.2       46,600
+2026-04-08     163   126    33    41     0    52     0   26.2   25  15.3       28,200
+2026-04-09     152    54    23     0     0    31     0   42.6   17  11.2       14,930
+2026-04-10     101    55    21     0     0    34     0   38.2    9   8.9       17,100
+2026-04-11      39    32    12     1     0    19     0   37.5    9  23.1        5,800
+2026-04-12     100    63    31     0     0    32     0   49.2   27  27.0       12,971
+2026-04-13     112    72    30     0     0    42     0   41.7   23  20.5       14,400
+2026-04-14     150   107    29    10     0    68     0   27.1   22  14.7       16,600
+2026-04-15     214   121    39    17     0    65     0   32.2   26  12.1       18,862
+2026-04-16     176   129    51     0     0    78     0   39.5   34  19.3       27,600
+2026-04-17     188   185    68     0     0   117     0   36.8   42  22.3       41,800
+2026-04-18     103   137    72     0     0    65     0   52.6   49  47.6       38,413
+2026-04-19     111   117    37    27     0    53     0   31.6   26  23.4       14,500
+2026-04-20     103    70    31     0     0    39     0   44.3   18  17.5       25,300
+2026-04-21      36    56    31     0     0    25     0   55.4   17  47.2       24,100
+2026-04-22       7    36    15     0    11    10     0   41.7    3  42.9        5,900
+
+  -> CSV: C:\Users\NITRO\OneDrive - PGX\Projetos - Super Nova\MultiBet\reports\diag_funil_play4tune_funil_diario.csv
+
+============================================================================================
+C. APROVACAO POR PAYMENT_METHOD x DIA (01/04 -> 22/04, BRT)
+============================================================================================
+
+dia          pm                            tent  aprv  fail  pend  expi  aprov%
+2026-04-01   Easypaisa                       16     9     0     0     7    56.3
+2026-04-01   Jazzcash                        16     3     0     0    13    18.8
+2026-04-02   Easypaisa                       14     7     0     0     7    50.0
+2026-04-02   Jazzcash                        10     4     0     0     6    40.0
+2026-04-03   Easypaisa                       16     4     0     0    12    25.0
+2026-04-03   Jazzcash                        16     6     0     0    10    37.5
+2026-04-04   Easypaisa                       10     5     0     0     5    50.0
+2026-04-04   Jazzcash                         9     3     0     0     6    33.3
+2026-04-05   Easypaisa                       16     9     0     0     7    56.3
+2026-04-05   Jazzcash                        14     8     0     0     6    57.1
+2026-04-06   Easypaisa                       36    10    11     0    15    27.8
+2026-04-06   Jazzcash                        62     8    47     0     7    12.9
+2026-04-07   Easypaisa                       45    25     0     0    20    55.6
+2026-04-07   Jazzcash                        37    24     0     0    13    64.9
+2026-04-08   Easypaisa                       77    20    38     0    19    26.0
+2026-04-08   Jazzcash                        46    13     0     0    33    28.3
+2026-04-08   (sem pm)                         3     0     3     0     0       —
+2026-04-09   Easypaisa                       24    12     0     0    12    50.0
+2026-04-09   Jazzcash                        30    11     0     0    19    36.7
+2026-04-10   Easypaisa                       32    10     0     0    22    31.3
+2026-04-10   Jazzcash                        23    11     0     0    12    47.8
+2026-04-11   Easypaisa                       18    10     1     0     7    55.6
+2026-04-11   Jazzcash                        14     2     0     0    12    14.3
+2026-04-12   Easypaisa                       29    15     0     0    14    51.7
+2026-04-12   Jazzcash                        34    16     0     0    18    47.1
+2026-04-13   Easypaisa                       43    21     0     0    22    48.8
+2026-04-13   Jazzcash                        29     9     0     0    20    31.0
+2026-04-14   Easypaisa                       54    11     4     0    39    20.4
+2026-04-14   Jazzcash                        53    18     6     0    29    34.0
+2026-04-15   Easypaisa                       45    13    16     0    16    28.9
+2026-04-15   Jazzcash                        76    26     1     0    49    34.2
+2026-04-16   Easypaisa                       20     6     0     0    14    30.0
+2026-04-16   Jazzcash                       109    45     0     0    64    41.3
+2026-04-17   Easypaisa                      113    36     0     0    77    31.9
+2026-04-17   Jazzcash                        72    32     0     0    40    44.4
+2026-04-18   Easypaisa                       73    32     0     0    41    43.8
+2026-04-18   Jazzcash                        64    40     0     0    24    62.5
+2026-04-19   Easypaisa                       78    16    27     0    35    20.5
+2026-04-19   Jazzcash                        39    21     0     0    18    53.8
+2026-04-20   Easypaisa                       52    21     0     0    31    40.4
+2026-04-20   Jazzcash                        18    10     0     0     8    55.6
+2026-04-21   Easypaisa                       29    16     0     0    13    55.2
+2026-04-21   Jazzcash                        27    15     0     0    12    55.6
+2026-04-22   Easypaisa                       23     8     0     8     7    34.8
+2026-04-22   Jazzcash                        13     7     0     3     3    53.8
+
+  -> CSV: C:\Users\NITRO\OneDrive - PGX\Projetos - Super Nova\MultiBet\reports\diag_funil_play4tune_gateway_aprovacao.csv
+
+[C.2] Resumo aprovacao por PM na janela inteira:
+  payment_method                 tent   aprv   fail  aprov% primeira               ultima                
+  Easypaisa                       863    316     97    36.6 2026-04-01 03:33       2026-04-23 00:22      
+  Jazzcash                        811    332     54    40.9 2026-04-01 03:57       2026-04-23 00:50      
+  (sem pm)                          3      0      3       — 2026-04-09 01:08       2026-04-09 01:08      
+
+============================================================================================
+D. TOP MOTIVOS DE FALHA NA JANELA (rejection_reason / error_reason / failure_source)
+============================================================================================
+
+  failure_source       rejection_reason                    error_reason                           qtd
+  GATEWAY              (null)                              Request failed with status code 400    118
+  GATEWAY              (null)                              Gateway circuit breaker is open         35
+  GATEWAY              (null)                              timeout of 5000ms exceeded               1
+
+============================================================================================
+E. CANAL DE AQUISICAO - UTM source dos cadastros por dia
+============================================================================================
+
+dia          utm_source                 cadastros
+2026-04-01   fb                                49
+2026-04-01   ig                                19
+2026-04-01   (null)                            15
+2026-04-02   fb                                23
+2026-04-02   (null)                            16
+2026-04-02   ig                                 5
+2026-04-03   fb                                53
+2026-04-03   ig                                17
+2026-04-03   (null)                            11
+2026-04-04   fb                                52
+2026-04-04   ig                                14
+2026-04-04   (null)                             4
+2026-04-05   fb                                47
+2026-04-05   ig                                11
+2026-04-05   (null)                             1
+2026-04-06   fb                                80
+2026-04-06   ig                                20
+2026-04-06   (null)                            10
+2026-04-06   an                                 2
+2026-04-07   fb                               145
+2026-04-07   ig                                35
+2026-04-07   (null)                             8
+2026-04-07   an                                 1
+2026-04-08   fb                               124
+2026-04-08   ig                                22
+2026-04-08   (null)                            16
+2026-04-08   an                                 1
+2026-04-09   fb                               104
+2026-04-09   ig                                24
+2026-04-09   (null)                            24
+2026-04-10   fb                                56
+2026-04-10   (null)                            24
+2026-04-10   ig                                21
+2026-04-11   fb                                18
+2026-04-11   ig                                12
+2026-04-11   (null)                             9
+2026-04-12   fb                                50
+2026-04-12   ig                                36
+2026-04-12   (null)                            13
+2026-04-12   an                                 1
+2026-04-13   fb                                65
+2026-04-13   ig                                31
+2026-04-13   (null)                            14
+2026-04-13   an                                 1
+2026-04-13   th                                 1
+2026-04-14   fb                               107
+2026-04-14   ig                                24
+2026-04-14   (null)                            19
+2026-04-15   fb                               136
+2026-04-15   ig                                58
+2026-04-15   (null)                            20
+2026-04-16   fb                                98
+2026-04-16   ig                                47
+2026-04-16   (null)                            29
+2026-04-16   th                                 2
+2026-04-17   fb                               117
+2026-04-17   ig                                45
+2026-04-17   (null)                            20
+2026-04-17   th                                 6
+2026-04-18   fb                                43
+2026-04-18   ig                                31
+2026-04-18   (null)                            29
+2026-04-19   fb                                66
+2026-04-19   ig                                24
+2026-04-19   (null)                            18
+2026-04-19   th                                 3
+2026-04-20   fb                                79
+2026-04-20   ig                                17
+2026-04-20   (null)                             6
+2026-04-20   th                                 1
+2026-04-21   fb                                15
+2026-04-21   (null)                            12
+2026-04-21   ig                                 9
+2026-04-22   (null)                             6
+2026-04-22   ig                                 1
+
+[E.2] Total por utm_source na janela:
+  utm_source                 cadastros      %
+  fb                              1527   63.8
+  ig                               523   21.9
+  (null)                           324   13.5
+  th                                13    0.5
+  an                                 6    0.3
+
+[E.3] Tracking Meta (para todos os cadastros na janela):
+  total cadastros   : 2393
+  com fbclid        : 2117 (88.5% do total)
+  utm=facebook/meta : 0
+
+============================================================================================
+F. 07/04/2026 DEEP DIVE - O que foi diferente?
+============================================================================================
+
+[F.1] 07/04 - tentativas por payment_method:
+  payment_method                tent  aprv  fail  aprov%    valor_pkr
+  Easypaisa                       45    25     0    55.6       33,100
+  Jazzcash                        37    24     0    64.9       13,500
+
+[F.2] 07/04 - origem dos cadastros:
+  utm_source             utm_campaign                         cadastros
+  (null)                 (null)                                     189
+
+[F.3] Media diaria na janela (excluindo 07/04):
+  tent_media=76.0 | aprv_media=28.5 | fail_media=7.3 | aprov%_media=39.4
+
+============================================================================================
+G. SPLIT HORARIO (PKT) - aprovacao por hora na janela
+============================================================================================
+
+ h_PKT   tent   aprv  aprov%
+     0     70     36    51.4  ##############
+     1     87     21    24.1  #################
+     2     75     33    44.0  ###############
+     3     48     15    31.3  #########
+     4     43     13    30.2  ########
+     5     40     15    37.5  ########
+     6     21      7    33.3  ####
+     7     41     19    46.3  ########
+     8     49     25    51.0  #########
+     9     50     24    48.0  ##########
+    10     55     23    41.8  ###########
+    11     99     37    37.4  ###################
+    12     81     32    39.5  ################
+    13     72     36    50.0  ##############
+    14     86     39    45.3  #################
+    15    102     36    35.3  ####################
+    16     71     30    42.3  ##############
+    17     59     20    33.9  ###########
+    18     72     22    30.6  ##############
+    19     61     28    45.9  ############
+    20     62     36    58.1  ############
+    21     73     32    43.8  ##############
+    22    120     29    24.2  ########################
+    23    140     40    28.6  ############################
+
+
+OK. Arquivos:
+  TXT: C:\Users\NITRO\OneDrive - PGX\Projetos - Super Nova\MultiBet\reports\diag_funil_play4tune_2026-04-23.txt
+  CSV funil:    C:\Users\NITRO\OneDrive - PGX\Projetos - Super Nova\MultiBet\reports\diag_funil_play4tune_funil_diario.csv
+  CSV gateway:  C:\Users\NITRO\OneDrive - PGX\Projetos - Super Nova\MultiBet\reports\diag_funil_play4tune_gateway_aprovacao.csv
