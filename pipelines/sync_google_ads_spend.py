@@ -2,22 +2,26 @@
 Pipeline: sync_google_ads_spend (Google Ads API -> Super Nova DB)
 ================================================================
 Puxa spend diario por campanha da Google Ads API e persiste no
-Super Nova DB em multibet.fact_google_ads_spend.
+Super Nova DB em multibet.fact_ad_spend (tabela MULTI-CANAL).
 
-Colunas de destino:
+Tabela de destino: multibet.fact_ad_spend
     - dt (DATE): dia do gasto
-    - campaign_id (VARCHAR): ID da campanha no Google Ads
+    - ad_source (VARCHAR): fonte do anuncio (google_ads, meta, tiktok, kwai)
+    - campaign_id (VARCHAR): ID da campanha
     - campaign_name (VARCHAR): nome da campanha
-    - channel_type (VARCHAR): tipo de canal (SEARCH, DISPLAY, etc.)
+    - channel_type (VARCHAR): tipo de canal (SEARCH, DISPLAY, PMAX, etc.)
     - cost_brl (NUMERIC): valor gasto em BRL
     - impressions (INTEGER)
     - clicks (INTEGER)
     - conversions (NUMERIC)
     - affiliate_id (VARCHAR): mapeado via dim_campaign_affiliate
-    - source (VARCHAR): ex: 'google_ads'
     - refreshed_at (TIMESTAMPTZ)
 
-Estrategia: DELETE periodo + INSERT (incremental por faixa de datas)
+Views criadas:
+    - multibet.vw_ad_spend_daily: agregado dia + fonte + affiliate (com CPC e CTR)
+    - multibet.vw_ad_spend_by_source: resumo geral por fonte (com CPA medio)
+
+Estrategia: DELETE periodo+fonte + INSERT (incremental, idempotente)
 
 Execucao:
     python pipelines/sync_google_ads_spend.py                # ultimos 7 dias
@@ -26,6 +30,10 @@ Execucao:
 
 Agendamento sugerido: rodar diariamente apos meia-noite (BRT) com --days 3
 para garantir que D-1 esteja completo e cobrir reprocessamentos do Google.
+
+Extensao multi-canal: para Meta/TikTok/Kwai, criar pipelines separados
+(sync_meta_spend.py, etc.) que inserem na mesma fact_ad_spend com
+ad_source diferente. As views consolidam automaticamente.
 """
 
 import sys
@@ -54,84 +62,131 @@ log = logging.getLogger(__name__)
 # ---------------------------------------------------------------------------
 DDL_SCHEMA = "CREATE SCHEMA IF NOT EXISTS multibet;"
 
+# ---------------------------------------------------------------------------
+# Tabela MULTI-CANAL: fact_ad_spend
+# Preparada para Google Ads, Meta, TikTok, Kwai e futuras fontes.
+# A coluna `ad_source` diferencia cada plataforma.
+# ---------------------------------------------------------------------------
 DDL_TABLE = """
-CREATE TABLE IF NOT EXISTS multibet.fact_google_ads_spend (
+CREATE TABLE IF NOT EXISTS multibet.fact_ad_spend (
     dt                  DATE NOT NULL,
-    campaign_id         VARCHAR(50) NOT NULL,
+    ad_source           VARCHAR(50) NOT NULL,      -- google_ads, meta, tiktok, kwai, etc.
+    campaign_id         VARCHAR(100) NOT NULL,
     campaign_name       VARCHAR(500),
-    channel_type        VARCHAR(50),
+    channel_type        VARCHAR(50),               -- SEARCH, DISPLAY, PERFORMANCE_MAX, etc.
     cost_brl            NUMERIC(18,2) DEFAULT 0,
     impressions         INTEGER DEFAULT 0,
     clicks              INTEGER DEFAULT 0,
     conversions         NUMERIC(18,2) DEFAULT 0,
+    page_views          BIGINT DEFAULT 0,          -- Meta: landing_page_view; Google: 0 (nativo nao expoe)
+    reach               BIGINT DEFAULT 0,          -- Meta: reach unico; Google: 0
     affiliate_id        VARCHAR(50),
-    source              VARCHAR(50) DEFAULT 'google_ads',
     refreshed_at        TIMESTAMPTZ DEFAULT NOW(),
-    PRIMARY KEY (dt, campaign_id)
+    PRIMARY KEY (dt, ad_source, campaign_id)
 );
 """
 
 DDL_INDEX_DT = """
-CREATE INDEX IF NOT EXISTS idx_gads_spend_dt
-ON multibet.fact_google_ads_spend (dt);
+CREATE INDEX IF NOT EXISTS idx_ad_spend_dt
+ON multibet.fact_ad_spend (dt);
+"""
+
+DDL_INDEX_SOURCE = """
+CREATE INDEX IF NOT EXISTS idx_ad_spend_source
+ON multibet.fact_ad_spend (ad_source);
 """
 
 DDL_INDEX_AFF = """
-CREATE INDEX IF NOT EXISTS idx_gads_spend_affiliate
-ON multibet.fact_google_ads_spend (affiliate_id);
+CREATE INDEX IF NOT EXISTS idx_ad_spend_affiliate
+ON multibet.fact_ad_spend (affiliate_id);
 """
 
-# Tabela de mapeamento campanha -> affiliate_id (manual, configuravel)
+# Mapeamento campanha -> affiliate_id (multi-canal)
 DDL_MAPPING = """
 CREATE TABLE IF NOT EXISTS multibet.dim_campaign_affiliate (
-    campaign_id         VARCHAR(50) PRIMARY KEY,
+    ad_source           VARCHAR(50) NOT NULL,      -- google_ads, meta, tiktok, kwai
+    campaign_id         VARCHAR(100) NOT NULL,
     campaign_name       VARCHAR(500),
     affiliate_id        VARCHAR(50),
     notes               VARCHAR(500),
-    updated_at          TIMESTAMPTZ DEFAULT NOW()
+    updated_at          TIMESTAMPTZ DEFAULT NOW(),
+    PRIMARY KEY (ad_source, campaign_id)
 );
 """
 
-# View agregada por dia + affiliate (para o dashboard consumir)
-DDL_VIEW = """
-CREATE OR REPLACE VIEW multibet.vw_google_ads_spend_daily AS
+# View agregada por dia + fonte + affiliate (multi-canal)
+DDL_VIEW_DAILY = """
+CREATE OR REPLACE VIEW multibet.vw_ad_spend_daily AS
 SELECT
     g.dt,
+    g.ad_source,
     COALESCE(g.affiliate_id, 'nao_mapeado') AS affiliate_id,
-    g.source,
     SUM(g.cost_brl) AS cost_brl,
     SUM(g.impressions) AS impressions,
     SUM(g.clicks) AS clicks,
     SUM(g.conversions) AS conversions,
-    COUNT(DISTINCT g.campaign_id) AS campaigns
-FROM multibet.fact_google_ads_spend g
-GROUP BY g.dt, COALESCE(g.affiliate_id, 'nao_mapeado'), g.source
-ORDER BY g.dt DESC, g.affiliate_id;
+    COUNT(DISTINCT g.campaign_id) AS campaigns,
+    CASE WHEN SUM(g.clicks) > 0
+         THEN ROUND(SUM(g.cost_brl) / SUM(g.clicks), 2)
+         ELSE 0 END AS cpc,
+    CASE WHEN SUM(g.impressions) > 0
+         THEN ROUND(100.0 * SUM(g.clicks) / SUM(g.impressions), 2)
+         ELSE 0 END AS ctr_pct
+FROM multibet.fact_ad_spend g
+GROUP BY g.dt, g.ad_source, COALESCE(g.affiliate_id, 'nao_mapeado')
+ORDER BY g.dt DESC, g.ad_source;
+"""
+
+# View consolidada por fonte (resumo geral multi-canal)
+DDL_VIEW_SOURCE = """
+CREATE OR REPLACE VIEW multibet.vw_ad_spend_by_source AS
+SELECT
+    g.ad_source,
+    MIN(g.dt) AS dt_min,
+    MAX(g.dt) AS dt_max,
+    COUNT(DISTINCT g.dt) AS dias,
+    SUM(g.cost_brl) AS cost_brl_total,
+    SUM(g.impressions) AS impressions_total,
+    SUM(g.clicks) AS clicks_total,
+    SUM(g.conversions) AS conversions_total,
+    COUNT(DISTINCT g.campaign_id) AS campaigns,
+    CASE WHEN SUM(g.clicks) > 0
+         THEN ROUND(SUM(g.cost_brl) / SUM(g.clicks), 2)
+         ELSE 0 END AS cpc_medio,
+    CASE WHEN SUM(g.conversions) > 0
+         THEN ROUND(SUM(g.cost_brl) / SUM(g.conversions), 2)
+         ELSE 0 END AS cpa_medio
+FROM multibet.fact_ad_spend g
+GROUP BY g.ad_source
+ORDER BY cost_brl_total DESC;
 """
 
 
 def setup_tables():
-    """Cria schema, tabelas e indices se nao existirem."""
-    log.info("Verificando/criando tabelas...")
+    """Cria schema, tabelas, indices e views se nao existirem."""
+    log.info("Verificando/criando tabelas multi-canal...")
     execute_supernova(DDL_SCHEMA)
     execute_supernova(DDL_TABLE)
     execute_supernova(DDL_INDEX_DT)
+    execute_supernova(DDL_INDEX_SOURCE)
     execute_supernova(DDL_INDEX_AFF)
     execute_supernova(DDL_MAPPING)
-    execute_supernova(DDL_VIEW)
-    log.info("Tabelas e view prontas.")
+    execute_supernova(DDL_VIEW_DAILY)
+    execute_supernova(DDL_VIEW_SOURCE)
+    log.info("Tabelas e views multi-canal prontas.")
 
 
-def load_campaign_mapping() -> dict:
-    """Carrega mapeamento campaign_id -> affiliate_id."""
+def load_campaign_mapping(ad_source: str = "google_ads") -> dict:
+    """Carrega mapeamento campaign_id -> affiliate_id para uma fonte."""
     rows = execute_supernova(
-        "SELECT campaign_id, affiliate_id FROM multibet.dim_campaign_affiliate",
+        "SELECT campaign_id, affiliate_id FROM multibet.dim_campaign_affiliate WHERE ad_source = %s",
+        params=(ad_source,),
         fetch=True,
     )
     if not rows:
         return {}
     mapping = {r[0]: r[1] for r in rows}
-    log.info(f"  Mapeamento campanha->affiliate: {len(mapping)} campanhas mapeadas")
+    log.info(f"  Mapeamento {ad_source} campanha->affiliate: {len(mapping)} campanhas mapeadas")
     return mapping
 
 
@@ -156,10 +211,12 @@ def sync(days: int = 7):
     # 2. Carregar mapeamento campanha -> affiliate
     mapping = load_campaign_mapping()
 
+    AD_SOURCE = "google_ads"
+
     # 3. Enriquecer com affiliate_id
     for row in rows:
         row["affiliate_id"] = mapping.get(row["campaign_id"])
-        row["source"] = "google_ads"
+        row["ad_source"] = AD_SOURCE
 
     # 4. Descobrir campanhas novas (sem mapeamento)
     unmapped = set()
@@ -179,16 +236,18 @@ def sync(days: int = 7):
     now_utc = datetime.now(timezone.utc)
 
     insert_sql = """
-        INSERT INTO multibet.fact_google_ads_spend
-            (dt, campaign_id, campaign_name, channel_type,
+        INSERT INTO multibet.fact_ad_spend
+            (dt, ad_source, campaign_id, campaign_name, channel_type,
              cost_brl, impressions, clicks, conversions,
-             affiliate_id, source, refreshed_at)
-        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+             page_views, reach,
+             affiliate_id, refreshed_at)
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
     """
 
     records = [
         (
             row["date"],
+            row["ad_source"],
             row["campaign_id"],
             row["campaign_name"][:500],
             row.get("channel_type", ""),
@@ -196,8 +255,9 @@ def sync(days: int = 7):
             row["impressions"],
             row["clicks"],
             row["conversions"],
+            row.get("page_views", 0),
+            row.get("reach", 0),
             row["affiliate_id"],
-            row["source"],
             now_utc,
         )
         for row in rows
@@ -206,10 +266,10 @@ def sync(days: int = 7):
     tunnel, conn = get_supernova_connection()
     try:
         with conn.cursor() as cur:
-            # Deletar periodo (idempotente — re-rodar nao duplica)
+            # Deletar periodo + fonte (idempotente — re-rodar nao duplica)
             cur.execute(
-                "DELETE FROM multibet.fact_google_ads_spend WHERE dt BETWEEN %s AND %s",
-                (start_date, end_date),
+                "DELETE FROM multibet.fact_ad_spend WHERE dt BETWEEN %s AND %s AND ad_source = %s",
+                (start_date, end_date, AD_SOURCE),
             )
             deleted = cur.rowcount
             log.info(f"  Deletados {deleted} registros antigos do periodo")
@@ -243,8 +303,8 @@ def sync(days: int = 7):
             f"  - {len(unmapped)} campanhas sem affiliate_id\n"
             f"  - Popule multibet.dim_campaign_affiliate com:\n"
             f"    INSERT INTO multibet.dim_campaign_affiliate "
-            f"(campaign_id, campaign_name, affiliate_id, notes)\n"
-            f"    VALUES ('<campaign_id>', '<nome>', '<affiliate_id>', 'mapeamento manual');"
+            f"(ad_source, campaign_id, campaign_name, affiliate_id, notes)\n"
+            f"    VALUES ('google_ads', '<campaign_id>', '<nome>', '<affiliate_id>', 'mapeamento manual');"
         )
 
 

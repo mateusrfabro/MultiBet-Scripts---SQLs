@@ -140,6 +140,11 @@ def get_campaign_spend(
                     "impressions": row.metrics.impressions,
                     "clicks": row.metrics.clicks,
                     "conversions": round(row.metrics.conversions, 2),
+                    # Google Ads API nao expoe landing_page_view nem reach unico nativamente
+                    # em GAQL level=campaign. Para page_views, precisaria conversao custom
+                    # importada do GA4. Mantemos 0 aqui; view consolidada usa somente Meta.
+                    "page_views": 0,
+                    "reach": 0,
                 })
 
     except Exception as e:
