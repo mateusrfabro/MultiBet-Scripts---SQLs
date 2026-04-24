@@ -281,6 +281,84 @@ class SmarticoClient:
             ext_brand_id=self.brand,
         )
 
+    def build_custom_property_event(
+        self,
+        user_ext_id: str,
+        prop_name: str,
+        value: Optional[str],
+        skip_cjm: bool = False,
+        remove_from_markers: Optional[List[str]] = None,
+        remove_from_segment: Optional[List[str]] = None,
+    ) -> SmarticoEvent:
+        """
+        Constroi um evento update_profile para uma Custom Property Smartico
+        (core_custom_prop1 ate core_custom_prop20).
+
+        Custom Properties sao campos string livres (1 valor por prop), ideais
+        para representar um unico valor categorico por jogador (ex: 1 rating
+        PCR por jogador). Diferente de markers/segment (arrays), aqui o push
+        simplesmente substitui o valor anterior (REPLACE).
+
+        Parametros:
+            prop_name: nome da property (ex: 'core_custom_prop1')
+                       validado contra o range prop1..prop20.
+            value:     novo valor (string) ou None pra limpar o campo.
+            skip_cjm:  True = nao dispara automations/jornadas.
+            remove_from_markers: tags a remover de core_external_markers
+                                 no mesmo payload (util pra migracao).
+            remove_from_segment: tags a remover de core_external_segment
+                                 no mesmo payload (util pra migracao).
+
+        Uso tipico (PCR v1.5 — push para core_custom_prop1):
+            client.build_custom_property_event(
+                user_ext_id="12345",
+                prop_name="core_custom_prop1",
+                value="PCR_RATING_A",
+                skip_cjm=True,
+            )
+
+        Uso em migracao (limpa buckets antigos + seta custom prop):
+            client.build_custom_property_event(
+                user_ext_id="12345",
+                prop_name="core_custom_prop1",
+                value="PCR_RATING_A",
+                remove_from_markers=["PCR_RATING_S","PCR_RATING_A",...],
+                remove_from_segment=["PCR_RATING_S","PCR_RATING_A",...],
+                skip_cjm=True,
+            )
+        """
+        # Validacao defensiva do nome da prop
+        valid_props = {f"core_custom_prop{i}" for i in range(1, 21)}
+        if prop_name not in valid_props:
+            raise ValueError(
+                f"prop_name invalido: {prop_name!r}. "
+                f"Deve ser core_custom_prop1 ... core_custom_prop20."
+            )
+
+        payload: Dict[str, Any] = {}
+
+        # Set / clear do custom prop
+        if value is None:
+            payload[f"!{prop_name}"] = None  # clear
+        else:
+            payload[prop_name] = str(value)  # replace
+
+        # Operacoes auxiliares de migracao (remove dos buckets antigos)
+        if remove_from_markers:
+            payload["-core_external_markers"] = list(remove_from_markers)
+        if remove_from_segment:
+            payload["-core_external_segment"] = list(remove_from_segment)
+
+        if skip_cjm:
+            payload["skip_cjm"] = True
+
+        return SmarticoEvent(
+            user_ext_id=user_ext_id,
+            event_type="update_profile",
+            payload=payload,
+            ext_brand_id=self.brand,
+        )
+
     # -------------------------------------------------------------------
     # Envio
     # -------------------------------------------------------------------
