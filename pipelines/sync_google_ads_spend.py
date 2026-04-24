@@ -196,10 +196,12 @@ def sync(days: int = 7):
 
     Estrategia: DELETE + INSERT para o periodo (idempotente).
     """
-    end_date = date.today() - timedelta(days=1)  # D-1
+    # Janela inclui D-0 por padrao (Google ajusta retroativamente ate ~72h).
+    # Uso intraday: cron 5x/dia com --days 2 = D-1 + D-0, DELETE+INSERT idempotente.
+    end_date = date.today()
     start_date = end_date - timedelta(days=days - 1)
 
-    log.info(f"Periodo: {start_date} a {end_date} ({days} dias)")
+    log.info(f"Periodo: {start_date} a {end_date} ({days} dias, inclui D-0 intraday)")
 
     # 1. Buscar dados da API
     rows = get_campaign_spend(start_date=start_date, end_date=end_date)

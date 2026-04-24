@@ -88,7 +88,9 @@ def get_campaign_spend(
             - conversions: float
     """
     if end_date is None:
-        end_date = date.today() - timedelta(days=1)  # D-1 (dia fechado)
+        # D-0 (hoje) por padrao — Google ajusta invalid clicks retroativamente
+        # ate ~72h, mas o ggr/spend intraday ja eh util pra dashboard fresh.
+        end_date = date.today()
     if start_date is None:
         start_date = end_date - timedelta(days=89)  # ultimos 90 dias
 
