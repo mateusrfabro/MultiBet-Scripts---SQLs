@@ -131,6 +131,9 @@ OFFICIAL_IDS = [
 
     ("464673", "464673", "meta_ads", "[TIN] Meta White",
      "ID oficial Pragmatic: Meta Ads — Reactivation/Slots (TIN Meta White). Confirmado forense: URLs com fbclid="),
+
+    ("477668", "477668", "tiktok_ads", "TikTok Ads",
+     "ID confirmado pelo gestor de trafego: TikTok Ads. Affiliate 477668 = campanhas TikTok. Adicionado 15/04/2026."),
 ]
 
 
@@ -255,7 +258,7 @@ SELECT
 
 FROM reg r
 LEFT JOIN url_signals s ON r.affiliate_id = s.affiliate_id
-WHERE r.affiliate_id NOT IN ('0', '468114', '297657', '445431', '464673')
+WHERE r.affiliate_id NOT IN ('0', '468114', '297657', '445431', '464673', '477668')
 ORDER BY r.qty_players DESC
 LIMIT 50
 """
@@ -448,7 +451,8 @@ def recriar_views():
                  ELSE NULL END AS roi_d30_pct,
             CASE WHEN SUM(c.ggr_d30) > 0
                  THEN ROUND(s.monthly_spend / SUM(c.ggr_d30)::numeric, 2)
-                 ELSE NULL END AS payback_ratio
+                 ELSE NULL END AS payback_ratio,
+            MAX(c.refreshed_at) AS refreshed_at
         FROM multibet.agg_cohort_acquisition c
         LEFT JOIN (
             SELECT

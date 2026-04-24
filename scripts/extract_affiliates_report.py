@@ -1,56 +1,63 @@
 """
 Extrator de Report Diario — Affiliates Google Ads e Meta.
+100% Athena — cross-validation entre camadas raw/bronze (_ec2) e BI (bireports/ps_bi).
 
-Detecta automaticamente se a data e intraday (dia corrente) ou D-1 (dia fechado)
-e alterna fontes de dados para garantir precisao:
-  - Intraday: BigQuery (real-time) para REG, FTD, FTD Deposit, Dep Amount
-  - D-1:      Athena (bireports/ps_bi) para tudo (carga completa)
-  - GGR/NGR/Saques: sempre Athena (sem fonte BQ real-time)
+Modo automatico:
+  - D-1 (dia fechado): bireports/ps_bi como fonte primaria, _ec2 como cross-validation
+  - Intraday (dia corrente): ecr_ec2/cashier_ec2 como primario (mais atualizados),
+    bireports como CV (pode ter delay ETL)
 
 Uso:
-    python scripts/extract_affiliates_report.py              # usa data padrao (hoje)
-    python scripts/extract_affiliates_report.py 2026-03-31   # data especifica
+    python scripts/extract_affiliates_report.py              # default D-1 (ontem BRT)
+    python scripts/extract_affiliates_report.py 2026-04-06   # data especifica
 """
 import sys
 sys.path.insert(0, r"c:\Users\NITRO\OneDrive - PGX\MultiBet")
 
 from db.athena import query_athena
-from db.bigquery import query_bigquery
-from datetime import date, datetime
+from datetime import datetime, timedelta
 import traceback
 import pytz
 
 # =====================================================================
 # CONFIGURACAO
 # =====================================================================
-DATA = sys.argv[1] if len(sys.argv) > 1 else str(date.today())
-
-# Detectar modo: intraday (hoje) ou dia fechado (D-1 ou anterior)
 BRT = pytz.timezone("America/Sao_Paulo")
 HOJE_BRT = datetime.now(BRT).strftime("%Y-%m-%d")
+
+# Default: D-1 (ontem BRT) — dados fechados sao mais confiaveis
+if len(sys.argv) > 1:
+    DATA = sys.argv[1]
+else:
+    ontem = datetime.now(BRT) - timedelta(days=1)
+    DATA = ontem.strftime("%Y-%m-%d")
+
 INTRADAY = (DATA == HOJE_BRT)
 
 CANAIS = {
     "google": {
         "label": "Google Ads",
         "affiliates": "('297657', '445431', '468114')",
-        "affiliates_bq": "(297657, 445431, 468114)",
         "ids_display": "297657, 445431, 468114",
     },
     "meta": {
         "label": "Meta Ads",
-        "affiliates": "('532570', '532571', '464673')",
-        "affiliates_bq": "(532570, 532571, 464673)",
-        "ids_display": "532570, 532571, 464673",
+        "affiliates": "('464673', '532090', '532571', '532570')",
+        "ids_display": "464673, 532090, 532571, 532570",
+    },
+    "tiktok": {
+        "label": "TikTok Ads",
+        "affiliates": "('477668')",
+        "ids_display": "477668",
     },
 }
 
 
 # =====================================================================
-# QUERIES ATHENA — dia fechado (D-1), carga completa
+# QUERIES — CAMADA BI (bireports/ps_bi) — fonte primaria D-1
 # =====================================================================
-def query_reg_athena(data, affiliates):
-    """REG via bireports_ec2.tbl_ecr (BRT)."""
+def query_reg_bireports(data, affiliates):
+    """REG via bireports_ec2.tbl_ecr (camada BI, BRT)."""
     return f"""
     SELECT COUNT(*) AS reg
     FROM bireports_ec2.tbl_ecr
@@ -60,7 +67,7 @@ def query_reg_athena(data, affiliates):
     """
 
 
-def query_ftd_athena(data, affiliates):
+def query_ftd_psbi(data, affiliates):
     """FTD same-day via bireports + ps_bi.dim_user (ftd_datetime)."""
     return f"""
     WITH regs AS (
@@ -100,8 +107,11 @@ def query_financeiro(data, affiliates):
     """
 
 
+# =====================================================================
+# QUERIES — CAMADA RAW/BRONZE (_ec2) — cross-validation
+# =====================================================================
 def query_reg_ecr_ec2(data, affiliates):
-    """REG via ecr_ec2.tbl_ecr — mais atualizada intraday que bireports."""
+    """REG via ecr_ec2.tbl_ecr — camada raw/bronze (sem filtro test_user)."""
     return f"""
     SELECT COUNT(*) AS reg_ecr
     FROM ecr_ec2.tbl_ecr
@@ -110,59 +120,40 @@ def query_reg_ecr_ec2(data, affiliates):
     """
 
 
-# =====================================================================
-# QUERIES BIGQUERY — real-time (intraday)
-# =====================================================================
-def query_reg_bigquery(data, affiliates_bq):
-    """REG real-time via BigQuery j_user."""
+def query_ftd_cashier(data, affiliates):
+    """FTD cross-validation via cashier_ec2 (camada raw).
+    Conta jogadores que registraram no dia E fizeram deposito confirmado no mesmo dia."""
     return f"""
-    SELECT COUNT(DISTINCT user_ext_id) AS reg_bq
-    FROM `smartico-bq6.dwh_ext_24105.j_user`
-    WHERE DATE(core_registration_date, "America/Sao_Paulo") = '{data}'
-      AND core_affiliate_id IN {affiliates_bq}
+    WITH regs AS (
+        SELECT c_ecr_id
+        FROM ecr_ec2.tbl_ecr
+        WHERE CAST(c_signup_time AT TIME ZONE 'UTC' AT TIME ZONE 'America/Sao_Paulo' AS DATE) = DATE '{data}'
+          AND CAST(c_affiliate_id AS VARCHAR) IN {affiliates}
+    )
+    SELECT COUNT(DISTINCT d.c_ecr_id) AS ftd_cashier
+    FROM cashier_ec2.tbl_cashier_deposit d
+    JOIN regs r ON d.c_ecr_id = r.c_ecr_id
+    WHERE d.c_txn_status = 'txn_confirmed_success'
+      AND CAST(d.c_created_time AT TIME ZONE 'UTC' AT TIME ZONE 'America/Sao_Paulo' AS DATE) = DATE '{data}'
     """
 
 
-def query_ftd_bigquery(data, affiliates_bq):
-    """FTD same-day via BigQuery j_user (acc_last_deposit_date).
-    Corrigido 31/03/2026: usar DATE() = data, nao IS NOT NULL."""
+def query_dep_cashier(data, affiliates):
+    """Dep Amount cross-validation via cashier_ec2 (camada raw, centavos /100).
+    Total de depositos confirmados dos jogadores dos affiliates no dia."""
     return f"""
-    SELECT COUNT(DISTINCT user_ext_id) AS ftd_bq
-    FROM `smartico-bq6.dwh_ext_24105.j_user`
-    WHERE DATE(core_registration_date, "America/Sao_Paulo") = '{data}'
-      AND core_affiliate_id IN {affiliates_bq}
-      AND DATE(acc_last_deposit_date, "America/Sao_Paulo") = '{data}'
-    """
-
-
-def query_ftd_deposit_bigquery(data, affiliates_bq):
-    """FTD Deposit real-time: valor total dos depositos de jogadores que
-    registraram E depositaram no mesmo dia. Fonte: tr_acc_deposit_approved.
-    Join j_user.user_id = tr.user_id (campo correto, nao user_ext_id)."""
-    return f"""
+    WITH base_players AS (
+        SELECT DISTINCT ecr_id
+        FROM ps_bi.dim_user
+        WHERE CAST(affiliate_id AS VARCHAR) IN {affiliates}
+          AND is_test = false
+    )
     SELECT
-        COUNT(DISTINCT j.user_ext_id) AS ftd_count,
-        ROUND(SUM(t.acc_last_deposit_amount), 2) AS ftd_deposit_total
-    FROM `smartico-bq6.dwh_ext_24105.j_user` j
-    JOIN `smartico-bq6.dwh_ext_24105.tr_acc_deposit_approved` t
-        ON j.user_id = t.user_id
-    WHERE DATE(j.core_registration_date, 'America/Sao_Paulo') = '{data}'
-      AND j.core_affiliate_id IN {affiliates_bq}
-      AND DATE(t.event_time, 'America/Sao_Paulo') = '{data}'
-    """
-
-
-def query_dep_total_bigquery(data, affiliates_bq):
-    """Dep Amount total real-time: todos os depositos aprovados dos jogadores
-    dos affiliates no dia (nao apenas FTD). Fonte: tr_acc_deposit_approved."""
-    return f"""
-    SELECT
-        COUNT(DISTINCT t.user_id) AS depositantes_unicos,
-        ROUND(SUM(t.acc_last_deposit_amount), 2) AS dep_amount_total
-    FROM `smartico-bq6.dwh_ext_24105.tr_acc_deposit_approved` t
-    JOIN `smartico-bq6.dwh_ext_24105.j_user` j ON j.user_id = t.user_id
-    WHERE j.core_affiliate_id IN {affiliates_bq}
-      AND DATE(t.event_time, 'America/Sao_Paulo') = '{data}'
+        COALESCE(SUM(d.c_confirmed_amount_in_ecr_ccy), 0) / 100.0 AS dep_cashier
+    FROM cashier_ec2.tbl_cashier_deposit d
+    JOIN base_players p ON d.c_ecr_id = p.ecr_id
+    WHERE d.c_txn_status = 'txn_confirmed_success'
+      AND CAST(d.c_created_time AT TIME ZONE 'UTC' AT TIME ZONE 'America/Sao_Paulo' AS DATE) = DATE '{data}'
     """
 
 
@@ -177,124 +168,78 @@ def fmt(valor):
 
 
 def run_canal(canal, cfg):
-    modo = "INTRADAY (real-time)" if INTRADAY else "DIA FECHADO (D-1)"
+    modo = "INTRADAY (parcial)" if INTRADAY else "DIA FECHADO (D-1)"
     hora_brt = datetime.now(BRT).strftime("%H:%M BRT")
 
     print(f"\n{'='*60}")
     print(f"EXTRACAO {cfg['label'].upper()} — {DATA}")
     print(f"Modo: {modo}" + (f" | Atualizado as {hora_brt}" if INTRADAY else ""))
     print(f"Affiliates: {cfg['ids_display']}")
+    print(f"Fonte: 100% Athena (camadas BI + raw/bronze)")
     print(f"{'='*60}")
 
     # -----------------------------------------------------------------
-    # REG
+    # REG — primario: bireports (D-1) ou ecr_ec2 (intraday)
+    # CV: a outra camada
     # -----------------------------------------------------------------
     if INTRADAY:
-        # Primario: BigQuery (real-time)
-        df_reg_bq = query_bigquery(query_reg_bigquery(DATA, cfg["affiliates_bq"]))
-        reg = int(df_reg_bq["reg_bq"].iloc[0])
-        reg_fonte = "BigQuery (real-time)"
-        # Cross-validation: ecr_ec2
+        # Intraday: ecr_ec2 como primario (mais atualizado)
+        df_ecr = query_athena(query_reg_ecr_ec2(DATA, cfg["affiliates"]), database="ecr_ec2")
+        reg = int(df_ecr["reg_ecr"].iloc[0])
+        reg_ecr = reg
+        reg_fonte = "ecr_ec2 (raw)"
         try:
-            df_ecr = query_athena(query_reg_ecr_ec2(DATA, cfg["affiliates"]), database="ecr_ec2")
-            reg_ecr = int(df_ecr["reg_ecr"].iloc[0])
-        except Exception:
-            reg_ecr = "N/A"
-        # bireports (delay)
-        try:
-            df_bi = query_athena(query_reg_athena(DATA, cfg["affiliates"]), database="bireports_ec2")
+            df_bi = query_athena(query_reg_bireports(DATA, cfg["affiliates"]), database="bireports_ec2")
             reg_bi = int(df_bi["reg"].iloc[0])
         except Exception:
             reg_bi = "N/A"
     else:
-        # Primario: bireports (carga completa)
-        df_bi = query_athena(query_reg_athena(DATA, cfg["affiliates"]), database="bireports_ec2")
+        # D-1: bireports como primario (carga completa)
+        df_bi = query_athena(query_reg_bireports(DATA, cfg["affiliates"]), database="bireports_ec2")
         reg = int(df_bi["reg"].iloc[0])
         reg_bi = reg
-        reg_fonte = "bireports_ec2"
-        # Cross-validation
+        reg_fonte = "bireports_ec2 (BI)"
         try:
             df_ecr = query_athena(query_reg_ecr_ec2(DATA, cfg["affiliates"]), database="ecr_ec2")
             reg_ecr = int(df_ecr["reg_ecr"].iloc[0])
         except Exception:
             reg_ecr = "N/A"
-        try:
-            df_reg_bq = query_bigquery(query_reg_bigquery(DATA, cfg["affiliates_bq"]))
-            reg_bq_val = int(df_reg_bq["reg_bq"].iloc[0])
-        except Exception:
-            reg_bq_val = "N/A"
 
     # -----------------------------------------------------------------
-    # FTD + FTD Deposit
+    # FTD + FTD Deposit — primario: ps_bi | CV: cashier_ec2
     # -----------------------------------------------------------------
-    if INTRADAY:
-        # Primario: BigQuery (real-time)
-        df_ftd_bq = query_bigquery(query_ftd_bigquery(DATA, cfg["affiliates_bq"]))
-        ftd = int(df_ftd_bq["ftd_bq"].iloc[0])
-        ftd_fonte = "BigQuery (real-time)"
+    df_ftd = query_athena(query_ftd_psbi(DATA, cfg["affiliates"]), database="bireports_ec2")
+    ftd = int(df_ftd["ftd"].iloc[0])
+    ftd_dep = float(df_ftd["ftd_dep"].iloc[0])
+    ftd_fonte = "ps_bi.dim_user"
+    ftd_dep_fonte = "ps_bi.dim_user"
 
-        # FTD Deposit: BigQuery tr_acc_deposit_approved
-        try:
-            df_ftd_dep = query_bigquery(query_ftd_deposit_bigquery(DATA, cfg["affiliates_bq"]))
-            ftd_dep = float(df_ftd_dep["ftd_deposit_total"].iloc[0])
-            ftd_dep_fonte = "BigQuery (real-time)"
-        except Exception:
-            ftd_dep = 0.0
-            ftd_dep_fonte = "ERRO BigQuery"
-
-        # Cross-validation: ps_bi
-        try:
-            df_psbi = query_athena(query_ftd_athena(DATA, cfg["affiliates"]), database="bireports_ec2")
-            ftd_psbi = int(df_psbi["ftd"].iloc[0])
-            ftd_dep_psbi = float(df_psbi["ftd_dep"].iloc[0])
-        except Exception:
-            ftd_psbi = "N/A"
-            ftd_dep_psbi = "N/A"
-    else:
-        # Primario: ps_bi (carga completa)
-        df_psbi = query_athena(query_ftd_athena(DATA, cfg["affiliates"]), database="bireports_ec2")
-        ftd = int(df_psbi["ftd"].iloc[0])
-        ftd_dep = float(df_psbi["ftd_dep"].iloc[0])
-        ftd_fonte = "ps_bi.dim_user"
-        ftd_dep_fonte = "ps_bi.dim_user"
-        ftd_psbi = ftd
-        ftd_dep_psbi = ftd_dep
-        # Cross-validation: BigQuery
-        try:
-            df_ftd_bq = query_bigquery(query_ftd_bigquery(DATA, cfg["affiliates_bq"]))
-            ftd_bq_val = int(df_ftd_bq["ftd_bq"].iloc[0])
-        except Exception:
-            ftd_bq_val = "N/A"
+    # CV: cashier_ec2 (raw)
+    try:
+        df_ftd_cv = query_athena(query_ftd_cashier(DATA, cfg["affiliates"]), database="cashier_ec2")
+        ftd_cashier = int(df_ftd_cv["ftd_cashier"].iloc[0])
+    except Exception as e:
+        ftd_cashier = f"N/A ({e.__class__.__name__})"
 
     # -----------------------------------------------------------------
-    # Dep Amount (total, nao so FTD)
-    # -----------------------------------------------------------------
-    if INTRADAY:
-        # BigQuery real-time para Dep Amount
-        try:
-            df_dep_bq = query_bigquery(query_dep_total_bigquery(DATA, cfg["affiliates_bq"]))
-            dep = float(df_dep_bq["dep_amount_total"].iloc[0])
-            dep_fonte = "BigQuery (real-time)"
-        except Exception:
-            dep = 0.0
-            dep_fonte = "ERRO BigQuery"
-    else:
-        dep_fonte = "bireports_ec2"
-        # dep ja vem do query_financeiro abaixo
-
-    # -----------------------------------------------------------------
-    # Financeiro: Saques, GGR, Bonus, NGR — sempre Athena
+    # Financeiro: Dep, Saques, GGR, Bonus, NGR — bireports
     # -----------------------------------------------------------------
     df3 = query_athena(query_financeiro(DATA, cfg["affiliates"]), database="ps_bi")
-    dep_athena = float(df3["dep_amount"].iloc[0])
+    dep = float(df3["dep_amount"].iloc[0])
     saq = float(df3["saques"].iloc[0])
     ggr_c = float(df3["ggr_cassino"].iloc[0])
     ggr_s = float(df3["ggr_sport"].iloc[0])
     bonus = float(df3["bonus_cost"].iloc[0])
     ngr = ggr_c + ggr_s - bonus
+    net_dep = dep - saq
+    pl = ngr  # P&L = NGR (GGR total - Bonus)
 
-    if not INTRADAY:
-        dep = dep_athena
+    # CV: cashier_ec2 para Dep Amount
+    try:
+        df_dep_cv = query_athena(query_dep_cashier(DATA, cfg["affiliates"]), database="cashier_ec2")
+        dep_cashier = float(df_dep_cv["dep_cashier"].iloc[0])
+    except Exception as e:
+        dep_cashier = f"N/A ({e.__class__.__name__})"
 
     # -----------------------------------------------------------------
     # Test users
@@ -324,45 +269,57 @@ def run_canal(canal, cfg):
     print(f"{'FTD':<16} {ftd:>14}  {ftd_fonte}")
     print(f"{'Conversao':<16} {conv:>14}  FTD/REG")
     print(f"{'FTD Deposit':<16} {fmt(ftd_dep):>14}  {ftd_dep_fonte}")
-    print(f"{'Dep Amount':<16} {fmt(dep):>14}  {dep_fonte}")
+    print(f"{'Dep Amount':<16} {fmt(dep):>14}  bireports_ec2")
     print(f"{'Saques':<16} {fmt(saq):>14}  bireports_ec2")
+    print(f"{'Net Deposit':<16} {fmt(net_dep):>14}  Dep - Saques")
     print(f"{'GGR Cassino':<16} {fmt(ggr_c):>14}  bireports_ec2")
     print(f"{'GGR Sport':<16} {fmt(ggr_s):>14}  bireports_ec2")
     print(f"{'Bonus Cost':<16} {fmt(bonus):>14}  bireports_ec2")
-    print(f"{'NGR':<16} {fmt(ngr):>14}  calculado")
+    print(f"{'P&L (NGR)':<16} {fmt(pl):>14}  GGR - Bonus")
 
-    # Validacao cruzada
-    print(f"\nValidacao cruzada:")
+    # Validacao cruzada (Athena: BI vs raw/bronze)
+    print(f"\nValidacao cruzada (BI vs raw/bronze):")
+
+    # REG
     if INTRADAY:
-        print(f"  REG: BigQuery={reg} | ecr_ec2={reg_ecr} | bireports={reg_bi}")
-        cv_ftd = f"ps_bi={ftd_psbi}" if isinstance(ftd_psbi, int) else f"ps_bi=N/A"
-        print(f"  FTD: BigQuery={ftd} | {cv_ftd} (ps_bi delay dbt)")
-        if isinstance(ftd_dep_psbi, float):
-            print(f"  FTD Dep: BigQuery={fmt(ftd_dep)} | ps_bi={fmt(ftd_dep_psbi)} (delay)")
-        print(f"  Dep Amount: BigQuery={fmt(dep)} | bireports={fmt(dep_athena)} (delay)")
+        print(f"  REG: ecr_ec2={reg_ecr} (primario) | bireports={reg_bi} (delay ETL)")
     else:
-        reg_bq_display = reg_bq_val if 'reg_bq_val' in dir() else "N/A"
-        ftd_bq_display = ftd_bq_val if 'ftd_bq_val' in dir() else "N/A"
-        match_reg = "OK" if isinstance(reg_bq_display, int) and abs(reg - reg_bq_display) <= 5 else "DIVERGE"
-        match_ftd = "OK" if isinstance(ftd_bq_display, int) and abs(ftd - ftd_bq_display) <= 5 else "DIVERGE"
-        print(f"  REG: bireports={reg} | ecr_ec2={reg_ecr} | BigQuery={reg_bq_display} ({match_reg})")
-        print(f"  FTD: ps_bi={ftd} | BigQuery={ftd_bq_display} ({match_ftd})")
+        match_reg = ""
+        if isinstance(reg_ecr, int):
+            diff_reg = abs(reg - reg_ecr)
+            match_reg = "OK" if diff_reg <= 5 else f"DIVERGE ({diff_reg})"
+        print(f"  REG: bireports={reg_bi} | ecr_ec2={reg_ecr} ({match_reg})")
+
+    # FTD
+    match_ftd = ""
+    if isinstance(ftd_cashier, int):
+        diff_ftd = abs(ftd - ftd_cashier)
+        match_ftd = "OK" if diff_ftd <= 5 else f"DIVERGE ({diff_ftd})"
+    print(f"  FTD: ps_bi={ftd} | cashier_ec2={ftd_cashier} ({match_ftd})")
+
+    # Dep
+    if isinstance(dep_cashier, float):
+        diff_dep = abs(dep - dep_cashier)
+        pct = f"{(diff_dep / dep * 100):.1f}%" if dep > 0 else "N/A"
+        match_dep = "OK" if dep == 0 or diff_dep < dep * 0.05 else f"DIVERGE ({pct})"
+        print(f"  Dep: bireports={fmt(dep)} | cashier_ec2={fmt(dep_cashier)} ({match_dep})")
+    else:
+        print(f"  Dep: bireports={fmt(dep)} | cashier_ec2={dep_cashier}")
 
     if ftd > reg:
         print(f"  *** ALERTA: FTD ({ftd}) > REG ({reg}) — verificar logica!")
     print(f"  Test users: {test_users} confirmados (excluidos das queries)")
 
     if INTRADAY:
-        print(f"\n  ** DADOS PARCIAIS — dia em andamento. GGR/NGR/Saques via Athena (delay ETL).")
+        print(f"\n  ** DADOS PARCIAIS — dia em andamento. Metricas podem ter delay ETL.")
 
 
 def run():
     modo = "INTRADAY" if INTRADAY else "DIA FECHADO"
     print(f"\n*** MODO: {modo} — Data: {DATA} ***")
+    print(f"*** Fonte: 100% Athena — BI (bireports/ps_bi) + raw/bronze (_ec2) ***")
     if INTRADAY:
-        print(f"*** BigQuery = fonte primaria (real-time) | Athena = cross-validation ***")
-    else:
-        print(f"*** Athena = fonte primaria (carga completa) | BigQuery = cross-validation ***")
+        print(f"*** ATENCAO: Modo intraday sem BigQuery — possivel delay ETL ***")
 
     for canal, cfg in CANAIS.items():
         try:

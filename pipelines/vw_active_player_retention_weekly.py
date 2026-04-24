@@ -4,23 +4,36 @@ Pipeline: Active Player Retention vs Repeat Depositors (semanal)
 Fluxo:
   1. Extrai dados direto do Athena (fonte de verdade, sempre atualizado)
   2. Grava resultado no Super Nova DB (tabela destino)
-  3. View no Super Nova DB aponta pra tabela → Gusta consome no front
+  3. View no Super Nova DB aponta pra tabela -> Gusta consome no front
 
 Fonte: Athena cashier_ec2 + bireports_ec2
-Destino: multibet.vw_active_player_retention_weekly (Super Nova DB)
+Destino: multibet.etl_active_player_retention_weekly (Super Nova DB)
+View: multibet.vw_active_player_retention_weekly
 
-Métricas por semana (dom-sáb):
+Metricas por semana (dom-sab):
   - depositantes_semana_atual, depositantes_semana_anterior
   - retidos_da_semana_anterior, repeat_depositors
   - retention_pct, repeat_depositor_pct
 
-Mauro: agendar execução diária (sugerido 06:00 BRT)
+Execucao:
+    python pipelines/vw_active_player_retention_weekly.py
 """
 import sys
-sys.path.insert(0, ".")
+import os
+import logging
+
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+
 from db.athena import query_athena
 from db.supernova import execute_supernova, get_supernova_connection
 import psycopg2.extras
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(message)s",
+    datefmt="%Y-%m-%d %H:%M:%S",
+)
+log = logging.getLogger(__name__)
 
 # ============================================================
 # 1. DDL — tabela destino + view (idempotente)
@@ -34,13 +47,29 @@ CREATE TABLE IF NOT EXISTS multibet.etl_active_player_retention_weekly (
     retidos_da_semana_anterior   INTEGER,
     repeat_depositors            INTEGER,
     retention_pct                NUMERIC(5,1),
-    repeat_depositor_pct         NUMERIC(5,1)
+    repeat_depositor_pct         NUMERIC(5,1),
+    refreshed_at                 TIMESTAMPTZ DEFAULT NOW()
 );
+"""
+
+DDL_ADD_REFRESHED_AT = """
+ALTER TABLE multibet.etl_active_player_retention_weekly
+ADD COLUMN IF NOT EXISTS refreshed_at TIMESTAMPTZ DEFAULT NOW();
 """
 
 DDL_VIEW = """
 CREATE OR REPLACE VIEW multibet.vw_active_player_retention_weekly AS
-SELECT * FROM multibet.etl_active_player_retention_weekly
+SELECT
+    semana,
+    semana_label,
+    depositantes_semana_atual,
+    depositantes_semana_anterior,
+    retidos_da_semana_anterior,
+    repeat_depositors,
+    retention_pct,
+    repeat_depositor_pct,
+    refreshed_at
+FROM multibet.etl_active_player_retention_weekly
 ORDER BY semana;
 """
 
@@ -59,6 +88,7 @@ weekly_depositors AS (
     LEFT JOIN bireports_ec2.tbl_ecr e ON e.c_ecr_id = d.c_ecr_id
     WHERE d.c_deposit_count > 0
       AND e.c_test_user = false
+      AND d.c_created_date >= DATE '2025-10-01'
     GROUP BY 1, 2
 ),
 weekly_metrics AS (
@@ -103,20 +133,32 @@ ORDER BY m.semana
 # 3. Executar pipeline
 # ============================================================
 def main():
-    # DDL
-    print("1/4 - Criando tabela destino (idempotente)...")
-    execute_supernova(DDL_TABLE)
+    from datetime import datetime, timezone
 
-    print("2/4 - Criando/atualizando view...")
+    # DDL
+    log.info("1/4 - Criando tabela destino (idempotente)...")
+    execute_supernova(DDL_TABLE)
+    try:
+        execute_supernova(DDL_ADD_REFRESHED_AT)
+    except Exception:
+        pass  # coluna ja existe
+
+    log.info("2/4 - Criando/atualizando view...")
     execute_supernova(DDL_VIEW)
 
     # Athena
-    print("3/4 - Extraindo dados do Athena (pode levar ~60s)...")
+    log.info("3/4 - Extraindo dados do Athena (pode levar ~60s)...")
     df = query_athena(ATHENA_SQL, database="cashier_ec2")
-    print(f"     {len(df)} semanas extraídas ({df['semana'].min()} a {df['semana'].max()})")
+
+    if df.empty:
+        log.warning("Nenhum dado retornado do Athena. Abortando sem truncar.")
+        return
+
+    log.info(f"     {len(df)} semanas extraidas ({df['semana'].min()} a {df['semana'].max()})")
 
     # Carga
-    print("4/4 - Carregando no Super Nova DB (TRUNCATE + INSERT)...")
+    log.info("4/4 - Carregando no Super Nova DB (TRUNCATE + INSERT)...")
+    now_utc = datetime.now(timezone.utc)
     tunnel, conn = get_supernova_connection()
     try:
         with conn.cursor() as cur:
@@ -124,8 +166,9 @@ def main():
             insert_sql = """
                 INSERT INTO multibet.etl_active_player_retention_weekly
                 (semana, semana_label, depositantes_semana_atual, depositantes_semana_anterior,
-                 retidos_da_semana_anterior, repeat_depositors, retention_pct, repeat_depositor_pct)
-                VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+                 retidos_da_semana_anterior, repeat_depositors, retention_pct, repeat_depositor_pct,
+                 refreshed_at)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
             """
             rows = [
                 (
@@ -136,18 +179,19 @@ def main():
                     int(row.repeat_depositors),
                     float(row.retention_pct) if row.retention_pct is not None else None,
                     float(row.repeat_depositor_pct) if row.repeat_depositor_pct is not None else None,
+                    now_utc,
                 )
                 for row in df.itertuples()
             ]
             psycopg2.extras.execute_batch(cur, insert_sql, rows, page_size=100)
             conn.commit()
-            print(f"     {len(rows)} semanas carregadas!")
+            log.info(f"     {len(rows)} semanas carregadas!")
     finally:
         conn.close()
         tunnel.stop()
 
     # Resumo
-    print("\n=== RESULTADO (via view) ===")
+    log.info("=== RESULTADO (via view) ===")
     result = execute_supernova(
         "SELECT semana_label, depositantes_semana_atual, depositantes_semana_anterior, "
         "retention_pct, repeat_depositor_pct "
@@ -155,10 +199,10 @@ def main():
         "WHERE semana >= DATE '2026-02-01'",
         fetch=True
     )
-    print(f"{'Semana':>15} | {'Atual':>7} | {'Anter':>7} | {'Ret%':>5} | {'Rep%':>5}")
-    print("-" * 50)
+    log.info(f"{'Semana':>15} | {'Atual':>7} | {'Anter':>7} | {'Ret%':>5} | {'Rep%':>5}")
+    log.info("-" * 50)
     for r in result:
-        print(f"{r[0]:>15} | {r[1]:>7,} | {r[2]:>7,} | {str(r[3] or '-'):>5} | {str(r[4] or '-'):>5}")
+        log.info(f"{r[0]:>15} | {r[1]:>7,} | {r[2]:>7,} | {str(r[3] or '-'):>5} | {str(r[4] or '-'):>5}")
 
 
 if __name__ == "__main__":

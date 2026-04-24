@@ -6,6 +6,21 @@ Grao: month_of_ftd (safra) x source x player_id
 Calcula GGR acumulado em janelas D0, D7, D30 por jogador,
 permitindo analise de ROI de longo prazo por fonte de trafego.
 
+Modos de execucao:
+    python pipelines/agg_cohort_acquisition.py             # incremental (D30 window)
+    python pipelines/agg_cohort_acquisition.py --full       # full rebuild (backfill)
+
+Incremental (padrao):
+    - So recalcula players com FTD nos ultimos 35 dias (janela D30 + buffer)
+    - Scan Athena reduzido de ~6 meses para ~35 dias (~80% economia)
+    - UPSERT no SuperNova DB (ON CONFLICT DO UPDATE)
+    - Players maduros (FTD > 30 dias) nao sao tocados
+
+Full (--full):
+    - Recalcula TODOS os players desde 2025-10-01
+    - TRUNCATE + INSERT (mesmo comportamento da v1)
+    - Usar para backfill ou correcao massiva
+
 Fontes:
     1. Athena: bireports_ec2.tbl_ecr (Gatekeeper + affiliate)
     2. Athena: cashier_ec2.tbl_cashier_deposit (FTD + 2nd deposit)
@@ -15,14 +30,12 @@ Fontes:
 
 Destino: Super Nova DB -> multibet.agg_cohort_acquisition
 View: multibet.vw_cohort_roi (ROI por safra x source)
-
-Execucao:
-    python pipelines/agg_cohort_acquisition.py
 """
 
 import sys
 import os
 import logging
+import argparse
 from datetime import datetime, timezone
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
@@ -82,7 +95,8 @@ SELECT
     -- Payback = Spend / GGR_D30 (quantos D30 para pagar)
     CASE WHEN SUM(c.ggr_d30) > 0
          THEN ROUND(s.monthly_spend / SUM(c.ggr_d30)::numeric, 2)
-         ELSE NULL END AS payback_ratio
+         ELSE NULL END AS payback_ratio,
+    MAX(c.refreshed_at) AS refreshed_at
 FROM multibet.agg_cohort_acquisition c
 LEFT JOIN (
     SELECT
@@ -96,8 +110,8 @@ GROUP BY c.month_of_ftd, c.source, s.monthly_spend
 ORDER BY c.month_of_ftd DESC, total_ggr_d30 DESC;
 """
 
-# --- Query Athena (player-level cohort) ---------------------------------------
-QUERY_ATHENA = """
+# --- Query FULL (backfill desde 2025-10-01) -----------------------------------
+QUERY_FULL = """
 WITH params AS (
     SELECT TIMESTAMP '2025-10-01' AS start_date
 ),
@@ -109,6 +123,7 @@ registrations AS (
         COALESCE(NULLIF(TRIM(c_tracker_id), ''), CAST(c_affiliate_id AS VARCHAR), 'sem_tracker') AS c_tracker_id
     FROM bireports_ec2.tbl_ecr
     WHERE c_sign_up_time >= (SELECT start_date FROM params)
+      AND c_test_user = false
 ),
 
 -- 2. FTD por player (1o deposito)
@@ -160,19 +175,122 @@ cohort AS (
         r.c_tracker_id,
         CAST(f.ftd_time AT TIME ZONE 'UTC' AT TIME ZONE 'America/Sao_Paulo' AS DATE) AS ftd_date,
         f.ftd_amount,
-        -- GGR D0 (dia do FTD)
         COALESCE(SUM(CASE
             WHEN g.game_date = CAST(f.ftd_time AT TIME ZONE 'UTC' AT TIME ZONE 'America/Sao_Paulo' AS DATE)
             THEN g.daily_ggr END), 0) AS ggr_d0,
-        -- GGR D7 (acumulado D0 a D7)
         COALESCE(SUM(CASE
             WHEN g.game_date <= date_add('day', 7, CAST(f.ftd_time AT TIME ZONE 'UTC' AT TIME ZONE 'America/Sao_Paulo' AS DATE))
             THEN g.daily_ggr END), 0) AS ggr_d7,
-        -- GGR D30 (acumulado D0 a D30)
         COALESCE(SUM(CASE
             WHEN g.game_date <= date_add('day', 30, CAST(f.ftd_time AT TIME ZONE 'UTC' AT TIME ZONE 'America/Sao_Paulo' AS DATE))
             THEN g.daily_ggr END), 0) AS ggr_d30,
-        -- 2nd deposit flag
+        CASE WHEN sd.c_ecr_id IS NOT NULL THEN 1 ELSE 0 END AS is_2nd_depositor
+    FROM registrations r
+    INNER JOIN first_deposits f ON r.c_ecr_id = f.c_ecr_id
+    LEFT JOIN player_daily_ggr g ON r.c_ecr_id = g.c_ecr_id
+    LEFT JOIN second_deposits sd ON r.c_ecr_id = sd.c_ecr_id
+    GROUP BY r.c_ecr_id, r.c_tracker_id, f.ftd_time, f.ftd_amount,
+             CASE WHEN sd.c_ecr_id IS NOT NULL THEN 1 ELSE 0 END
+)
+
+SELECT
+    c_ecr_id,
+    c_tracker_id,
+    ftd_date,
+    ftd_amount,
+    ggr_d0,
+    ggr_d7,
+    ggr_d30,
+    is_2nd_depositor
+FROM cohort
+"""
+
+# --- Query INCREMENTAL (so janela D30 ativa) ----------------------------------
+# So recalcula players com FTD nos ultimos 35 dias (D30 + 5 dias buffer).
+# Scan Athena reduzido de ~6 meses para ~35 dias.
+# Players maduros (FTD > 30 dias) ja tem D0/D7/D30 finalizados — nao recalcular.
+QUERY_INCREMENTAL = """
+WITH params AS (
+    -- Janela: 35 dias (D30 + 5 dias de buffer pra edge cases de timezone)
+    SELECT
+        date_add('day', -35, CURRENT_DATE) AS window_start,
+        -- Scan fund_ec2 com margem extra pro JOIN de GGR
+        date_add('day', -40, CURRENT_DATE) AS scan_start
+),
+
+-- 1. Gatekeeper (todos — tabela leve, ~200K rows)
+registrations AS (
+    SELECT
+        c_ecr_id,
+        COALESCE(NULLIF(TRIM(c_tracker_id), ''), CAST(c_affiliate_id AS VARCHAR), 'sem_tracker') AS c_tracker_id
+    FROM bireports_ec2.tbl_ecr
+    WHERE c_sign_up_time >= TIMESTAMP '2025-10-01'
+      AND c_test_user = false
+),
+
+-- 2. FTD por player — SO os com FTD na janela ativa
+first_deposits AS (
+    SELECT c_ecr_id, ftd_time, ftd_amount FROM (
+        SELECT
+            c_ecr_id,
+            c_created_time AS ftd_time,
+            CAST(c_confirmed_amount_in_inhouse_ccy AS DECIMAL(18,2)) / 100.0 AS ftd_amount,
+            ROW_NUMBER() OVER(PARTITION BY c_ecr_id ORDER BY c_created_time) AS rn
+        FROM cashier_ec2.tbl_cashier_deposit
+        WHERE c_txn_status = 'txn_confirmed_success'
+    ) sub
+    WHERE rn = 1
+      AND CAST(ftd_time AT TIME ZONE 'UTC' AT TIME ZONE 'America/Sao_Paulo' AS DATE)
+          >= (SELECT window_start FROM params)
+),
+
+-- 3. 2nd deposit flag (so para players na janela)
+second_deposits AS (
+    SELECT c_ecr_id FROM (
+        SELECT
+            d.c_ecr_id,
+            ROW_NUMBER() OVER(PARTITION BY d.c_ecr_id ORDER BY d.c_created_time) AS rn
+        FROM cashier_ec2.tbl_cashier_deposit d
+        INNER JOIN first_deposits f ON d.c_ecr_id = f.c_ecr_id
+        WHERE d.c_txn_status = 'txn_confirmed_success'
+    ) WHERE rn = 2
+),
+
+-- 4. GGR por player/dia — scan reduzido: so transacoes dos ultimos 40 dias
+--    E so para players da janela ativa (via INNER JOIN first_deposits)
+player_daily_ggr AS (
+    SELECT
+        t.c_ecr_id,
+        CAST(t.c_start_time AT TIME ZONE 'UTC' AT TIME ZONE 'America/Sao_Paulo' AS DATE) AS game_date,
+        SUM(CASE WHEN t.c_txn_type IN (27, 28, 59)
+                 THEN CAST(t.c_amount_in_ecr_ccy AS DECIMAL(18,2)) / 100.0 ELSE 0 END)
+        - SUM(CASE WHEN t.c_txn_type IN (45, 80, 72, 112)
+                   THEN CAST(t.c_amount_in_ecr_ccy AS DECIMAL(18,2)) / 100.0 ELSE 0 END)
+        AS daily_ggr
+    FROM fund_ec2.tbl_real_fund_txn t
+    INNER JOIN first_deposits f ON t.c_ecr_id = f.c_ecr_id
+    WHERE t.c_start_time >= (SELECT scan_start FROM params)
+      AND t.c_txn_status = 'SUCCESS'
+      AND t.c_txn_type IN (27, 28, 45, 59, 72, 80, 112)
+    GROUP BY 1, 2
+),
+
+-- 5. Cohort: FTD + GGR janelas + 2nd deposit
+cohort AS (
+    SELECT
+        r.c_ecr_id,
+        r.c_tracker_id,
+        CAST(f.ftd_time AT TIME ZONE 'UTC' AT TIME ZONE 'America/Sao_Paulo' AS DATE) AS ftd_date,
+        f.ftd_amount,
+        COALESCE(SUM(CASE
+            WHEN g.game_date = CAST(f.ftd_time AT TIME ZONE 'UTC' AT TIME ZONE 'America/Sao_Paulo' AS DATE)
+            THEN g.daily_ggr END), 0) AS ggr_d0,
+        COALESCE(SUM(CASE
+            WHEN g.game_date <= date_add('day', 7, CAST(f.ftd_time AT TIME ZONE 'UTC' AT TIME ZONE 'America/Sao_Paulo' AS DATE))
+            THEN g.daily_ggr END), 0) AS ggr_d7,
+        COALESCE(SUM(CASE
+            WHEN g.game_date <= date_add('day', 30, CAST(f.ftd_time AT TIME ZONE 'UTC' AT TIME ZONE 'America/Sao_Paulo' AS DATE))
+            THEN g.daily_ggr END), 0) AS ggr_d30,
         CASE WHEN sd.c_ecr_id IS NOT NULL THEN 1 ELSE 0 END AS is_2nd_depositor
     FROM registrations r
     INNER JOIN first_deposits f ON r.c_ecr_id = f.c_ecr_id
@@ -212,14 +330,19 @@ def load_mapping() -> dict:
     return {r[0]: r[1] for r in (rows or [])}
 
 
-def refresh():
-    log.info("Executando query no Athena (cohort player-level, D0/D7/D30)...")
-    log.info("AVISO: Query pesada — JOIN de FTDs + GGR diario + 2nd deposit")
-    df = query_athena(QUERY_ATHENA, database="fund_ec2")
+def refresh(mode="incremental"):
+    is_full = mode == "full"
+    query = QUERY_FULL if is_full else QUERY_INCREMENTAL
+    label = "FULL (backfill)" if is_full else "INCREMENTAL (janela D30)"
+
+    log.info(f"Modo: {label}")
+    log.info(f"Executando query no Athena ({label})...")
+    df = query_athena(query, database="fund_ec2")
     log.info(f"{len(df)} players obtidos do Athena.")
 
     if df.empty:
-        log.warning("Nenhum dado. Abortando.")
+        log.warning("Nenhum dado retornado." +
+                     (" Abortando." if is_full else " Nenhum player novo na janela D30."))
         return
 
     # Mapear source
@@ -228,13 +351,6 @@ def refresh():
     df["month_of_ftd"] = pd.to_datetime(df["ftd_date"]).dt.strftime("%Y-%m")
 
     now_utc = datetime.now(timezone.utc)
-
-    insert_sql = """
-        INSERT INTO multibet.agg_cohort_acquisition
-            (c_ecr_id, month_of_ftd, source, c_tracker_id, ftd_date, ftd_amount,
-             ggr_d0, ggr_d7, ggr_d30, is_2nd_depositor, refreshed_at)
-        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-    """
 
     records = []
     for _, row in df.iterrows():
@@ -255,8 +371,33 @@ def refresh():
     ssh, conn = get_supernova_connection()
     try:
         with conn.cursor() as cur:
-            cur.execute("TRUNCATE TABLE multibet.agg_cohort_acquisition;")
-            psycopg2.extras.execute_batch(cur, insert_sql, records, page_size=2000)
+            if is_full:
+                # Full: limpa tudo e reinsere
+                log.info("TRUNCATE + INSERT (full rebuild)...")
+                cur.execute("TRUNCATE TABLE multibet.agg_cohort_acquisition;")
+                insert_sql = """
+                    INSERT INTO multibet.agg_cohort_acquisition
+                        (c_ecr_id, month_of_ftd, source, c_tracker_id, ftd_date, ftd_amount,
+                         ggr_d0, ggr_d7, ggr_d30, is_2nd_depositor, refreshed_at)
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                """
+                psycopg2.extras.execute_batch(cur, insert_sql, records, page_size=2000)
+            else:
+                # Incremental: UPSERT — insere novos, atualiza janela ativa
+                log.info(f"UPSERT (ON CONFLICT DO UPDATE) para {len(records)} players...")
+                upsert_sql = """
+                    INSERT INTO multibet.agg_cohort_acquisition
+                        (c_ecr_id, month_of_ftd, source, c_tracker_id, ftd_date, ftd_amount,
+                         ggr_d0, ggr_d7, ggr_d30, is_2nd_depositor, refreshed_at)
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                    ON CONFLICT (c_ecr_id) DO UPDATE SET
+                        ggr_d0           = EXCLUDED.ggr_d0,
+                        ggr_d7           = EXCLUDED.ggr_d7,
+                        ggr_d30          = EXCLUDED.ggr_d30,
+                        is_2nd_depositor = EXCLUDED.is_2nd_depositor,
+                        refreshed_at     = EXCLUDED.refreshed_at
+                """
+                psycopg2.extras.execute_batch(cur, upsert_sql, records, page_size=2000)
         conn.commit()
     finally:
         conn.close()
@@ -265,13 +406,19 @@ def refresh():
     total = len(records)
     avg_d30 = sum(r[8] for r in records) / max(total, 1)
     pct_2nd = sum(r[9] for r in records) / max(total, 1) * 100
-    log.info(f"{total:,} players inseridos | "
+    log.info(f"{total:,} players {'inseridos' if is_full else 'upserted'} | "
              f"Avg LTV D30: R$ {avg_d30:,.2f} | "
              f"2nd deposit rate: {pct_2nd:.1f}%")
 
 
 if __name__ == "__main__":
-    log.info("=== Iniciando pipeline agg_cohort_acquisition ===")
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--full", action="store_true",
+                        help="Full rebuild (backfill desde 2025-10-01). Padrao: incremental.")
+    args = parser.parse_args()
+
+    mode = "full" if args.full else "incremental"
+    log.info(f"=== Iniciando pipeline agg_cohort_acquisition ({mode}) ===")
     setup_table()
-    refresh()
+    refresh(mode=mode)
     log.info("=== Pipeline concluido ===")
