@@ -100,6 +100,7 @@ def get_campaign_spend(
         raise ValueError("META_ADS_ACCOUNT_IDS nao configurado no .env")
 
     all_rows = []
+    failed_accounts = []
 
     for acc_id in accounts:
         log.info(f"  Meta Ads: buscando {acc_id} de {start_date} a {end_date}...")
@@ -108,80 +109,91 @@ def get_campaign_spend(
         after = ""
         page = 0
 
-        while True:
-            time_range = urllib.parse.quote(json.dumps({"since": str(start_date), "until": str(end_date)}))
-            url = (
-                f"https://graph.facebook.com/{API_VERSION}/{acc_id}/insights"
-                f"?access_token={token}"
-                f"&fields=campaign_id,campaign_name,account_name,spend,impressions,"
-                f"clicks,reach,actions"
-                f"&level=campaign"
-                f"&time_increment=1"
-                f"&time_range={time_range}"
-                f"&limit=500"
-            )
-            if after:
-                url += f"&after={after}"
+        try:
+            while True:
+                time_range = urllib.parse.quote(json.dumps({"since": str(start_date), "until": str(end_date)}))
+                url = (
+                    f"https://graph.facebook.com/{API_VERSION}/{acc_id}/insights"
+                    f"?access_token={token}"
+                    f"&fields=campaign_id,campaign_name,account_name,spend,impressions,"
+                    f"clicks,reach,actions"
+                    f"&level=campaign"
+                    f"&time_increment=1"
+                    f"&time_range={time_range}"
+                    f"&limit=500"
+                )
+                if after:
+                    url += f"&after={after}"
 
-            data = _api_get(url)
-            rows = data.get("data", [])
+                data = _api_get(url)
+                rows = data.get("data", [])
 
-            for r in rows:
-                spend = float(r.get("spend", 0))
-                impressions = int(r.get("impressions", 0))
-                clicks = int(r.get("clicks", 0))
-                reach = int(r.get("reach", 0))
+                for r in rows:
+                    spend = float(r.get("spend", 0))
+                    impressions = int(r.get("impressions", 0))
+                    clicks = int(r.get("clicks", 0))
+                    reach = int(r.get("reach", 0))
 
-                # Conversoes + landing_page_view (KPI de tráfego — recomendado em 24/04 pelo
-                # traffic-analyst: link_click infla 4.7x vs LP real, então usar landing_page_view).
-                conversions = 0.0
-                page_views = 0
-                for action in (r.get("actions") or []):
-                    atype = action.get("action_type", "")
-                    if atype in (
-                        "offsite_conversion.fb_pixel_purchase",
-                        "offsite_conversion.fb_pixel_complete_registration",
-                        "offsite_conversion.fb_pixel_lead",
-                        "omni_complete_registration",
-                        "complete_registration",
-                    ):
-                        conversions += float(action.get("value", 0))
-                    elif atype == "landing_page_view":
-                        page_views = int(float(action.get("value", 0)))
+                    # Conversoes + landing_page_view (KPI de tráfego — recomendado em 24/04 pelo
+                    # traffic-analyst: link_click infla 4.7x vs LP real, então usar landing_page_view).
+                    conversions = 0.0
+                    page_views = 0
+                    for action in (r.get("actions") or []):
+                        atype = action.get("action_type", "")
+                        if atype in (
+                            "offsite_conversion.fb_pixel_purchase",
+                            "offsite_conversion.fb_pixel_complete_registration",
+                            "offsite_conversion.fb_pixel_lead",
+                            "omni_complete_registration",
+                            "complete_registration",
+                        ):
+                            conversions += float(action.get("value", 0))
+                        elif atype == "landing_page_view":
+                            page_views = int(float(action.get("value", 0)))
 
-                if spend == 0 and impressions == 0:
-                    continue
+                    if spend == 0 and impressions == 0:
+                        continue
 
-                all_rows.append({
-                    "date": r.get("date_start", ""),
-                    "account_id": acc_id,
-                    "account_name": r.get("account_name", ""),
-                    "campaign_id": r.get("campaign_id", ""),
-                    "campaign_name": r.get("campaign_name", ""),
-                    "cost_brl": round(spend, 2),
-                    "impressions": impressions,
-                    "clicks": clicks,
-                    "conversions": round(conversions, 2),
-                    "page_views": page_views,
-                    "reach": reach,
-                })
+                    all_rows.append({
+                        "date": r.get("date_start", ""),
+                        "account_id": acc_id,
+                        "account_name": r.get("account_name", ""),
+                        "campaign_id": r.get("campaign_id", ""),
+                        "campaign_name": r.get("campaign_name", ""),
+                        "cost_brl": round(spend, 2),
+                        "impressions": impressions,
+                        "clicks": clicks,
+                        "conversions": round(conversions, 2),
+                        "page_views": page_views,
+                        "reach": reach,
+                    })
 
-            # Paginacao
-            paging = data.get("paging", {})
-            cursors = paging.get("cursors", {})
-            after = cursors.get("after", "")
-            page += 1
+                # Paginacao
+                paging = data.get("paging", {})
+                cursors = paging.get("cursors", {})
+                after = cursors.get("after", "")
+                page += 1
 
-            if not paging.get("next") or not after:
-                break
+                if not paging.get("next") or not after:
+                    break
 
-        log.info(f"    {acc_id}: {len([r for r in all_rows if r['account_id'] == acc_id])} linhas")
+            log.info(f"    {acc_id}: {len([r for r in all_rows if r['account_id'] == acc_id])} linhas")
+        except RuntimeError as e:
+            # Conta sem permissao ou revogada: loga warning e continua com as demais
+            # (resiliencia: 1 conta caida nao derruba o pipeline inteiro).
+            log.warning(f"    {acc_id}: FALHOU — {e} (pulando conta)")
+            failed_accounts.append((acc_id, str(e)))
 
     total_spend = sum(r["cost_brl"] for r in all_rows)
     log.info(
         f"Meta Ads API: {len(all_rows)} linhas totais | "
         f"Spend total: R$ {total_spend:,.2f}"
     )
+    if failed_accounts:
+        log.warning(
+            f"  {len(failed_accounts)} conta(s) falharam (ignoradas): "
+            f"{', '.join(a[0] for a in failed_accounts)}"
+        )
 
     return all_rows
 
