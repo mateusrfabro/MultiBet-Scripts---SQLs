@@ -247,7 +247,8 @@ class SmarticoClient:
         Nota sobre o operador `^` com pattern (bug descoberto em 20/04/2026):
             `^core_external_segment: ["PCR_*"]` engole o evento inteiro (pd:0)
             quando o pattern nao matcha nada. Preferir `-remove` com tags
-            especificas quando possivel.
+            especificas quando possivel. `^` so e seguro quando ha garantia
+            de que pelo menos uma tag matcha.
         """
         payload: Dict[str, Any] = {}
 
@@ -269,6 +270,84 @@ class SmarticoClient:
                 "Nenhuma operacao em core_external_segment foi especificada "
                 "(add_tags/remove_tags/remove_pattern/replace_with/clear_all)."
             )
+
+        if skip_cjm:
+            payload["skip_cjm"] = True
+
+        return SmarticoEvent(
+            user_ext_id=user_ext_id,
+            event_type="update_profile",
+            payload=payload,
+            ext_brand_id=self.brand,
+        )
+
+    def build_custom_property_event(
+        self,
+        user_ext_id: str,
+        prop_name: str,
+        value: Optional[str],
+        skip_cjm: bool = False,
+        remove_from_markers: Optional[List[str]] = None,
+        remove_from_segment: Optional[List[str]] = None,
+    ) -> SmarticoEvent:
+        """
+        Constroi um evento update_profile para uma Custom Property Smartico
+        (core_custom_prop1 ate core_custom_prop20).
+
+        Custom Properties sao campos string livres (1 valor por prop), ideais
+        para representar um unico valor categorico por jogador (ex: 1 rating
+        PCR por jogador). Diferente de markers/segment (arrays), aqui o push
+        simplesmente substitui o valor anterior (REPLACE).
+
+        Parametros:
+            prop_name: nome da property (ex: 'core_custom_prop1')
+                       validado contra o range prop1..prop20.
+            value:     novo valor (string) ou None pra limpar o campo.
+            skip_cjm:  True = nao dispara automations/jornadas.
+            remove_from_markers: tags a remover de core_external_markers
+                                 no mesmo payload (util pra migracao).
+            remove_from_segment: tags a remover de core_external_segment
+                                 no mesmo payload (util pra migracao).
+
+        Uso tipico (PCR v1.5 — push para core_custom_prop1):
+            client.build_custom_property_event(
+                user_ext_id="12345",
+                prop_name="core_custom_prop1",
+                value="PCR_RATING_A",
+                skip_cjm=True,
+            )
+
+        Uso em migracao (limpa buckets antigos + seta custom prop):
+            client.build_custom_property_event(
+                user_ext_id="12345",
+                prop_name="core_custom_prop1",
+                value="PCR_RATING_A",
+                remove_from_markers=["PCR_RATING_S","PCR_RATING_A",...],
+                remove_from_segment=["PCR_RATING_S","PCR_RATING_A",...],
+                skip_cjm=True,
+            )
+        """
+        # Validacao defensiva do nome da prop
+        valid_props = {f"core_custom_prop{i}" for i in range(1, 21)}
+        if prop_name not in valid_props:
+            raise ValueError(
+                f"prop_name invalido: {prop_name!r}. "
+                f"Deve ser core_custom_prop1 ... core_custom_prop20."
+            )
+
+        payload: Dict[str, Any] = {}
+
+        # Set / clear do custom prop
+        if value is None:
+            payload[f"!{prop_name}"] = None  # clear
+        else:
+            payload[prop_name] = str(value)  # replace
+
+        # Operacoes auxiliares de migracao (remove dos buckets antigos)
+        if remove_from_markers:
+            payload["-core_external_markers"] = list(remove_from_markers)
+        if remove_from_segment:
+            payload["-core_external_segment"] = list(remove_from_segment)
 
         if skip_cjm:
             payload["skip_cjm"] = True
@@ -376,6 +455,7 @@ class SmarticoClient:
 
             if resp.status_code == 200:
                 errors = self._parse_individual_errors(resp)
+                self._warn_if_silent_drop(resp, len(batch_payload))
                 return True, errors
 
             if resp.status_code in (429, 500, 502, 503, 504):
@@ -404,6 +484,32 @@ class SmarticoClient:
             ]
 
         return False, [{"error": "max_retries_exceeded"}]
+
+    @staticmethod
+    def _warn_if_silent_drop(resp: requests.Response, batch_size: int) -> None:
+        """
+        Smartico retorna HTTP 200 + err_code:0 + pd:N, onde pd = perfis atualizados.
+        Se pd < batch_size, alguns eventos foram descartados silenciosamente
+        (ex: operador ^ sem matching, user_ext_id nao encontrado, no-op).
+        Emite WARNING para nao ocultar erro silencioso (descoberto 20/04/2026).
+        """
+        try:
+            data = resp.json()
+        except ValueError:
+            return
+        pd_val = data.get("pd")
+        if pd_val is None:
+            return
+        if pd_val < batch_size:
+            log.warning(
+                "Smartico aceitou o batch mas processou apenas %d/%d perfis "
+                "(pd=%d). Eventos restantes foram descartados silenciosamente "
+                "(provavel no-op ou user nao encontrado). req_id=%s",
+                pd_val,
+                batch_size,
+                pd_val,
+                data.get("req_id"),
+            )
 
     @staticmethod
     def _parse_individual_errors(resp: requests.Response) -> List[Dict[str, Any]]:

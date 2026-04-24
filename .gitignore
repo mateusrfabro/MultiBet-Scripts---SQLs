@@ -112,6 +112,11 @@ _archive/
 _clones/
 _workdir_migration/
 
+# Pastas de exploracao / projetos paralelos (nao-MultiBet core)
+temp/                               # scripts exploratorios, validacao ad-hoc
+caixinhas/                          # placeholder, nao-core
+clustering-btr-utm-campaign/        # projeto separado, rodar isoladamente
+
 # Fragmentos adicionais de terminal (heredocs/quotes escapados)
 /[{}()\[\]'\`$]*
 /[A-Z][A-Z][A-Z]
