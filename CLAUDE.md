@@ -31,13 +31,25 @@ Meu objetivo é crescer para gestor/gerente, então preciso entregar além do es
 
 ## Checklist PRE-TASK (OBRIGATORIO)
 Antes de responder qualquer task que envolva SQL, análise ou recomendação de tabelas:
-1. **Consultar MEMORY.md** — verificar feedbacks e limitações já documentadas
-2. **Buscar scripts existentes** em `scripts/` e `pipelines/` que já resolveram problema similar
-3. **Verificar se a tabela recomendada tem limitações conhecidas** — se a memória diz que tem problema, NÃO usar
-4. **Se não tem certeza, perguntar** — nunca enviar query não validada pra stakeholder
+1. **Consultar MEMORY.md** — carrega automaticamente; é o "GPS" da sessão
+2. **Abrir o índice temático relevante via Read:**
+   - Task de **SQL** → ler `memory/INDEX_feedbacks_criticos.md` + `memory/INDEX_schemas.md`
+   - Task de **schema/banco** (qual tabela usar?) → `memory/INDEX_schemas.md`
+   - Task de **entrega para stakeholder** (formato, legenda, WhatsApp) → `memory/INDEX_feedbacks_operacionais.md`
+   - Task envolvendo **deploy/git/EC2** → `memory/INDEX_feedbacks_criticos.md` (seção Deploy)
+   - Task sobre **projeto ativo** (views, PCR, matriz risco, CRM etc.) → `memory/INDEX_projetos.md`
+   - Task envolvendo **API externa** (Meta, etc.) → `memory/INDEX_referencias.md`
+   - Navegação em `docs/` → `docs/INDEX.md`
+3. **Buscar scripts existentes** em `scripts/` e `pipelines/` que já resolveram problema similar
+4. **Verificar se a tabela recomendada tem limitações conhecidas** — se o índice diz que tem problema, NÃO usar
+5. **Se não tem certeza, perguntar** — nunca enviar query não validada pra stakeholder
 
-> Regra nasceu em 25/03/2026: query ps_bi enviada ao Head sem consultar memória que já dizia
-> "dim_game INCOMPLETO". PG Soft sumiu dos resultados. Retrabalho evitável.
+> Regra item 1-4 nasceu em 25/03/2026: query ps_bi enviada ao Head sem consultar memória
+> que já dizia "dim_game INCOMPLETO". PG Soft sumiu dos resultados. Retrabalho evitável.
+>
+> Regra item 2 (índices temáticos) nasceu em 24/04/2026: MEMORY.md passou de 200 linhas e
+> começou a carregar truncado. Refatorado em hub + 5 sub-índices (`INDEX_*.md`). Sub-índices
+> não carregam automaticamente — precisam ser abertos via Read conforme o tema.
 
 ## Como devo ser ajudado
 1. **SQL:** sempre otimizado, com comentários explicando cada bloco,

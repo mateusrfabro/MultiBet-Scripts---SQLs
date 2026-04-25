@@ -1,0 +1,44 @@
+============================================================
+AFFILIATE DAILY REPORT — 2026-04-20
+============================================================
+
+EXTRAIDO POR  : Squad Intelligence Engine
+DATA EXTRACAO : 2026-04-24 17:18 BRT
+FONTE         : AWS Athena - ps_bi (fct_player_activity_daily + dim_user)
+PERIODO       : 2026-04-20
+LINHAS        : 1
+
+------------------------------------------------------------
+DICIONARIO DE COLUNAS
+------------------------------------------------------------
+
+data                 Data do report (YYYY-MM-DD, BRT)
+affiliates           Affiliate IDs consolidados (separados por ;)
+reg                  Novos cadastros no dia (D-1)
+ftd                  First Time Deposits no dia
+ftd_deposit          Valor do FTD (BRL)
+qty_dep              Qtd de depositos confirmados no dia
+dep_amount           Valor depositado no dia (BRL)
+qty_saques           Qtd de saques confirmados no dia
+saques               Valor sacado no dia (BRL)
+ggr_casino           GGR Cassino = realbet - realwin casino (BRL)
+ggr_sport            GGR Sport = realbet - realwin sb (BRL)
+ngr                  NGR = GGR - Bonus Turned Real (ps_bi.ngr_base)
+
+------------------------------------------------------------
+GLOSSARIO
+------------------------------------------------------------
+
+REG                  New Registered Customer
+FTD                  First Time Deposit
+GGR                  Gross Gaming Revenue (bet - win)
+NGR                  Net Gaming Revenue (GGR - BTR)
+
+------------------------------------------------------------
+REGRAS DE EXTRACAO
+------------------------------------------------------------
+
+- Affiliate(s): 363722
+- Exclusao: players is_test = true
+- REG/FTD: filtro por signup_datetime/ftd_datetime convertido para BRT
+- NGR: usa ps_bi.ngr_base (proxy = GGR - bonus_issued)

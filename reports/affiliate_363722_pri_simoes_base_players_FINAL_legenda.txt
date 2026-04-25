@@ -1,0 +1,74 @@
+============================================================
+BASE TOTAL DE PLAYERS - AFFILIATE 363722 (Pri Simoes)
+============================================================
+
+DEMANDANTE    : Rapha (CRM)
+EXTRAIDO POR  : Squad Intelligence Engine
+DATA EXTRACAO : 2026-04-24 16:41 BRT
+FONTE         : AWS Athena - ps_bi.dim_user (camada BI dbt)
+
+------------------------------------------------------------
+DICIONARIO DE COLUNAS
+------------------------------------------------------------
+
+ecr_id          Identificador interno do player (ID 18 digitos MultiBet).
+                Unico por player.
+
+smartico_id     ID do player no Smartico (= ps_bi.dim_user.external_id).
+                Este e o campo que deve ser usado para matching na
+                plataforma do CRM (Smartico user_ext_id).
+
+nome_completo   Nome concatenado: first_name + middle_name + last_name +
+                second_last_name (espacos extras foram removidos).
+
+screen_name     Nickname do player na plataforma MultiBet.
+
+affiliate_id    ID do afiliado (363722 - Pri Simoes).
+
+signup_brt      Data e hora do cadastro em horario de Brasilia (UTC-3).
+
+tracker_id      ID do tracker/campanha de aquisicao.
+                Pode vir vazio se o player nao foi capturado por
+                tracker especifico (so affiliate).
+
+country_code    ISO 3166-1 alpha-2 (ex: BR = Brasil).
+
+------------------------------------------------------------
+REGRAS DE EXTRACAO
+------------------------------------------------------------
+
+- Filtro principal: affiliate_id = 363722 (Pri Simoes)
+- Exclusao: players is_test = true
+- Exclusao: players sem external_id (sem ID Smartico -> nao sao
+  utilizaveis no CRM)
+- Ordenacao: data de cadastro crescente
+
+------------------------------------------------------------
+VALIDACAO CRUZADA (100% ATHENA)
+------------------------------------------------------------
+
+Fonte / Contagem / Delta vs ps_bi / Status
+ps_bi.dim_user            2278      -            BASE
+ecr_ec2.tbl_ecr           2278      +0  (0.00%)  [OK]
+ecr_ec2.tbl_ecr_banner    2278   +0  (0.00%)  [OK]
+
+Integridade Smartico ID:
+  Total de linhas              : 2278
+  external_id unicos           : 2278
+  Duplicatas                   : 0  [OK]
+
+OBS: BigQuery da Smartico foi desativado em 19/04/2026, portanto a
+validacao cruzada via j_user nao foi possivel. A reconciliacao foi
+feita 100% no Athena com 3 fontes independentes (ps_bi.dim_user,
+ecr_ec2.tbl_ecr, ecr_ec2.tbl_ecr_banner).
+
+STATUS FINAL DO AUDITOR: APROVADO
+
+------------------------------------------------------------
+ACAO SUGERIDA
+------------------------------------------------------------
+
+Usar a coluna "smartico_id" como chave de matching na plataforma
+Smartico. Campo equivale a user_ext_id no BigQuery/Smartico.
+
+Qualquer duvida sobre a extracao, falar com o time de dados.
