@@ -400,14 +400,45 @@ def publicar_smartico(
 
     log.info(f"[Smartico] Enviando {len(smartico_events)} eventos para a API...")
     result = client.send_events(smartico_events)
-    log.info(f"  Resultado: enviados={result.get('sent', 0)} | "
-             f"falhas={result.get('failed', 0)}")
-    if result.get("errors"):
-        log.warning(f"  Erros (amostra 3): {result['errors'][:3]}")
+    sent = result.get("sent", 0)
+    failed = result.get("failed", 0)
+    total = len(smartico_events)
+    log.info(f"  Resultado: enviados={sent} | falhas={failed} | total={total}")
+
+    # Reconciliacao: confere se sent + failed == total (sem dropps silenciosos)
+    diferenca = total - (sent + failed)
+    if diferenca > 0:
+        log.warning(f"  ATENCAO: {diferenca} eventos sumiram sem reportar erro "
+                    f"(possivel drop silencioso — ver _warn_if_silent_drop nos logs).")
+
+    # Exporta lista de falhas para CSV (auditoria + reprocesso manual)
+    errors = result.get("errors", [])
+    if errors:
+        ts = datetime.now().strftime("%Y%m%d_%H%M%S")
+        reports_dir = Path("reports")
+        reports_dir.mkdir(exist_ok=True)
+        falhas_path = reports_dir / f"smartico_seg_sa_falhas_{ts}.csv"
+        # Mapeia user_ext_id pra player_id pra facilitar investigacao
+        ext_to_player = {ed["user_ext_id"]: ed.get("player_id", "")
+                          for ed in events_add + events_remove}
+        with open(falhas_path, "w", encoding="utf-8") as f:
+            f.write("eid;error_code;error_message;user_ext_id;player_id\n")
+            for err in errors:
+                eid = err.get("eid", "")
+                # tenta extrair user_ext_id do eid (formato: <user_ext_id>_<timestamp>)
+                ext = eid.split("_")[0] if "_" in eid else eid
+                pid = ext_to_player.get(ext, "")
+                f.write(f"{eid};{err.get('error_code', '')};"
+                         f"{err.get('error_message', '')};"
+                         f"{ext};{pid}\n")
+        log.warning(f"  Falhas exportadas para: {falhas_path}")
+        log.warning(f"  Amostra (3 erros): {errors[:3]}")
+
     return {
         "total_eventos_add": len(events_add),
         "total_eventos_remove": len(events_remove),
-        "sent": result.get("sent", 0),
-        "failed": result.get("failed", 0),
-        "errors": result.get("errors", []),
+        "sent": sent,
+        "failed": failed,
+        "errors": errors,
+        "reconciliacao_diff": diferenca,
     }

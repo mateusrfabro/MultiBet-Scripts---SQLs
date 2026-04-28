@@ -52,6 +52,7 @@ from pipelines.segmentacao_sa_enriquecimento import (
     bloco_6_kyc,
     bloco_1_2_metricas_30d,
     bloco_3_top_jogos_e_temporal,
+    assert_all_v2_cols,
 )
 from pipelines.segmentacao_sa_smartico import publicar_smartico
 
@@ -946,6 +947,10 @@ def main():
     sa = bloco_5b_btr_bonus(sa, snapshot_date=SNAPSHOT_DATE)
     log.info(f"Enriquecimento OK — A+S final: {len(sa):,} linhas x {len(sa.columns)} cols")
     log.info(f"  Base full pro Smartico: {len(df_full):,} linhas x {len(df_full.columns)} cols")
+
+    # FIX A1 (best-practices 28/04): valida que TODAS as 32 colunas v2 existem
+    # antes de gravar/exportar — evita NULL silencioso por mudanca de naming.
+    assert_all_v2_cols(sa, where="apos enriquecimento A+S")
 
     # 7. Persistir incremental
     if not args.no_db:

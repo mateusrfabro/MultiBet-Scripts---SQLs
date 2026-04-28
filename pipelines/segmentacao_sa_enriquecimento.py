@@ -32,11 +32,61 @@ Uso:
 """
 import logging
 from datetime import datetime, timedelta, date
-from typing import Optional
+from typing import Optional, List
 
+import numpy as np
 import pandas as pd
 
 log = logging.getLogger(__name__)
+
+
+# ============================================================
+# CONTRATO DE COLUNAS V2 — gerado pelos blocos, consumido por gravar/csv
+# ============================================================
+# Defesa contra bug silencioso: se um bloco renomear coluna sem atualizar
+# este contrato, a asserção dispara antes de gravar NULL no banco.
+COLS_BLOCO_4 = [
+    "LIFECYCLE_STATUS", "RG_STATUS", "ACCOUNT_RESTRICTED_FLAG",
+    "SELF_EXCLUDED_FLAG", "PRIMARY_VERTICAL",
+]
+COLS_BLOCO_5 = ["BONUS_ABUSE_FLAG"]
+COLS_BLOCO_6 = [
+    "KYC_STATUS", "kyc_level", "self_exclusion_status",
+    "cool_off_status", "restricted_product",
+]
+COLS_BLOCO_1_2 = [
+    "GGR_30D", "NGR_30D", "DEPOSIT_AMOUNT_30D", "DEPOSIT_COUNT_30D",
+    "WITHDRAWAL_AMOUNT_30D", "WITHDRAWAL_COUNT_30D",
+    "AVG_DEPOSIT_TICKET_30D", "AVG_DEPOSIT_TICKET_LIFETIME",
+    "BET_AMOUNT_30D", "BET_COUNT_30D", "AVG_BET_TICKET_30D",
+    "AVG_DEPOSIT_TICKET_TIER", "AVG_BET_TICKET_TIER",
+]
+COLS_BLOCO_3 = [
+    "PRODUCT_MIX", "TOP_PROVIDER_1", "TOP_PROVIDER_2",
+    "TOP_GAME_1", "TOP_GAME_2",
+    "TOP_GAME_1_TIER_TURNOVER", "TOP_GAME_2_TIER_TURNOVER", "TOP_GAME_3_TIER_TURNOVER",
+    "TOP_GAME_1_TIER_ROUNDS",   "TOP_GAME_2_TIER_ROUNDS",   "TOP_GAME_3_TIER_ROUNDS",
+    "DOMINANT_WEEKDAY", "DOMINANT_TIMEBUCKET", "LAST_PRODUCT_PLAYED",
+]
+COLS_BLOCO_5B = [
+    "BONUS_ISSUED_30D", "BTR_30D", "BTR_CASINO_30D", "BTR_SPORT_30D",
+    "BONUS_DEPENDENCY_RATIO_LIFETIME", "NGR_PER_BONUS_REAL_30D",
+    "LAST_BONUS_DATE", "LAST_BONUS_TYPE",
+]
+ALL_V2_COLS = (COLS_BLOCO_4 + COLS_BLOCO_5 + COLS_BLOCO_6
+               + COLS_BLOCO_1_2 + COLS_BLOCO_3 + COLS_BLOCO_5B)
+
+
+def assert_all_v2_cols(df: pd.DataFrame, where: str = "") -> None:
+    """
+    Garante que todas as colunas v2 esperadas existem no DataFrame antes de
+    persistir/exportar. Falha rapido em vez de gravar NULL silencioso no banco.
+    """
+    missing = [c for c in ALL_V2_COLS if c not in df.columns]
+    if missing:
+        raise RuntimeError(
+            f"[assert_all_v2_cols/{where}] {len(missing)} colunas v2 ausentes: {missing}"
+        )
 
 
 # ============================================================
@@ -180,15 +230,15 @@ def bloco_6_kyc(df: pd.DataFrame, snapshot_date: Optional[str] = None) -> pd.Dat
         df["restricted_product"] = None
         return df
 
-    # OTIMIZACAO: max() + group by (sem window function) + filtro temporal 3y.
-    # Athena tem limite ~256KB por query — usar batching para listas grandes.
-    snap_minus_3y = pd.to_datetime(snapshot_date).date() - timedelta(days=365 * 3)
+    # OTIMIZACAO: max() + group by (sem window function) — mais barato em Iceberg.
+    # FIX Bug M1 (auditoria 28/04): SEM filtro temporal — whales/VIPs com KYC
+    # concluido em 2020-2022 podem nunca ter atualizado. Filtro c_ecr_id IN(...)
+    # ja restringe a ~10.9k IDs, escaneamento e barato.
     sql_template = f"""
     WITH max_dates AS (
         SELECT c_ecr_id, MAX(c_updated_time) AS max_t
         FROM ecr_ec2.tbl_ecr_kyc_level
         WHERE c_ecr_id IN ({{ids_str}})
-          AND c_updated_time >= TIMESTAMP '{snap_minus_3y}'
         GROUP BY c_ecr_id
     )
     SELECT k.c_ecr_id AS player_id, k.c_level, k.c_desc
@@ -802,45 +852,35 @@ def bloco_5b_btr_bonus(df: pd.DataFrame, snapshot_date: Optional[str] = None) ->
 
     raw["player_id"] = pd.to_numeric(raw["player_id"], errors="coerce").astype("Int64")
 
-    # BTR_30D
-    raw["BONUS_ISSUED_30D"] = raw["bonus_issued_30d"].fillna(0)
-    raw["BTR_30D"] = raw.apply(
-        lambda r: (r["bonus_turnedreal_30d"] / r["bonus_issued_30d"])
-                  if (r["bonus_issued_30d"] or 0) > 0 else None,
-        axis=1
-    )
+    # FIX M5/M6 (auditoria 28/04): vetorizado com np.where (~5x mais rapido que apply)
+    issued = raw["bonus_issued_30d"].fillna(0).astype(float)
+    turned = raw["bonus_turnedreal_30d"].fillna(0).astype(float)
+    realbet = raw["realbet_total_30d"].fillna(0).astype(float)
+    casino_rb = raw["casino_realbet_30d"].fillna(0).astype(float)
+    sport_rb = raw["sb_realbet_30d"].fillna(0).astype(float)
+    ngr_30d = raw["ngr_30d_for_btr"].fillna(0).astype(float)
+    deposit_lt = raw["deposit_lifetime"].fillna(0).astype(float)
+    bonus_lt = raw["bonus_issued_lifetime"].fillna(0).astype(float)
 
-    # BTR split por produto (proxy via proporcao casino vs sport realbet)
-    def btr_casino(r):
-        if not r["bonus_issued_30d"] or r["bonus_issued_30d"] <= 0:
-            return None
-        if not r["realbet_total_30d"] or r["realbet_total_30d"] <= 0:
-            return 0.0
-        prop = r["casino_realbet_30d"] / r["realbet_total_30d"]
-        return (r["bonus_turnedreal_30d"] * prop) / r["bonus_issued_30d"]
-    def btr_sport(r):
-        if not r["bonus_issued_30d"] or r["bonus_issued_30d"] <= 0:
-            return None
-        if not r["realbet_total_30d"] or r["realbet_total_30d"] <= 0:
-            return 0.0
-        prop = r["sb_realbet_30d"] / r["realbet_total_30d"]
-        return (r["bonus_turnedreal_30d"] * prop) / r["bonus_issued_30d"]
-    raw["BTR_CASINO_30D"] = raw.apply(btr_casino, axis=1)
-    raw["BTR_SPORT_30D"]  = raw.apply(btr_sport, axis=1)
+    raw["BONUS_ISSUED_30D"] = issued
+
+    # BTR_30D = bonus_turnedreal / bonus_issued (None se sem bonus)
+    issued_safe = issued.replace(0, np.nan)
+    raw["BTR_30D"] = turned / issued_safe  # NaN onde issued=0
+
+    # BTR split por produto (proxy via proporcao realbet)
+    realbet_safe = realbet.replace(0, np.nan)
+    prop_casino = (casino_rb / realbet_safe).fillna(0)
+    prop_sport  = (sport_rb / realbet_safe).fillna(0)
+    raw["BTR_CASINO_30D"] = (turned * prop_casino) / issued_safe
+    raw["BTR_SPORT_30D"]  = (turned * prop_sport)  / issued_safe
 
     # BONUS_DEPENDENCY_RATIO_LIFETIME
-    raw["BONUS_DEPENDENCY_RATIO_LIFETIME"] = raw.apply(
-        lambda r: (r["bonus_issued_lifetime"] / r["deposit_lifetime"])
-                  if (r["deposit_lifetime"] or 0) > 0 else None,
-        axis=1
-    )
+    deposit_lt_safe = deposit_lt.replace(0, np.nan)
+    raw["BONUS_DEPENDENCY_RATIO_LIFETIME"] = bonus_lt / deposit_lt_safe
 
     # NGR_PER_BONUS_REAL_30D
-    raw["NGR_PER_BONUS_REAL_30D"] = raw.apply(
-        lambda r: (r["ngr_30d_for_btr"] / r["bonus_issued_30d"])
-                  if (r["bonus_issued_30d"] or 0) > 0 else None,
-        axis=1
-    )
+    raw["NGR_PER_BONUS_REAL_30D"] = ngr_30d / issued_safe
 
     # LAST_BONUS_DATE / LAST_BONUS_TYPE
     raw["LAST_BONUS_DATE"] = pd.to_datetime(raw["last_bonus_date"], errors="coerce").dt.date

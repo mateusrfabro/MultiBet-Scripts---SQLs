@@ -35,21 +35,22 @@ source venv/bin/activate
 # v2 (28/04/2026): pipeline expandido para 57 colunas + push Smartico
 # external_markers (tags SEG_*) para toda a base PCR (~136k jogadores).
 #
-# Modo padrao: --push-smartico --smartico-dry-run (gera JSON em reports/,
-# NAO envia tags). Quando Raphael (CRM) validar o canary, trocar para
-# --smartico-confirm pra liberar full push.
+# Modo prod: --push-smartico --smartico-confirm (envia real).
+# Raphael (CRM) validou canary em 28/04/2026 — aprovado para full push.
+# skip_cjm=True INTERNO sempre — popula tags sem disparar Automation/Missions
+# (camada de seguranca: CRM decide quando disparar campanhas).
 #
 # CHEATSHEET:
 #   --no-email                   pula envio email
 #   --no-db                      pula persistencia banco
-#   --push-smartico              habilita Smartico push
-#   --smartico-dry-run           gera JSON, nao envia (DEFAULT seguro)
-#   --smartico-canary            so 1 jogador (rating A estavel)
-#   --smartico-confirm           OBRIGATORIO pra envio real
+#   --push-smartico              habilita Smartico push (este script ja usa)
+#   --smartico-dry-run           gera JSON, NAO envia (so pra debug)
+#   --smartico-canary            so 1 jogador (so pra debug)
+#   --smartico-confirm           OBRIGATORIO pra envio real (este script usa)
 
 python3 pipelines/segmentacao_sa_diaria.py \
     --push-smartico \
-    --smartico-dry-run \
+    --smartico-confirm \
     >> "$LOGFILE" 2>&1
 
 EXIT_CODE=$?
