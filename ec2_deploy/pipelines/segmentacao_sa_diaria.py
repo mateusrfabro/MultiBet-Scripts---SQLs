@@ -644,165 +644,184 @@ def gerar_csv(df: pd.DataFrame, snapshot_date: str) -> tuple[Path, Path]:
     csv_path = Path(OUTPUT_DIR) / f"players_segmento_SA_{snapshot_date}_FINAL.csv"
     legenda_path = Path(OUTPUT_DIR) / f"players_segmento_SA_{snapshot_date}_FINAL_legenda.txt"
 
-    # Ordena por PVS desc, escreve formato BR
-    # Ordem alinhada com CSV de referencia do Castrin (57 col)
+    # CSV alinhado EXATO com o de referencia do Castrin (57 colunas, mesma ordem).
+    # Renomes: rating->PCR_RATING, pvs->PVS_SCORE, recency_days->RECENCY_DAYS,
+    # ngr_total->NGR_90D, classificacao_risco->RISK_MATRIX_TIER, c_category->category.
+    # Calculo NOVO: BONUS_DEPENDENCY_RATIO_30D = BONUS_ISSUED_30D / DEPOSIT_AMOUNT_30D.
+    # Removidos do CSV (mas preservados no banco e na view): tendencia,
+    # tendencia_motivo, score_risco — features internas do nosso pipeline.
+    df_csv = df.copy()
+
+    # BONUS_DEPENDENCY_RATIO_30D — calculo na hora (vetorizado)
+    issued_30d = pd.to_numeric(df_csv.get("BONUS_ISSUED_30D"), errors="coerce").fillna(0)
+    dep_30d = pd.to_numeric(df_csv.get("DEPOSIT_AMOUNT_30D"), errors="coerce").fillna(0)
+    df_csv["BONUS_DEPENDENCY_RATIO_30D"] = np.where(
+        dep_30d > 0, issued_30d / dep_30d.replace(0, np.nan), np.nan
+    )
+
+    # Renomes para match exato com Castrin
+    rename_map = {
+        "rating":              "PCR_RATING",
+        "pvs":                 "PVS_SCORE",
+        "recency_days":        "RECENCY_DAYS",
+        "ngr_total":           "NGR_90D",
+        "classificacao_risco": "RISK_MATRIX_TIER",
+        "c_category":          "category",
+    }
+    df_csv = df_csv.rename(columns=rename_map)
+
+    # Ordem exata das 57 colunas conforme CSV de referencia do Castrin
     cols_csv = [
-        # ----- Identificacao + classificacao -----
         "player_id", "external_id", "registration_date", "affiliate_id",
-        "rating", "pvs", "tendencia", "tendencia_motivo",
-        "classificacao_risco", "score_risco",
-        "LIFECYCLE_STATUS", "recency_days",
-        # ----- Metricas 30d -----
-        "GGR_30D", "NGR_30D", "ngr_total",  # NGR_90D = ngr_total
+        "PVS_SCORE", "PCR_RATING", "LIFECYCLE_STATUS", "RECENCY_DAYS",
+        "GGR_30D", "NGR_30D", "NGR_90D",
         "DEPOSIT_AMOUNT_30D", "DEPOSIT_COUNT_30D",
         "AVG_DEPOSIT_TICKET_30D", "AVG_DEPOSIT_TICKET_TIER",
         "BET_AMOUNT_30D", "BET_COUNT_30D",
         "AVG_BET_TICKET_30D", "AVG_BET_TICKET_TIER",
         "WITHDRAWAL_AMOUNT_30D", "WITHDRAWAL_COUNT_30D",
-        # ----- Comportamento e produto -----
         "PRODUCT_MIX", "PRIMARY_VERTICAL",
         "TOP_PROVIDER_1", "TOP_PROVIDER_2",
         "TOP_GAME_1", "TOP_GAME_2",
         "TOP_GAME_1_TIER_TURNOVER", "TOP_GAME_2_TIER_TURNOVER", "TOP_GAME_3_TIER_TURNOVER",
         "TOP_GAME_1_TIER_ROUNDS",   "TOP_GAME_2_TIER_ROUNDS",   "TOP_GAME_3_TIER_ROUNDS",
         "DOMINANT_WEEKDAY", "DOMINANT_TIMEBUCKET", "LAST_PRODUCT_PLAYED",
-        # ----- Bonus -----
         "BONUS_ISSUED_30D",
         "BTR_30D", "BTR_CASINO_30D", "BTR_SPORT_30D",
         "LAST_BONUS_DATE", "LAST_BONUS_TYPE",
-        "bonus_ratio",  # = BONUS_DEPENDENCY_RATIO_30D (proxy 90d aceito enquanto)
-        "BONUS_DEPENDENCY_RATIO_LIFETIME", "NGR_PER_BONUS_REAL_30D",
-        # ----- Risco / regulatorio / KYC -----
-        "classificacao_risco",  # = RISK_MATRIX_TIER
+        "BONUS_DEPENDENCY_RATIO_30D", "BONUS_DEPENDENCY_RATIO_LIFETIME",
+        "NGR_PER_BONUS_REAL_30D",
+        "RISK_MATRIX_TIER",
         "RG_STATUS", "ACCOUNT_RESTRICTED_FLAG", "SELF_EXCLUDED_FLAG",
         "BONUS_ABUSE_FLAG",
         "KYC_STATUS", "AVG_DEPOSIT_TICKET_LIFETIME",
         "kyc_level", "self_exclusion_status", "cool_off_status",
         "restricted_product",
-        "c_category",
+        "category",
     ]
-    cols_existentes = [c for c in cols_csv if c in df.columns]
-    df[cols_existentes].sort_values("pvs", ascending=False).to_csv(
+
+    # Validacao defensiva: garante que TODAS as 57 colunas existem (falha rapido)
+    missing = [c for c in cols_csv if c not in df_csv.columns]
+    if missing:
+        raise RuntimeError(f"CSV missing colunas Castrin: {missing}")
+    if len(cols_csv) != 57:
+        raise RuntimeError(f"CSV deveria ter 57 colunas — tem {len(cols_csv)}")
+
+    df_csv[cols_csv].sort_values("PVS_SCORE", ascending=False).to_csv(
         csv_path, index=False, sep=";", decimal=",", encoding="utf-8-sig"
     )
-    log.info(f"CSV salvo: {csv_path} ({len(df):,} linhas)")
+    log.info(f"CSV salvo: {csv_path} ({len(df):,} linhas x 57 cols — match Castrin)")
 
-    # Legenda — versao expandida v2 (57 colunas)
+    # Legenda — 57 colunas alinhadas EXATO com CSV de referencia do Castrin
     legenda = f"""LEGENDA — players_segmento_SA_{snapshot_date}
 ==============================================================
 
 Snapshot: {snapshot_date} | Janelas: 90d (rating/PCR) + 30d (gatilhos operacionais)
-Fonte: multibet.segmentacao_sa_atual (Super Nova DB)
+Janelas 30d e 90d terminam em D-1 (excluem dia parcial em curso).
 
-REGRA GERAL: a base diaria inclui TODOS os c_category com Rating A ou S
+REGRA GERAL: a base diaria inclui TODOS os 'category' com Rating A ou S
 para visibilidade total. CRM filtra conforme o uso operacional.
-Janelas 30d e 90d terminam em D-1 (excluem dia parcial).
 
 ==============================================================
-BLOCO 1 — IDENTIFICACAO E CLASSIFICACAO
+IDENTIFICACAO E CLASSIFICACAO
 ==============================================================
 
-  player_id         ID interno do jogador (ecr_id, 18 digitos).
-  external_id       ID Smartico (CRM).
-  rating            Tier do PCR. Apenas 'A' (VIP, top 7-10%) ou 'S' (Whale, top 1%).
-  pvs               Player Value Score (0-100). Ranking percentil baseado em
-                    9 componentes (GGR, deposito, recencia, margem, frequencia,
-                    dias ativos, mix produto, taxa atividade, penalidade bonus).
-                    Cortes: A 92-99% | S top 1%.
+  player_id            ID interno do jogador (ecr_id, 18 digitos).
+  external_id          ID Smartico (CRM).
+  registration_date    Data de cadastro.
+  affiliate_id         ID do afiliado de aquisicao.
 
-  tendencia         Estavel | Subindo | Caindo
-                    - Subindo: A com PVS perto do corte S (em rota pra virar S)
-                    - Caindo:  S com PVS perto do corte A (em rota pra virar A)
-                    - Estavel: nenhum dos casos acima
-  tendencia_motivo  'threshold' (proximidade ao corte) ou 'temporal_+X.X' (delta
-                    de PVS vs snapshot de 7 dias atras).
-
-  classificacao_risco  Tier comportamental (Matriz de Risco v2):
-                       Muito Bom | Bom | Mediano | Ruim | Muito Ruim | Nao Identificado
-                       Mede COMO o jogador joga (21 tags comportamentais).
-                       (= RISK_MATRIX_TIER no CSV de referencia)
-  score_risco       Score normalizado 0-100 da Matriz.
-
-  c_category        Status atual da conta:
-                    real_user / rg_closed / rg_cool_off / closed / fraud / play_user
-  affiliate_id      ID do afiliado de aquisicao.
-  registration_date Data de cadastro.
-
-  LIFECYCLE_STATUS  Ciclo de vida do jogador:
-                    NEW      - tenure < 30d AND num_deposits < 3 (onboarding)
-                    ACTIVE   - recency_days <= 7 (ativo recente)
-                    AT_RISK  - 8 <= recency <= 30 (gatilho de retencao)
-                    CHURNED  - 31 <= recency <= 90 (reengajamento)
-                    DORMANT  - recency > 90 (dormente)
-  recency_days      Dias desde a ultima atividade.
+  PVS_SCORE            Player Value Score (0-100). Ranking percentil baseado em
+                       9 componentes do PCR (GGR, deposito, recencia, margem,
+                       frequencia, dias ativos, mix produto, taxa atividade,
+                       penalidade bonus).
+  PCR_RATING           Tier do PCR. 'A' (VIP, top 7-10%) ou 'S' (Whale, top 1%).
+  LIFECYCLE_STATUS     Ciclo de vida:
+                       NEW      - tenure < 30d AND num_deposits < 3
+                       ACTIVE   - recency <= 7 dias
+                       AT_RISK  - 8 <= recency <= 30 dias
+                       CHURNED  - 31 <= recency <= 90 dias
+                       DORMANT  - recency > 90 dias
+  RECENCY_DAYS         Dias desde a ultima atividade.
 
 ==============================================================
-BLOCO 2 — METRICAS DE VALOR (90d e 30d)
+METRICAS DE VALOR (BRL — 30d e 90d)
 ==============================================================
 
-  ggr_total / ngr_total        GGR/NGR 90d (BRL).
-  total_deposits / cashouts    Volumes 90d (BRL).
-  num_deposits / days_active   Contagens 90d.
-  product_type                 CASINO | SPORT | MISTO | OUTRO (90d).
-  casino_rounds / sport_bets   Rodadas e apostas 90d.
-  bonus_issued / bonus_ratio   Bonus emitido e dependencia (90d).
-  wd_ratio / net_deposit       Saque/deposito e net_deposit (90d).
-  margem_ggr / ggr_por_dia     Margem e GGR diario.
-
-  GGR_30D / NGR_30D            GGR/NGR ultimos 30 dias.
-  DEPOSIT_AMOUNT_30D           Volume depositado 30d.
-  DEPOSIT_COUNT_30D            Numero de depositos 30d.
-  WITHDRAWAL_AMOUNT_30D        Volume sacado 30d.
-  WITHDRAWAL_COUNT_30D         Numero de saques 30d.
-  AVG_DEPOSIT_TICKET_30D       Ticket medio do jogador 30d.
-  AVG_DEPOSIT_TICKET_LIFETIME  Ticket medio lifetime.
-  AVG_DEPOSIT_TICKET_TIER      Ticket medio do TIER (rating x matriz) — ref.
-  BET_AMOUNT_30D               Turnover (apostado) 30d.
-  BET_COUNT_30D                Total de apostas 30d (casino + sport).
-  AVG_BET_TICKET_30D           Ticket medio aposta 30d.
-  AVG_BET_TICKET_TIER          Ticket medio aposta do TIER — referencia.
+  GGR_30D / NGR_30D                  Receita bruta/liquida ultimos 30 dias.
+  NGR_90D                            NGR consolidado 90d (baseline do PCR).
+  DEPOSIT_AMOUNT_30D / COUNT_30D     Volume e numero de depositos 30d.
+  AVG_DEPOSIT_TICKET_30D             Ticket medio depositos 30d (do jogador).
+  AVG_DEPOSIT_TICKET_TIER            Ticket medio depositos 30d do TIER
+                                     (rating x matriz_risco) — referencia.
+  AVG_DEPOSIT_TICKET_LIFETIME        Ticket medio depositos lifetime (do jogador).
+  BET_AMOUNT_30D / COUNT_30D         Turnover (apostado) e numero de apostas 30d.
+  AVG_BET_TICKET_30D                 Ticket medio aposta 30d (do jogador).
+  AVG_BET_TICKET_TIER                Ticket medio aposta 30d do TIER — referencia.
+  WITHDRAWAL_AMOUNT_30D / COUNT_30D  Volume e numero de saques 30d.
 
 ==============================================================
-BLOCO 3 — COMPORTAMENTO E PRODUTO
+COMPORTAMENTO E PRODUTO
 ==============================================================
 
-  PRODUCT_MIX                  CASINO_PURO | SPORT_PURO | MISTO | INACTIVE.
-  PRIMARY_VERTICAL             Vertical principal (CASINO/SPORT/MISTO).
-  TOP_PROVIDER_1/2             Top providers do TIER por NGR (90d).
-  TOP_GAME_1/2                 Top jogos do TIER por NGR (90d).
-  TOP_GAME_1/2/3_TIER_TURNOVER Top 3 jogos do TIER por turnover (apostado).
-  TOP_GAME_1/2/3_TIER_ROUNDS   Top 3 jogos do TIER por numero de rodadas.
-  DOMINANT_WEEKDAY             Dia da semana dominante do TIER (90d).
-  DOMINANT_TIMEBUCKET          Bucket de horario dominante: MADRUGADA (0-5h),
-                               MANHA (6-11h), TARDE (12-17h), NOITE (18-23h).
-  LAST_PRODUCT_PLAYED          Ultimo produto jogado pelo player.
+  PRODUCT_MIX                        CASINO_PURO | SPORT_PURO | MISTO | INACTIVE.
+  PRIMARY_VERTICAL                   Vertical principal: CASINO | SPORT | MISTO.
+  TOP_PROVIDER_1 / TOP_PROVIDER_2    Top 2 providers do TIER por NGR (90d).
+  TOP_GAME_1 / TOP_GAME_2            Top 2 jogos do TIER por NGR (90d).
+  TOP_GAME_1/2/3_TIER_TURNOVER       Top 3 jogos do TIER por turnover (apostado).
+  TOP_GAME_1/2/3_TIER_ROUNDS         Top 3 jogos do TIER por numero de rodadas.
+  DOMINANT_WEEKDAY                   Dia dominante do TIER (Dom/Seg/.../Sab).
+  DOMINANT_TIMEBUCKET                Horario dominante do TIER:
+                                     MADRUGADA (0-5h) | MANHA (6-11h)
+                                     TARDE (12-17h) | NOITE (18-23h).
+  LAST_PRODUCT_PLAYED                Ultimo produto jogado pelo jogador.
 
 ==============================================================
-BLOCO 4 — BONUS E BTR
+BONUS E BTR (Bonus Turnover Ratio)
 ==============================================================
 
-  BONUS_ISSUED_30D             Bonus emitido 30d (BRL).
-  BTR_30D                      Bonus Turnover Ratio 30d
-                               (bonus_turnedreal / bonus_issued).
-  BTR_CASINO_30D / SPORT_30D   BTR splitado por vertical (proxy via realbet).
-  LAST_BONUS_DATE              Ultima data com bonus_issued > 0 (180d window).
-  LAST_BONUS_TYPE              Tipo do ultimo bonus (proxy = CASH).
-  BONUS_DEPENDENCY_RATIO_LIFETIME  Dependencia de bonus lifetime.
-  NGR_PER_BONUS_REAL_30D       NGR / bonus_issued 30d (eficiencia bonus).
+  BONUS_ISSUED_30D                   Bonus emitido 30d (BRL).
+  BTR_30D                            bonus_turnedreal / bonus_issued (30d).
+  BTR_CASINO_30D / BTR_SPORT_30D     BTR splitado por vertical (proxy realbet).
+  LAST_BONUS_DATE / LAST_BONUS_TYPE  Ultima data e tipo de bonus emitido.
+  BONUS_DEPENDENCY_RATIO_30D         BONUS_ISSUED_30D / DEPOSIT_AMOUNT_30D.
+  BONUS_DEPENDENCY_RATIO_LIFETIME    Dependencia de bonus lifetime.
+  NGR_PER_BONUS_REAL_30D             NGR_30D / BONUS_ISSUED_30D (eficiencia).
 
 ==============================================================
-BLOCO 5 — RISCO REGULATORIO E KYC
+RISCO COMPORTAMENTAL E REGULATORIO
 ==============================================================
 
-  RG_STATUS                    NORMAL | RG_CLOSED | RG_COOL_OFF.
-  ACCOUNT_RESTRICTED_FLAG      1 se conta tem alguma restricao operacional.
-  SELF_EXCLUDED_FLAG           1 se jogador em auto-exclusao permanente.
-  BONUS_ABUSE_FLAG             1 se Matriz de Risco aponta abuso de bonus
-                               (potencial_abuser != 0 OU promo_chainer != 0).
-  KYC_STATUS / kyc_level       Nivel de KYC: KYC_0 | KYC_1 | KYC_2 | KYC_3.
-  self_exclusion_status        Detalhe de auto-exclusao (None / SELF_EXCLUDED_PERM).
-  cool_off_status              Detalhe de pausa cool-off (None / COOL_OFF_ACTIVE).
-  restricted_product           Produtos restritos (ex: 'casino, sports_book').
+  RISK_MATRIX_TIER                   Tier comportamental (Matriz de Risco v2):
+                                     Muito Bom | Bom | Mediano | Ruim |
+                                     Muito Ruim | Nao Identificado.
+  RG_STATUS                          NORMAL | RG_CLOSED | RG_COOL_OFF.
+  ACCOUNT_RESTRICTED_FLAG            1 se conta com restricao operacional.
+  SELF_EXCLUDED_FLAG                 1 se auto-exclusao permanente.
+  BONUS_ABUSE_FLAG                   1 se Matriz aponta abuso de bonus
+                                     (potencial_abuser != 0 OR promo_chainer != 0).
+
+==============================================================
+KYC / RESTRICOES DETALHADAS
+==============================================================
+
+  KYC_STATUS / kyc_level             KYC_0 | KYC_1 | KYC_2 | KYC_3.
+  self_exclusion_status              Detalhe (None | SELF_EXCLUDED_PERM).
+  cool_off_status                    Detalhe (None | COOL_OFF_ACTIVE).
+  restricted_product                 Produtos restritos (ex: 'casino, sports_book').
+
+==============================================================
+STATUS DE CONTA
+==============================================================
+
+  category                           Status atual da conta:
+                                     real_user     - ativa normal
+                                     rg_closed     - autoexcluido permanente
+                                     rg_cool_off   - pausa temporaria
+                                     closed        - conta fechada
+                                     fraud         - fraude confirmada
+                                     play_user     - fun-mode
+                                     (vazio)       - sem categoria
 
 ==============================================================
 
