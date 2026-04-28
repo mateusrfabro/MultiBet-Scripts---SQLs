@@ -82,7 +82,7 @@ TENDENCIA_DELTA_TEMPORAL = 3.0
 # MODO TESTE: enviando soh pro caio.ferreira (head) validar antes de liberar geral.
 # Lista completa preservada comentada — descomentar apos OK do head.
 EMAIL_DESTINATARIOS = [
-    "caio.ferreira@multi.bet.br",
+    "ext.caio.ferreira@multi.bet.br",
 ]
 # EMAIL_DESTINATARIOS_PROD = [
 #     "victor.campello@multi.bet.br",
@@ -902,6 +902,8 @@ def main():
                          help="Publica tags SEG_* no Smartico (default: skip)")
     parser.add_argument("--smartico-canary", action="store_true",
                          help="So 1 jogador canary (use com --push-smartico)")
+    parser.add_argument("--smartico-amostra", type=int, default=0,
+                         help="Amostra de N jogadores diversos (1 por rating S/A/B/C/D/E/NEW)")
     parser.add_argument("--smartico-confirm", action="store_true",
                          help="OBRIGATORIO para envio real (sem dry-run)")
     parser.add_argument("--smartico-dry-run", action="store_true",
@@ -1005,6 +1007,7 @@ def main():
             snapshot_date=SNAPSHOT_DATE,
             dry_run=args.smartico_dry_run or not args.smartico_confirm,
             canary=args.smartico_canary,
+            amostra=args.smartico_amostra if args.smartico_amostra > 0 else None,
             skip_cjm=True,  # SEMPRE True (popula sem disparar Automation)
             confirm=args.smartico_confirm,
         )

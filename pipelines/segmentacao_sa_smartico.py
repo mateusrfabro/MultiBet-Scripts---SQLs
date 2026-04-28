@@ -168,7 +168,7 @@ def _identificar_players_sumidos(df_atual: pd.DataFrame,
 
 
 # ============================================================
-# Selecao canary
+# Selecao canary / amostra
 # ============================================================
 def _pick_canary(df: pd.DataFrame) -> Optional[pd.Series]:
     """
@@ -203,6 +203,43 @@ def _pick_canary(df: pd.DataFrame) -> Optional[pd.Series]:
     if candidates.empty:
         return None
     return candidates.sample(n=1, random_state=42).iloc[0]
+
+
+def _pick_amostra_diversa(df: pd.DataFrame, n: int = 10) -> pd.DataFrame:
+    """
+    Seleciona uma amostra diversa de N jogadores cobrindo todos os ratings
+    para validacao manual no painel Smartico.
+
+    Distribuicao alvo (de N=10): 1 S + 2 A + 2 B + 2 C + 1 D + 1 E + 1 NEW.
+    Filtros: c_category=real_user, external_id valido.
+    Para tiers com poucos jogadores (S, NEW), pega o que tiver disponivel.
+    """
+    rating_col = df.get("rating", pd.Series([""] * len(df))).fillna("").astype(str)
+    cat_col = df.get("c_category", pd.Series([""] * len(df))).fillna("").astype(str)
+    base = df[(cat_col == "real_user") & df["external_id"].notna()].copy()
+    base["_rating"] = rating_col[base.index]
+
+    # Distribuicao por rating (ajusta proporcional ao N)
+    if n == 10:
+        plano = {"S": 1, "A": 2, "B": 2, "C": 2, "D": 1, "E": 1, "NEW": 1}
+    else:
+        # proporcional ao N (mantém pelo menos 1 de cada se possivel)
+        plano = {r: max(1, n // 7) for r in ["S", "A", "B", "C", "D", "E", "NEW"]}
+
+    selecionados = []
+    for r, qtd in plano.items():
+        sub = base[base["_rating"] == r]
+        if sub.empty:
+            continue
+        amostra = sub.sample(n=min(qtd, len(sub)), random_state=42)
+        selecionados.append(amostra)
+
+    if not selecionados:
+        return pd.DataFrame()
+    out = pd.concat(selecionados).drop(columns=["_rating"], errors="ignore")
+    log.info(f"  Amostra diversa: {len(out)} jogadores")
+    log.info(f"  Distribuicao: {out['rating'].value_counts().to_dict()}")
+    return out
 
 
 # ============================================================
@@ -240,6 +277,7 @@ def publicar_smartico(
     skip_cjm: bool = True,
     confirm: bool = False,
     limit: Optional[int] = None,
+    amostra: Optional[int] = None,
     incluir_diff_sumidos: bool = True,
 ) -> Dict:
     """
@@ -258,7 +296,7 @@ def publicar_smartico(
 
     df = df.copy()
 
-    # Modo canary
+    # Modo canary (1 jogador)
     if canary:
         canary_row = _pick_canary(df)
         if canary_row is None:
@@ -268,7 +306,20 @@ def publicar_smartico(
         df = pd.DataFrame([canary_row])
         log.info(f"[Smartico] CANARY: player_id={canary_row['player_id']} "
                  f"external_id={canary_row['external_id']} rating={canary_row['rating']}")
-        incluir_diff_sumidos = False  # nao faz sentido em canary
+        incluir_diff_sumidos = False
+
+    # Modo amostra diversa (N jogadores cobrindo todos os ratings)
+    elif amostra and amostra > 0:
+        df = _pick_amostra_diversa(df, n=amostra)
+        if df.empty:
+            log.error("[Smartico] Sem candidatos amostra — abortando.")
+            return {"total_eventos_add": 0, "total_eventos_remove": 0,
+                    "sent": 0, "failed": 0, "errors": ["sem amostra"]}
+        log.info(f"[Smartico] AMOSTRA DIVERSA — {len(df)} jogadores")
+        log.info(f"  IDs (player_id | external_id | rating):")
+        for _, r in df.iterrows():
+            log.info(f"    {r['player_id']} | {r['external_id']} | {r.get('rating')}")
+        incluir_diff_sumidos = False
 
     if limit and limit > 0:
         df = df.head(limit)
