@@ -1051,35 +1051,39 @@ def main():
     # 8. Gerar CSV + legenda
     csv_path, legenda_path = gerar_csv(sa, SNAPSHOT_DATE)
 
-    # 9. Distribuicao do CSV — Google Drive (default) ou e-mail (opcional)
-    # Smartico AUTH bloqueado pelo tenant Microsoft 365 da Multibet, entao
-    # mudamos pro Drive: pasta compartilhada com os destinatarios CRM,
-    # upload diario via Service Account (sem TI).
+    # 9. Distribuicao do CSV — Slack (canal CRM)
+    # Smartico AUTH bloqueado pelo tenant Microsoft 365 da Multibet e
+    # iam.disableServiceAccountKeyCreation bloqueia Google Drive na PGS.
+    # Solucao: upload via Slack Bot (canal compartilhado com Castrin/CRM).
+    # Flag --no-email mantida como kill switch (nome legado, na real "no-distrib").
     if not args.no_email:
         try:
-            from db.google_drive import GoogleDriveUploader
+            from db.slack_uploader import enviar_arquivos_slack
             log.info("=" * 70)
-            log.info("DISTRIBUICAO via Google Drive (pasta compartilhada com CRM)")
+            log.info("DISTRIBUICAO via Slack (canal CRM)")
             log.info("=" * 70)
-            drive = GoogleDriveUploader()
-            file_id_csv, link_csv = drive.upload_replace(
-                local_path=str(csv_path),
-                remote_name=csv_path.name,
-                mime_type="text/csv",
+            n_total = len(sa)
+            n_s = (sa["rating"] == "S").sum()
+            n_a = (sa["rating"] == "A").sum()
+            ggr_total = sa["ggr_total"].astype(float).sum()
+            comentario = (
+                f"*Segmentacao A+S diaria — {SNAPSHOT_DATE}*\n"
+                f"• Total: *{n_total:,}* jogadores ({n_s:,} S + {n_a:,} A)\n"
+                f"• GGR 90d desta base: *R$ {ggr_total:,.0f}*\n"
+                f"• 57 colunas | janelas 30d (gatilhos) + 90d (baseline PCR)\n"
+                f"_Detalhes das colunas no arquivo *_legenda.txt em anexo._"
             )
-            file_id_leg, link_leg = drive.upload_replace(
-                local_path=str(legenda_path),
-                remote_name=legenda_path.name,
-                mime_type="text/plain",
+            ok = enviar_arquivos_slack(
+                arquivos=[str(csv_path), str(legenda_path)],
+                comentario=comentario,
             )
-            log.info(f"  CSV:     {link_csv}")
-            log.info(f"  Legenda: {link_leg}")
-            log.info("  Destinatarios ja tem acesso a pasta — visualizam direto no Drive.")
+            if not ok:
+                log.warning("Slack NAO enviado. CSV local em: %s", csv_path)
         except Exception as e:
-            log.error(f"Falha no upload Google Drive: {type(e).__name__}: {e}")
+            log.error(f"Falha no upload Slack: {type(e).__name__}: {e}")
             log.error(f"  CSV gerado localmente em: {csv_path}")
     else:
-        log.info("--no-email: pulando upload Google Drive. CSV local em: %s", csv_path)
+        log.info("--no-email: pulando distribuicao. CSV local em: %s", csv_path)
 
     # 10. Publicar tags SEG_* no Smartico (opcional, default: skip)
     # ATENCAO: Smartico recebe a base COMPLETA (~136k), nao so A+S.
