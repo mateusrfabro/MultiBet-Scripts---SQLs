@@ -1051,19 +1051,35 @@ def main():
     # 8. Gerar CSV + legenda
     csv_path, legenda_path = gerar_csv(sa, SNAPSHOT_DATE)
 
-    # 9. Enviar email
+    # 9. Distribuicao do CSV — Google Drive (default) ou e-mail (opcional)
+    # Smartico AUTH bloqueado pelo tenant Microsoft 365 da Multibet, entao
+    # mudamos pro Drive: pasta compartilhada com os destinatarios CRM,
+    # upload diario via Service Account (sem TI).
     if not args.no_email:
-        corpo = montar_corpo_email(sa, SNAPSHOT_DATE)
-        ok = enviar_email(
-            destinatarios=EMAIL_DESTINATARIOS,
-            assunto=f"Segmentacao A+S diaria — {SNAPSHOT_DATE}",
-            corpo_html=corpo,
-            anexos=[str(csv_path), str(legenda_path)],
-        )
-        if not ok:
-            log.warning("Email NAO enviado (verifique config SMTP no .env). CSV gerado em: %s", csv_path)
+        try:
+            from db.google_drive import GoogleDriveUploader
+            log.info("=" * 70)
+            log.info("DISTRIBUICAO via Google Drive (pasta compartilhada com CRM)")
+            log.info("=" * 70)
+            drive = GoogleDriveUploader()
+            file_id_csv, link_csv = drive.upload_replace(
+                local_path=str(csv_path),
+                remote_name=csv_path.name,
+                mime_type="text/csv",
+            )
+            file_id_leg, link_leg = drive.upload_replace(
+                local_path=str(legenda_path),
+                remote_name=legenda_path.name,
+                mime_type="text/plain",
+            )
+            log.info(f"  CSV:     {link_csv}")
+            log.info(f"  Legenda: {link_leg}")
+            log.info("  Destinatarios ja tem acesso a pasta — visualizam direto no Drive.")
+        except Exception as e:
+            log.error(f"Falha no upload Google Drive: {type(e).__name__}: {e}")
+            log.error(f"  CSV gerado localmente em: {csv_path}")
     else:
-        log.info("--no-email: pulando envio. CSV em: %s", csv_path)
+        log.info("--no-email: pulando upload Google Drive. CSV local em: %s", csv_path)
 
     # 10. Publicar tags SEG_* no Smartico (opcional, default: skip)
     # ATENCAO: Smartico recebe a base COMPLETA (~136k), nao so A+S.
